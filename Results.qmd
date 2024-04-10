@@ -1,0 +1,12 @@
+---
+title: "Results"
+format: html
+---
+
+
+## Question: Have you smoked at least 100 cigarettes in your entire life? [Note: 5 packs = 100 cigarettes]
+
+
+
+
+

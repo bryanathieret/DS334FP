@@ -8,6 +8,8 @@ library(tidyverse)
 library(readr)
 library(here)
 library(haven)
+library(emmeans)
+library(lmerTest)
 
 twenty022 <- read_xpt(here::here("LLCP2022.XPT ")) ## space after T 
 twenty021 <- read_xpt(here::here("LLCP2021.XPT"))
@@ -267,6 +269,75 @@ smokefull2 = smoke1full |> mutate(MentalIllness = case_when(
     SMOKE100 == 9 ~ NA))
   
 smokefull2 = smokefull2 |> filter(!is.na(SMOKE100))
+
+smokefullsummary = smokefull2 |> 
+  group_by(state, IYEAR, age, sex) |> 
+  summarise(MentalIllness = sum(MentalIllness, na.rm = TRUE),
+            Alcoholic = sum(Alcoholic, na.rm = TRUE),
+            SubstanceAddiction = sum(SubstanceAddiction, na.rm = TRUE),
+            Incarcerated = sum(Incarcerated, na.rm = TRUE),
+            SeparationDivorce = sum(SeparationDivorce, na.rm = TRUE),
+            DomesticViolence = sum(DomesticViolence, na.rm = TRUE),
+            PhysicalAbuse = sum(PhysicalAbuse, na.rm = TRUE),
+            EmotionalAbuse = sum(EmotionalAbuse, na.rm = TRUE),
+            SexualAbuse1 = sum(SexualAbuse1, na.rm = TRUE),
+            SexualAbuse2 = sum(SexualAbuse2, na.rm = TRUE),
+            SexualAbuse3 = sum(SexualAbuse3, na.rm = TRUE),
+            Neglect1 = sum(Neglect1, na.rm = TRUE),
+            Neglect2 = sum(Neglect2, na.rm = TRUE))
+
+
+smokefullsummary |> ggplot(aes(x = age, y = MentalIllness, col = sex, group = age)) +
+  geom_boxplot() +
+  geom_jitter() +
+  facet_wrap(~IYEAR)
+
+smokefullsummary |> ggplot(aes(x = age, y = Alcoholic, col = sex, group = age)) +
+  geom_boxplot() +
+  geom_jitter() +
+  facet_wrap(~IYEAR)
+
+smokefullsummary |> ggplot(aes(x = age, y = SubstanceAddiction, col = sex, group = age)) +
+  geom_boxplot() +
+  geom_jitter() +
+  facet_wrap(~IYEAR)
+
+smokefullsummary |> ggplot(aes(x = age, y = Incarcerated, col = sex, group = age)) +
+  geom_boxplot() +
+  geom_jitter() +
+  facet_wrap(~IYEAR)
+
+
+smokefull2 = smokefull2 |> mutate(smoke100YES = if_else(SMOKE100 == 1, 1, 0)) |> 
+  mutate(smoke100NO = if_else(SMOKE100 == 0, 1, 0)) |>
+  mutate(sex = as.factor(sex)) |>
+  mutate(age = as.factor(age))
+
+smoke100mod0 = glm(cbind(smoke100YES, smoke100NO) ~ age + sex + age*sex, family = "quasibinomial", data = smokefull2)
+summary(smoke100mod0)
+
+
+smoke100modmentalIllness = glm(cbind(smoke100YES, smoke100NO) ~ age + sex + MentalIllness + MentalIllness*sex + MentalIllness*age + MentalIllness*age*sex, family = "quasibinomial", data = smokefull2)
+summary(smoke100modmentalIllness)
+pairs(lsmeans(smoke100modmentalIllness, ~age|sex|MentalIllness))
+
+
+
+                     
+                     Alcoholic + Alcoholic*sex
+                     SubstanceAddiction + SubstanceAddiction*sex +
+                     Incarcerated + Incarcerated*sex +
+                     SeparationDivorce + SeparationDivorce*sex +
+                     DomesticViolence + DomesticViolence*sex +
+                     PhysicalAbuse + 
+                     EmotionalAbuse + 
+                     SexualAbuse1 + 
+                     SexualAbuse2 + 
+                     SexualAbuse3 + 
+                     Neglect1 + 
+                     Neglect2
+
+
 
 ```
 
