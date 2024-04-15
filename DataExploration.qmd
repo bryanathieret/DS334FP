@@ -1,0 +1,1113 @@
+---
+title: "Untitled"
+format: html
+---
+
+```{r}
+library(tidyverse)
+library(readr)
+library(here)
+library(haven)
+library(emmeans)
+library(lmerTest)
+library(lme4)
+
+twenty022 <- read_xpt(here::here("LLCP2022.XPT ")) ## space after T 
+twenty021 <- read_xpt(here::here("LLCP2021.XPT"))
+twenty020 <- read_xpt(here::here("LLCP2020.XPT"))
+twenty019 <- read_xpt(here::here("LLCP2019.XPT"))
+
+```
+
+
+```{r}
+## 2022: 
+twenty022 = twenty022 |> select(
+                    IYEAR, '_STATE', SEXVAR, MARITAL, VETERAN3, INCOME3, "_BMI5", 
+                    EDUCA, RENTHOM1, EMPLOY1, CHILDREN, CAREGIV1, CRGVREL4, CRGVLNG1, CRGVPRB3, SDHEMPLY, FOODSTMP, SDHFOOD1, SDHBILLS, SDHUTILS, SOMALE, TRNSGNDR, RRCLASS3, "_METSTAT", "_URBSTAT", "_IMPRACE", "_AGE_G",
+                    GENHLTH, PHYSHLTH, MENTHLTH, POORHLTH, EXERANY2, SLEPTIM1, LASTDEN4, CVDINFR4, CVDCRHD4, CVDSTRK3, ASTHMA3, CHCSCNC1, CHCOCNC1, CHCCOPD3, ADDEPEV3, CHCKDNY2, HAVARTH4, DIABETE4, DEAF, BLIND, DIFFWALK, DIFFDRES, DIFFALON, PREDIAB2,
+                      DIABTYPE, CNCRTYP2,  LSATISFY, EMTSUPRT, SDHISOLT, SDHSTRE1, 
+                    SMOKE100, SMOKDAY2, USENOW3, ECIGNOW2, LCSFIRST, LCSLAST, LCSNUMCG, LCSSCNCR, ALCDAY4, AVEDRNK3, DRNK3GE5, MAXDRNKS, COPDSMOK, MARIJAN1, MARJSMOK, LASTSMK2, 
+                    PRIMINSR, MEDCOST1, 
+                    ACEDEPRS, ACEDRINK, ACEDRUGS, ACEPRISN, 
+                    ACEDIVRC, ACEPUNCH, ACEHURT1, ACESWEAR,
+                    ACETOUCH, ACETTHEM, ACEHVSEX, ACEADSAF, 
+                    ACEADNED) |> 
+  filter(!is.na(ACEDEPRS) | !is.na(ACEDRINK) | !is.na(ACEDRUGS) | !is.na(ACEPRISN) | 
+           !is.na(ACEDIVRC) | !is.na(ACEPUNCH) | !is.na(ACEHURT1) | !is.na(ACESWEAR) | 
+           !is.na(ACETOUCH) | !is.na(ACETTHEM) | !is.na(ACEHVSEX) | !is.na(ACEADSAF) |
+           !is.na(ACEADNED))
+
+## 2021: 
+twenty021 = twenty021 |> select(
+                    IYEAR, '_STATE', SEXVAR, MARITAL, VETERAN3, INCOME3, "_BMI5",
+                    EDUCA, RENTHOM1, EMPLOY1, CHILDREN, CAREGIV1, CRGVREL4, CRGVLNG1, CRGVPRB3, SOMALE, TRNSGNDR, "_METSTAT", "_URBSTAT", "_IMPRACE", "_AGE_G",
+                    GENHLTH, PHYSHLTH, MENTHLTH, POORHLTH, EXERANY2, CVDINFR4, CVDCRHD4, CVDSTRK3, ASTHMA3, ADDEPEV3, CHCKDNY2, DIABETE4, DEAF, BLIND, DIFFWALK, DIFFDRES, DIFFALON,
+                    SMOKE100, SMOKDAY2, USENOW3, LCSFIRST, LCSLAST, LCSNUMCG, AVEDRNK3, DRNK3GE5, MAXDRNKS, MARIJAN1, LASTSMK2, 
+                    PRIMINSR, MEDCOST1, 
+                    ACEDEPRS, ACEDRINK, ACEDRUGS, ACEPRISN, 
+                    ACEDIVRC, ACEPUNCH, ACEHURT1, ACESWEAR,
+                    ACETOUCH, ACETTHEM, ACEHVSEX, ACEADSAF, 
+                    ACEADNED) |> 
+  filter(!is.na(ACEDEPRS) | !is.na(ACEDRINK) | !is.na(ACEDRUGS) | !is.na(ACEPRISN) | 
+           !is.na(ACEDIVRC) | !is.na(ACEPUNCH) | !is.na(ACEHURT1) | !is.na(ACESWEAR) | 
+           !is.na(ACETOUCH) | !is.na(ACETTHEM) | !is.na(ACEHVSEX) | !is.na(ACEADSAF) |
+           !is.na(ACEADNED))
+
+## 2020: 
+
+twenty020 = twenty020 |> select(
+                    IYEAR, '_STATE', SEXVAR, MARITAL, VETERAN3, INCOME2, WEIGHT2, HEIGHT3, 
+                    EDUCA, RENTHOM1, EMPLOY1, CHILDREN, CAREGIV1, CRGVREL4, CRGVLNG1, CRGVPRB3, SOMALE, TRNSGNDR, "_METSTAT", "_URBSTAT", "_IMPRACE", "_AGE_G",
+                    GENHLTH, PHYSHLTH, MENTHLTH, POORHLTH, EXERANY2, CVDINFR4, CVDCRHD4, CVDSTRK3, ASTHMA3, ADDEPEV3, CHCKDNY2, DIABETE4, DEAF, BLIND, DIFFWALK, DIFFDRES, DIFFALON,
+                    SMOKE100, SMOKDAY2, USENOW3, LCSFIRST, LCSLAST, LCSNUMCG, AVEDRNK3, DRNK3GE5, MAXDRNKS, MARIJAN1, LASTSMK2, 
+                    HLTHCVR1,
+                    ACEDEPRS, ACEDRINK, ACEDRUGS, ACEPRISN, 
+                    ACEDIVRC, ACEPUNCH, ACEHURT1, ACESWEAR,
+                    ACETOUCH, ACETTHEM, ACEHVSEX) |> 
+  filter(!is.na(ACEDEPRS) | !is.na(ACEDRINK) | !is.na(ACEDRUGS) | !is.na(ACEPRISN) | 
+           !is.na(ACEDIVRC) | !is.na(ACEPUNCH) | !is.na(ACEHURT1) | !is.na(ACESWEAR) | 
+           !is.na(ACETOUCH) | !is.na(ACETTHEM) | !is.na(ACEHVSEX))
+
+## 2019: 
+
+twenty019 = twenty019 |> select(
+                    IYEAR, '_STATE', SEXVAR, MARITAL, VETERAN3, INCOME2, WEIGHT2, HEIGHT3, 
+                    EDUCA, RENTHOM1, EMPLOY1, CHILDREN, CAREGIV1, CRGVLNG1, CRGVPRB3, SOMALE, TRNSGNDR, "_METSTAT", "_URBSTAT", "_IMPRACE", "_AGE_G",
+                    GENHLTH, PHYSHLTH, MENTHLTH, POORHLTH, EXERANY2, CVDINFR4, CVDCRHD4, CVDSTRK3, ASTHMA3, ADDEPEV3, CHCKDNY2, DIABETE4, DEAF, BLIND, DIFFWALK, DIFFDRES, DIFFALON,
+                    SMOKE100, SMOKDAY2, USENOW3, LCSFIRST, LCSLAST, LCSNUMCG, AVEDRNK3, DRNK3GE5, MAXDRNKS, MARIJAN1, LASTSMK2, 
+                    HLTHCVR1,
+                    ACEDEPRS, ACEDRINK, ACEDRUGS, ACEPRISN, 
+                    ACEDIVRC, ACEPUNCH, ACEHURT1, ACESWEAR,
+                    ACETOUCH, ACETTHEM, ACEHVSEX) |> 
+  filter(!is.na(ACEDEPRS) | !is.na(ACEDRINK) | !is.na(ACEDRUGS) | !is.na(ACEPRISN) | 
+           !is.na(ACEDIVRC) | !is.na(ACEPUNCH) | !is.na(ACEHURT1) | !is.na(ACESWEAR) | 
+           !is.na(ACETOUCH) | !is.na(ACETTHEM) | !is.na(ACEHVSEX))
+
+```
+
+# Demographics  
+
+```{r}
+onedemo = twenty022 |> select(IYEAR, '_STATE', "_AGE_G","_IMPRACE", SEXVAR, ACEDEPRS, ACEDRINK, ACEDRUGS, ACEPRISN, ACEDIVRC, ACEPUNCH, ACEHURT1, ACESWEAR, ACETOUCH, ACETTHEM, ACEHVSEX, ACEADSAF, ACEADNED) |>
+  rename("state" = "_STATE",
+         "age" = "_AGE_G",
+         "race" = "_IMPRACE",
+         "sex" = SEXVAR,
+        "MentalIllness" = ACEDEPRS,
+         "Alcoholic" = ACEDRINK,
+         "SubstanceAddiction" = ACEDRUGS,
+         "Incarcerated" = ACEPRISN,
+         "SeparationDivorce" = ACEDIVRC,
+         "DomesticViolence" = ACEPUNCH,
+         "PhysicalAbuse" = ACEHURT1,
+         "EmotionalAbuse" = ACESWEAR,
+         "SexualAbuse1" = ACETOUCH,
+         "SexualAbuse2" = ACETTHEM,
+         "SexualAbuse3" = ACEHVSEX,
+         "Neglect1" = ACEADSAF,
+         "Neglect2" = ACEADNED)
+
+twodemo = twenty021 |> select(IYEAR, '_STATE', "_AGE_G","_IMPRACE", SEXVAR, ACEDEPRS, ACEDRINK, ACEDRUGS, ACEPRISN, ACEDIVRC, ACEPUNCH, ACEHURT1, ACESWEAR, ACETOUCH, ACETTHEM, ACEHVSEX, ACEADSAF, ACEADNED) |>
+  rename("state" = "_STATE",
+         "age" = "_AGE_G",
+         "race" = "_IMPRACE",
+         "sex" = SEXVAR,
+        "MentalIllness" = ACEDEPRS,
+         "Alcoholic" = ACEDRINK,
+         "SubstanceAddiction" = ACEDRUGS,
+         "Incarcerated" = ACEPRISN,
+         "SeparationDivorce" = ACEDIVRC,
+         "DomesticViolence" = ACEPUNCH,
+         "PhysicalAbuse" = ACEHURT1,
+         "EmotionalAbuse" = ACESWEAR,
+         "SexualAbuse1" = ACETOUCH,
+         "SexualAbuse2" = ACETTHEM,
+         "SexualAbuse3" = ACEHVSEX,
+         "Neglect1" = ACEADSAF,
+         "Neglect2" = ACEADNED)
+
+
+threedemo = twenty020 |> select(IYEAR, '_STATE', "_AGE_G","_IMPRACE", SEXVAR, ACEDEPRS, ACEDRINK, ACEDRUGS, ACEPRISN, ACEDIVRC, ACEPUNCH, ACEHURT1, ACESWEAR, ACETOUCH, ACETTHEM, ACEHVSEX) |>
+  rename("state" = "_STATE",
+         "age" = "_AGE_G",
+         "race" = "_IMPRACE",
+         "sex" = SEXVAR,
+        "MentalIllness" = ACEDEPRS,
+         "Alcoholic" = ACEDRINK,
+         "SubstanceAddiction" = ACEDRUGS,
+         "Incarcerated" = ACEPRISN,
+         "SeparationDivorce" = ACEDIVRC,
+         "DomesticViolence" = ACEPUNCH,
+         "PhysicalAbuse" = ACEHURT1,
+         "EmotionalAbuse" = ACESWEAR,
+         "SexualAbuse1" = ACETOUCH,
+         "SexualAbuse2" = ACETTHEM,
+         "SexualAbuse3" = ACEHVSEX)
+
+fourdemo = twenty019 |> select(IYEAR, '_STATE', "_AGE_G","_IMPRACE", SEXVAR, ACEDEPRS, ACEDRINK, ACEDRUGS, ACEPRISN, ACEDIVRC, ACEPUNCH, ACEHURT1, ACESWEAR, ACETOUCH, ACETTHEM, ACEHVSEX) |>
+  rename("state" = "_STATE",
+         "age" = "_AGE_G",
+         "race" = "_IMPRACE",
+         "sex" = SEXVAR,
+        "MentalIllness" = ACEDEPRS,
+         "Alcoholic" = ACEDRINK,
+         "SubstanceAddiction" = ACEDRUGS,
+         "Incarcerated" = ACEPRISN,
+         "SeparationDivorce" = ACEDIVRC,
+         "DomesticViolence" = ACEPUNCH,
+         "PhysicalAbuse" = ACEHURT1,
+         "EmotionalAbuse" = ACESWEAR,
+         "SexualAbuse1" = ACETOUCH,
+         "SexualAbuse2" = ACETTHEM,
+         "SexualAbuse3" = ACEHVSEX)
+alldeom = full_join(onedemo, full_join(twodemo, full_join(threedemo, fourdemo, relationship = "many-to-many"), relationship = "many-to-many"), relationship = "many-to-many")  |> mutate(IYEAR = as.numeric(IYEAR)) |> select(-IYEAR, -age, -state, -race, -sex) |>
+  mutate(MentalIllness = case_when(
+  MentalIllness == 1 ~ 1,
+  MentalIllness == 2 ~ 0,
+  MentalIllness == 7 ~ 0,
+  MentalIllness == 9 ~ NA)) |>
+  mutate(Alcoholic = case_when(
+    Alcoholic == 1 ~ 1,
+    Alcoholic == 2 ~ 0,
+    Alcoholic == 7 ~ 0,
+    Alcoholic == 9 ~ NA)) |> 
+  mutate(SubstanceAddiction = case_when(
+    SubstanceAddiction == 1 ~ 1,
+    SubstanceAddiction == 2 ~ 0,
+    SubstanceAddiction == 7 ~ 0,
+    SubstanceAddiction == 9 ~ NA)) |>
+  mutate(Incarcerated = case_when(
+    Incarcerated == 1 ~ 1,
+    Incarcerated == 2 ~ 0,
+    Incarcerated == 7 ~ 0,
+    Incarcerated == 9 ~ NA)) |> 
+  mutate(SeparationDivorce = case_when(
+    SeparationDivorce == 1 ~ 1,
+    SeparationDivorce == 2 ~ 0,
+    SeparationDivorce == 7 ~ 0,
+    SeparationDivorce == 8 ~ 0,
+    SeparationDivorce == 9 ~ NA)) |>
+  mutate(DomesticViolence = case_when(
+    DomesticViolence == 1 ~ 0,
+    DomesticViolence == 2 ~ 1, 
+    DomesticViolence == 3 ~ 1,
+    DomesticViolence == 7 ~ 0,
+    DomesticViolence == 9 ~ NA)) |>
+  mutate(PhysicalAbuse = case_when(
+    PhysicalAbuse == 1 ~ 0,
+    PhysicalAbuse == 2 ~ 1,
+    PhysicalAbuse == 3 ~ 1,
+    PhysicalAbuse == 7 ~ 0,
+    PhysicalAbuse == 9 ~ NA)) |>
+  mutate(EmotionalAbuse = case_when(
+    EmotionalAbuse == 1 ~ 0,
+    EmotionalAbuse == 2 ~ 1, 
+    EmotionalAbuse == 3 ~ 1,
+    EmotionalAbuse == 7 ~ 0,
+    EmotionalAbuse == 9 ~ NA)) |>
+  mutate(SexualAbuse1 = case_when(
+    SexualAbuse1 == 1 ~ 0,
+    SexualAbuse1 == 2 ~ 1,
+    SexualAbuse1 == 3 ~ 1,
+    SexualAbuse1 == 7 ~ 0,
+    SexualAbuse1 == 9 ~ NA)) |>
+  mutate(SexualAbuse2 = case_when(
+    SexualAbuse2 == 1 ~ 0,
+    SexualAbuse2 == 2 ~ 1,
+    SexualAbuse2 == 3 ~ 1,
+    SexualAbuse2 == 7 ~ 0,
+    SexualAbuse2 == 9 ~ NA)) |> 
+  mutate(SexualAbuse3 = case_when(
+    SexualAbuse3 == 1 ~ 0,
+    SexualAbuse3 == 2 ~ 1,
+    SexualAbuse3 == 3 ~ 1,
+    SexualAbuse3 == 7 ~ 0,
+    SexualAbuse3 == 9 ~ NA)) |>
+  mutate(Neglect1 = case_when(
+    Neglect1 == NA ~ NA,
+    Neglect1 == 1 ~ 0,
+    Neglect1 == 2 ~ 1,
+    Neglect1 == 3 ~ 1,
+    Neglect1 == 4 ~ 1,
+    Neglect1 == 5 ~ 1,
+    Neglect1 == 7 ~ 0,
+    Neglect1 == 9 ~ NA)) |>
+  mutate(Neglect2 = case_when(
+    Neglect2 == 1 ~ 0,
+    Neglect2 == 2 ~ 1,
+    Neglect2 == 3 ~ 1,
+    Neglect2 == 4 ~ 1,
+    Neglect2 == 5 ~ 1,
+    Neglect2 == NA ~ NA,
+    Neglect2 == 7 ~ 0,
+    Neglect2 == 9 ~ NA))
+
+alldeomcor = cor(alldeom, use = "complete.obs")
+
+alldeomcor = round(alldeomcor, 2) 
+alldeomcor = alldeomcor |> 
+  as.data.frame.matrix() |>
+  rownames_to_column() |>
+  as_tibble() |> 
+  pivot_longer(cols = c(2:14), names_to = "columnname", values_to = "correlation") |>
+  mutate(columnname = fct_relevel(columnname, 
+                                  c("EmotionalAbuse", "PhysicalAbuse", "Neglect1", "Neglect2", "SexualAbuse1", "SexualAbuse2", "SexualAbuse3", "SeparationDivorce", "MentalIllness", "Incarcerated", "DomesticViolence", "Alcoholic", "SubstanceAddiction"))) |> 
+  mutate(rowname = fct_relevel(rowname, 
+                                  c("SubstanceAddiction", "Alcoholic", "DomesticViolence", "Incarcerated", "MentalIllness", "SeparationDivorce", "SexualAbuse3", "SexualAbuse2", "SexualAbuse1", "Neglect2", "Neglect1", "PhysicalAbuse", "EmotionalAbuse")))
+
+
+alldeomcor |> ggplot(aes(x = columnname, y = rowname)) +
+  geom_tile(aes(fill = correlation)) +
+  scale_fill_distiller(palette = "RdPu", direction = 1) + 
+  scale_x_discrete(position = "top") +
+  geom_text(aes(label = correlation), color = "black", size = 5, family = "Avenir")+
+  theme_classic() +
+  theme(
+    axis.title = element_blank(),
+    axis.text = element_text(color = "black", size = 9, family = "Avenir")
+  )
+
+
+alldeomcor |> filter(correlation > 0.5 & correlation != 1)
+
+
+
+
+
+
+
+
+
+alldeom2 = full_join(onedemo, full_join(twodemo, full_join(threedemo, fourdemo, relationship = "many-to-many"), relationship = "many-to-many"), relationship = "many-to-many")  |> mutate(IYEAR = as.numeric(IYEAR)) |> select(-IYEAR, -age, -state, -race, -sex) |> mutate(MentalIllness = case_when(
+  MentalIllness == 1 ~ 1,
+  MentalIllness == 2 ~ 0,
+  MentalIllness == 7 ~ 0,
+  MentalIllness == 9 ~ NA)) |>
+  mutate(Alcoholic = case_when(
+    Alcoholic == 1 ~ 1,
+    Alcoholic == 2 ~ 0,
+    Alcoholic == 7 ~ 0,
+    Alcoholic == 9 ~ NA)) |> 
+  mutate(SubstanceAddiction = case_when(
+    SubstanceAddiction == 1 ~ 1,
+    SubstanceAddiction == 2 ~ 0,
+    SubstanceAddiction == 7 ~ 0,
+    SubstanceAddiction == 9 ~ NA)) |>
+  mutate(Incarcerated = case_when(
+    Incarcerated == 1 ~ 1,
+    Incarcerated == 2 ~ 0,
+    Incarcerated == 7 ~ 0,
+    Incarcerated == 9 ~ NA)) |> 
+  mutate(SeparationDivorce = case_when(
+    SeparationDivorce == 1 ~ 1,
+    SeparationDivorce == 2 ~ 0,
+    SeparationDivorce == 7 ~ 0,
+    SeparationDivorce == 8 ~ 0,
+    SeparationDivorce == 9 ~ NA)) |>
+  mutate(DomesticViolence = case_when(
+    DomesticViolence == 1 ~ 0,
+    DomesticViolence == 2 ~ 1, 
+    DomesticViolence == 3 ~ 1,
+    DomesticViolence == 7 ~ 0,
+    DomesticViolence == 9 ~ NA)) |>
+  mutate(PhysicalAbuse = case_when(
+    PhysicalAbuse == 1 ~ 0,
+    PhysicalAbuse == 2 ~ 1,
+    PhysicalAbuse == 3 ~ 1,
+    PhysicalAbuse == 7 ~ 0,
+    PhysicalAbuse == 9 ~ NA)) |>
+  mutate(EmotionalAbuse = case_when(
+    EmotionalAbuse == 1 ~ 0,
+    EmotionalAbuse == 2 ~ 1, 
+    EmotionalAbuse == 3 ~ 1,
+    EmotionalAbuse == 7 ~ 0,
+    EmotionalAbuse == 9 ~ NA)) |>
+  mutate(SexualAbuse1 = case_when(
+    SexualAbuse1 == 1 ~ 0,
+    SexualAbuse1 == 2 ~ 1,
+    SexualAbuse1 == 3 ~ 1,
+    SexualAbuse1 == 7 ~ 0,
+    SexualAbuse1 == 9 ~ NA)) |>
+  mutate(SexualAbuse2 = case_when(
+    SexualAbuse2 == 1 ~ 0,
+    SexualAbuse2 == 2 ~ 1,
+    SexualAbuse2 == 3 ~ 1,
+    SexualAbuse2 == 7 ~ 0,
+    SexualAbuse2 == 9 ~ NA)) |> 
+  mutate(SexualAbuse3 = case_when(
+    SexualAbuse3 == 1 ~ 0,
+    SexualAbuse3 == 2 ~ 1,
+    SexualAbuse3 == 3 ~ 1,
+    SexualAbuse3 == 7 ~ 0,
+    SexualAbuse3 == 9 ~ NA)) |>
+  mutate(Neglect1 = case_when(
+    Neglect1 == NA ~ NA,
+    Neglect1 == 1 ~ 0,
+    Neglect1 == 2 ~ 1,
+    Neglect1 == 3 ~ 1,
+    Neglect1 == 4 ~ 1,
+    Neglect1 == 5 ~ 1,
+    Neglect1 == 7 ~ 0,
+    Neglect1 == 9 ~ NA)) |>
+  mutate(Neglect2 = case_when(
+    Neglect2 == 1 ~ 0,
+    Neglect2 == 2 ~ 1,
+    Neglect2 == 3 ~ 1,
+    Neglect2 == 4 ~ 1,
+    Neglect2 == 5 ~ 1,
+    Neglect2 == NA ~ NA,
+    Neglect2 == 7 ~ 0,
+    Neglect2 == 9 ~ NA))
+
+alldeom2 = alldeom2 |> 
+  # mental illness: 
+  mutate("MentalIllness_Alcoholic" = if_else(MentalIllness == 1 & Alcoholic == 1, 1, 0)) |>
+  mutate("MentalIllness_Alcoholic_PhysicalAbuse" = if_else(MentalIllness == 1 & Alcoholic == 1 & PhysicalAbuse == 1, 1, 0)) |>
+  mutate("MentalIllness_Alcoholic_PhysicalAbuse_Neglect1" = if_else(MentalIllness == 1 & Alcoholic == 1 & PhysicalAbuse == 1 & Neglect1 == 1 , 1, 0)) |>
+  mutate("MentalIllness_Alcoholic_PhysicalAbuse_Neglect1_Neglect2" = if_else(MentalIllness == 1 & Alcoholic == 1 & PhysicalAbuse == 1 & Neglect1 == 1 & Neglect2 == 1, 1, 0)) |>
+  mutate("MentalIllness_Alcoholic_PhysicalAbuse_Neglect1_Neglect2_SexualAbuse1" = if_else(MentalIllness == 1 & Alcoholic == 1 & PhysicalAbuse == 1 & Neglect1 == 1 & Neglect2 == 1 & SexualAbuse1 == 1, 1, 0)) |>
+  mutate("MentalIllness_Alcoholic_PhysicalAbuse_Neglect1_Neglect2_SexualAbuse1_SexualAbuse2" = if_else(MentalIllness == 1 & Alcoholic == 1 & PhysicalAbuse == 1 & Neglect1 == 1 & Neglect2 == 1 & SexualAbuse1 == 1 & SexualAbuse2 == 1, 1, 0)) |>
+  mutate("MentalIllness_Alcoholic_PhysicalAbuse_Neglect1_Neglect2_SexualAbuse1_SexualAbuse2_SexualAbuse3" = if_else(MentalIllness == 1 & Alcoholic == 1 & PhysicalAbuse == 1 & Neglect1 == 1 & Neglect2 == 1 & SexualAbuse1 == 1 & SexualAbuse2 == 1 & SexualAbuse3 == 1, 1, 0)) |>
+  mutate("MentalIllness_Alcoholic_PhysicalAbuse_Neglect1_Neglect2_SexualAbuse1_SexualAbuse2_SexualAbuse3_SeparationDivorce" = if_else(MentalIllness == 1 & Alcoholic == 1 & PhysicalAbuse == 1 & Neglect1 == 1 & Neglect2 == 1 & SexualAbuse1 == 1 & SexualAbuse2 == 1 & SexualAbuse3 == 1 & SeparationDivorce == 1, 1, 0)) |>
+  mutate("MentalIllness_Alcoholic_PhysicalAbuse_Neglect1_Neglect2_SexualAbuse1_SexualAbuse2_SexualAbuse3_SeparationDivorce_Incarcerated" = if_else(MentalIllness == 1 & Alcoholic == 1 & PhysicalAbuse == 1 & Neglect1 == 1 & Neglect2 == 1 & SexualAbuse1 == 1 & SexualAbuse2 == 1 & SexualAbuse3 == 1 & SeparationDivorce == 1 & Incarcerated == 1, 1, 0)) |>
+  mutate("MentalIllness_Alcoholic_PhysicalAbuse_Neglect1_Neglect2_SexualAbuse1_SexualAbuse2_SexualAbuse3_SeparationDivorce_Incarcerated_DomesticViolence" = if_else(MentalIllness == 1 & Alcoholic == 1 & PhysicalAbuse == 1 & Neglect1 == 1 & Neglect2 == 1 & SexualAbuse1 == 1 & SexualAbuse2 == 1 & SexualAbuse3 == 1 & SeparationDivorce == 1 & Incarcerated == 1 & DomesticViolence == 1, 1, 0)) |>
+  mutate("MentalIllness_Alcoholic_PhysicalAbuse_Neglect1_Neglect2_SexualAbuse1_SexualAbuse2_SexualAbuse3_SeparationDivorce_Incarcerated_DomesticViolence_SubstanceAddiction" = if_else(MentalIllness == 1 & Alcoholic == 1 & PhysicalAbuse == 1 & Neglect1 == 1 & Neglect2 == 1 & SexualAbuse1 == 1 & SexualAbuse2 == 1 & SexualAbuse3 == 1 & SeparationDivorce == 1 & Incarcerated == 1 & DomesticViolence == 1 & SubstanceAddiction == 1, 1, 0)) 
+  
+  
+
+alldeom2cor = cor(alldeom2, use = "complete.obs")
+
+alldeom2cor = round(alldeom2cor, 2) 
+alldeom2cor = alldeom2cor |> 
+  as.data.frame.matrix() |>
+  rownames_to_column() |>
+  as_tibble() |> 
+  pivot_longer(cols = c(2:24), names_to = "columnname", values_to = "correlation")
+
+  
+  
+  mutate("MentalIllness_Alcoholic_Neglect1" = if_else(MentalIllness == 1 & Alcoholic == 1 & Neglect1 == 1, 1, 0)) |>
+  mutate("MentalIllness_Alcoholic_Neglect2" = if_else(MentalIllness == 1 & Alcoholic == 1 & Neglect2 == 1, 1, 0)) |>
+  
+  
+  
+  
+  mutate("MentalIllness_PhysicalAbuse" = if_else(MentalIllness == 1 & PhysicalAbuse == 1, 1, 0)) |>
+  mutate("MentalIllness_Neglect1" = if_else(MentalIllness == 1 & Neglect1 == 1, 1, 0)) |>
+  mutate("MentalIllness_Neglect2" = if_else(MentalIllness == 1 & Neglect2 == 1, 1, 0)) |>
+  mutate("MentalIllness_SexualAbuse1" = if_else(MentalIllness == 1 & SexualAbuse1 == 1, 1, 0)) |>
+  mutate("MentalIllness_SexualAbuse2" = if_else(MentalIllness == 1 & SexualAbuse2 == 1, 1, 0)) |>
+  mutate("MentalIllness_SexualAbuse3" = if_else(MentalIllness == 1 & SexualAbuse3 == 1, 1, 0)) |>
+  mutate("MentalIllness_SeparationDivorce" = if_else(MentalIllness == 1 & SeparationDivorce == 1, 1, 0)) |> 
+  mutate("MentalIllness_Incarcerated" = if_else(MentalIllness == 1 & Incarcerated == 1, 1, 0)) |>
+  mutate("MentalIllness_DomesticViolence" = if_else(MentalIllness == 1 & DomesticViolence == 1, 1, 0)) |>
+  mutate("MentalIllness_SubstanceAddiction" = if_else(MentalIllness == 1 & SubstanceAddiction == 1, 1, 0))
+  mutate("MentalIllness_Alcoholic_PhysicalAbuse" = if_else(MentalIllness == 1 & Alcoholic == 1 & PhysicalAbuse == 1, 1, 0))
+```
+
+
+
+
+```{r}
+aces = alldeom |> pivot_longer(c(1:13), names_to = "category", values_to = "values") |> distinct(category) |> pull(category)
+
+new2 = {}
+new3 = {}
+new4 = {}
+new5 = {}
+new6 = {}
+new7 = {}
+new8 = {}
+new9 = {}
+new10 = {}
+new11 = {}
+new12 = {}
+#Mental Illness
+for (i in 2:13){
+    new[i] <- paste(aces[1], aces[i])
+    for (j in 3:13){
+      new2[j] <- paste(new[2], aces[j])
+      for (k in 4:13){
+        new3[k] <- paste(new[3], aces[k])
+        for (l in 5:13){
+          new4[l] <- paste(new[4], aces[l])
+          for (m in 6:13){
+            new5[m] <- paste(new[5], aces[m])
+            for (n in 7:13){
+              new6[n] <- paste(new[6], aces[n])
+              for (o in 8:13){
+                new7[o] <- paste(new[7], aces[o])
+                for (p in 9:13){
+                  new8[p] <- paste(new[8], aces[p])
+                  for (q in 10:13){
+                    new9[q] <- paste(new[9], aces[q])
+                    for (r in 11:13){
+                      new10[r] <- paste(new[10], aces[r])
+                      for (s in 12:13){
+                        new11[s] <- paste(new[11], aces[s])
+                        for (t in 13){
+                          new12[t] <- paste(new[12], aces[t])
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+}
+
+new
+new2
+new3
+new4
+new5
+new6
+new7
+new8
+new9
+new10
+new11
+new12
+
+
+
+
+
+new1 = list()
+for (i in 1:13){
+  cat <- aces[i]
+  for (j in 2:13) {
+     value <- paste(cat, aces[j])
+     new1 = cbind(new1, value)
+  }
+}
+list(new1$category)
+new1 = new1$category |> as.matrix() |> as.data.frame() |> pivot_longer(c(1), values_to = "category") |> select(category)
+
+
+for (i in 1:793180){
+  
+  for (j in 1:13){
+    
+  }
+}
+```
+
+
+# Conditional Probability of ACEs:  
+
+```{r}
+# denominator: 793180
+alldeom |> summarise(n_MI = sum(MentalIllness, na.rm = TRUE),
+                     n_Alc = sum(Alcoholic, na.rm = TRUE),
+                     n_SubAdd = sum(SubstanceAddiction, na.rm = TRUE),
+                     n_Incar = sum(Incarcerated, na.rm = TRUE),
+                     n_Sep = sum(SeparationDivorce, na.rm = TRUE),
+                     n_DV = sum(DomesticViolence, na.rm = TRUE),
+                     n_PA = sum(PhysicalAbuse, na.rm = TRUE),
+                     n_EA = sum(EmotionalAbuse, na.rm = TRUE), 
+                     n_SA1 = sum(SexualAbuse1, na.rm = TRUE),
+                     n_SA2 = sum(SexualAbuse2, na.rm = TRUE),
+                     n_SA3 = sum(SexualAbuse3, na.rm = TRUE),
+                     n_N1 = sum(Neglect1, na.rm = TRUE),
+                     n_N2 = sum(Neglect2, na.rm = TRUE))
+
+alldeom |> summarise(n_MI = sum(MentalIllness, na.rm = TRUE)/793180,
+                     n_Alc = sum(Alcoholic, na.rm = TRUE)/793180,
+                     n_SubAdd = sum(SubstanceAddiction, na.rm = TRUE)/793180,
+                     n_Incar = sum(Incarcerated, na.rm = TRUE)/793180,
+                     n_Sep = sum(SeparationDivorce, na.rm = TRUE)/793180,
+                     n_DV = sum(DomesticViolence, na.rm = TRUE)/793180,
+                     n_PA = sum(PhysicalAbuse, na.rm = TRUE)/793180,
+                     n_EA = sum(EmotionalAbuse, na.rm = TRUE)/793180, 
+                     n_SA1 = sum(SexualAbuse1, na.rm = TRUE)/793180,
+                     n_SA2 = sum(SexualAbuse2, na.rm = TRUE)/793180,
+                     n_SA3 = sum(SexualAbuse3, na.rm = TRUE)/793180,
+                     n_N1 = sum(Neglect1, na.rm = TRUE)/107049,
+                     n_N2 = sum(Neglect2, na.rm = TRUE)/107049)
+
+everything = full_join(onedemo, full_join(twodemo, full_join(threedemo, fourdemo, relationship = "many-to-many"), relationship = "many-to-many"), relationship = "many-to-many")  |> mutate(IYEAR = as.numeric(IYEAR)) |>
+  mutate(MentalIllness = case_when(
+  MentalIllness == 1 ~ 1,
+  MentalIllness == 2 ~ 0,
+  MentalIllness == 7 ~ 0,
+  MentalIllness == 9 ~ NA)) |>
+  mutate(Alcoholic = case_when(
+    Alcoholic == 1 ~ 1,
+    Alcoholic == 2 ~ 0,
+    Alcoholic == 7 ~ 0,
+    Alcoholic == 9 ~ NA)) |> 
+  mutate(SubstanceAddiction = case_when(
+    SubstanceAddiction == 1 ~ 1,
+    SubstanceAddiction == 2 ~ 0,
+    SubstanceAddiction == 7 ~ 0,
+    SubstanceAddiction == 9 ~ NA)) |>
+  mutate(Incarcerated = case_when(
+    Incarcerated == 1 ~ 1,
+    Incarcerated == 2 ~ 0,
+    Incarcerated == 7 ~ 0,
+    Incarcerated == 9 ~ NA)) |> 
+  mutate(SeparationDivorce = case_when(
+    SeparationDivorce == 1 ~ 1,
+    SeparationDivorce == 2 ~ 0,
+    SeparationDivorce == 7 ~ 0,
+    SeparationDivorce == 8 ~ 0,
+    SeparationDivorce == 9 ~ NA)) |>
+  mutate(DomesticViolence = case_when(
+    DomesticViolence == 1 ~ 0,
+    DomesticViolence == 2 ~ 1, 
+    DomesticViolence == 3 ~ 1,
+    DomesticViolence == 7 ~ 0,
+    DomesticViolence == 9 ~ NA)) |>
+  mutate(PhysicalAbuse = case_when(
+    PhysicalAbuse == 1 ~ 0,
+    PhysicalAbuse == 2 ~ 1,
+    PhysicalAbuse == 3 ~ 1,
+    PhysicalAbuse == 7 ~ 0,
+    PhysicalAbuse == 9 ~ NA)) |>
+  mutate(EmotionalAbuse = case_when(
+    EmotionalAbuse == 1 ~ 0,
+    EmotionalAbuse == 2 ~ 1, 
+    EmotionalAbuse == 3 ~ 1,
+    EmotionalAbuse == 7 ~ 0,
+    EmotionalAbuse == 9 ~ NA)) |>
+  mutate(SexualAbuse1 = case_when(
+    SexualAbuse1 == 1 ~ 0,
+    SexualAbuse1 == 2 ~ 1,
+    SexualAbuse1 == 3 ~ 1,
+    SexualAbuse1 == 7 ~ 0,
+    SexualAbuse1 == 9 ~ NA)) |>
+  mutate(SexualAbuse2 = case_when(
+    SexualAbuse2 == 1 ~ 0,
+    SexualAbuse2 == 2 ~ 1,
+    SexualAbuse2 == 3 ~ 1,
+    SexualAbuse2 == 7 ~ 0,
+    SexualAbuse2 == 9 ~ NA)) |> 
+  mutate(SexualAbuse3 = case_when(
+    SexualAbuse3 == 1 ~ 0,
+    SexualAbuse3 == 2 ~ 1,
+    SexualAbuse3 == 3 ~ 1,
+    SexualAbuse3 == 7 ~ 0,
+    SexualAbuse3 == 9 ~ NA)) |>
+  mutate(Neglect1 = case_when(
+    Neglect1 == NA ~ NA,
+    Neglect1 == 1 ~ 0,
+    Neglect1 == 2 ~ 1,
+    Neglect1 == 3 ~ 1,
+    Neglect1 == 4 ~ 1,
+    Neglect1 == 5 ~ 1,
+    Neglect1 == 7 ~ 0,
+    Neglect1 == 9 ~ NA)) |>
+  mutate(Neglect2 = case_when(
+    Neglect2 == 1 ~ 0,
+    Neglect2 == 2 ~ 1,
+    Neglect2 == 3 ~ 1,
+    Neglect2 == 4 ~ 1,
+    Neglect2 == 5 ~ 1,
+    Neglect2 == NA ~ NA,
+    Neglect2 == 7 ~ 0,
+    Neglect2 == 9 ~ NA))
+
+n_states = everything |> group_by(state) |> summarise(n = n())
+left_join(n_states, states, by = c("state" = "number")) |>
+  ggplot(aes(x = state.y, y = n)) + geom_col() +
+  coord_flip()
+left_join(n_states, states, by = c("state" = "number")) |> group_by(state.y) |>
+  summarise(prop = n/793180) |>
+  ggplot(aes(x = state.y, y = prop)) + geom_col() +
+  coord_flip()
+
+```
+
+
+
+
+
+# Adverse Childhood Events and Addiction
+
+## ACEs  
+2022: ACEDEPRS, ACEDRINK, ACEDRUGS, ACEPRISN, ACEDIVRC, ACEPUNCH, ACEHURT1, ACESWEAR, ACETOUCH, ACETTHEM, ACEHVSEX, ACEADSAF, ACEADNED
+2021: ACEDEPRS, ACEDRINK, ACEDRUGS, ACEPRISN, ACEDIVRC, ACEPUNCH, ACEHURT1, ACESWEAR, ACETOUCH, ACETTHEM, ACEHVSEX, ACEADSAF, ACEADNED
+2020: ACEDEPRS, ACEDRINK, ACEDRUGS, ACEPRISN, ACEDIVRC, ACEPUNCH, ACEHURT1, ACESWEAR, ACETOUCH, ACETTHEM, ACEHVSEX,
+2019: ACEDEPRS, ACEDRINK, ACEDRUGS, ACEPRISN, ACEDIVRC, ACEPUNCH, ACEHURT1, ACESWEAR, ACETOUCH, ACETTHEM, ACEHVSEX, 
+
+## Addiction 
+2022: SMOKE100, SMOKDAY2, USENOW3, ECIGNOW2, LCSFIRST, LCSLAST, LCSNUMCG, ALCDAY4, AVEDRNK3, DRNK3GE5, MAXDRNKS, MARIJAN1, MARJSMOK, LASTSMK2, 
+2021: SMOKE100, SMOKDAY2, USENOW3, ECIGNOW1, LCSFIRST, LCSLAST, LCSNUMCG, ALCDAY5, AVEDRNK3, DRNK3GE5, MAXDRNKS, MARIJAN1,          , LASTSMK2, 
+2020: SMOKE100, SMOKDAY2, USENOW3, ECIGNOW, LCSFIRST, LCSLAST, LCSNUMCG, ALCDAY5, AVEDRNK3, DRNK3GE5, MAXDRNKS, MARIJAN1,           , LASTSMK2, 
+2019: SMOKE100, SMOKDAY2, USENOW3,        , LCSFIRST, LCSLAST, LCSNUMCG, ALCDAY5, AVEDRNK3, DRNK3GE5, MAXDRNKS, MARIJAN1,           , LASTSMK2, 
+
+### Other variables:  
+"_IMPRACE", "_AGE_G", IYEAR, '_STATE', SEXVAR,
+
+```{r SMOKE100}
+# Question: Have you smoked at least 100 cigarettes in your entire life? [Note: 5 packs = 100 cigarettes]
+## smoke1
+smoke122 = twenty022 |> select(IYEAR, '_STATE', "_AGE_G","_IMPRACE", SEXVAR, ACEDEPRS, ACEDRINK, ACEDRUGS, ACEPRISN, ACEDIVRC, ACEPUNCH, ACEHURT1, ACESWEAR, ACETOUCH, ACETTHEM, ACEHVSEX, ACEADSAF, ACEADNED, SMOKE100) |>
+  rename("state" = "_STATE",
+         "age" = "_AGE_G",
+         "race" = "_IMPRACE",
+         "sex" = SEXVAR,
+        "MentalIllness" = ACEDEPRS,
+         "Alcoholic" = ACEDRINK,
+         "SubstanceAddiction" = ACEDRUGS,
+         "Incarcerated" = ACEPRISN,
+         "SeparationDivorce" = ACEDIVRC,
+         "DomesticViolence" = ACEPUNCH,
+         "PhysicalAbuse" = ACEHURT1,
+         "EmotionalAbuse" = ACESWEAR,
+         "SexualAbuse1" = ACETOUCH,
+         "SexualAbuse2" = ACETTHEM,
+         "SexualAbuse3" = ACEHVSEX,
+         "Neglect1" = ACEADSAF,
+         "Neglect2" = ACEADNED)
+  
+
+
+smoke121 = twenty021 |> select(IYEAR, '_STATE', "_AGE_G","_IMPRACE", SEXVAR, ACEDEPRS, ACEDRINK, ACEDRUGS, ACEPRISN, ACEDIVRC, ACEPUNCH, ACEHURT1, ACESWEAR, ACETOUCH, ACETTHEM, ACEHVSEX, ACEADSAF, ACEADNED, SMOKE100) |>
+  rename("state" = "_STATE",
+         "age" = "_AGE_G",
+         "race" = "_IMPRACE",
+         "sex" = SEXVAR,
+        "MentalIllness" = ACEDEPRS,
+         "Alcoholic" = ACEDRINK,
+         "SubstanceAddiction" = ACEDRUGS,
+         "Incarcerated" = ACEPRISN,
+         "SeparationDivorce" = ACEDIVRC,
+         "DomesticViolence" = ACEPUNCH,
+         "PhysicalAbuse" = ACEHURT1,
+         "EmotionalAbuse" = ACESWEAR,
+         "SexualAbuse1" = ACETOUCH,
+         "SexualAbuse2" = ACETTHEM,
+         "SexualAbuse3" = ACEHVSEX,
+         "Neglect1" = ACEADSAF,
+         "Neglect2" = ACEADNED)
+
+smoke120 = twenty020 |> select(IYEAR, '_STATE', "_AGE_G","_IMPRACE", SEXVAR, ACEDEPRS, ACEDRINK, ACEDRUGS, ACEPRISN, ACEDIVRC, ACEPUNCH, ACEHURT1, ACESWEAR, ACETOUCH, ACETTHEM, ACEHVSEX, SMOKE100) |>
+  rename("state" = "_STATE",
+         "age" = "_AGE_G",
+         "race" = "_IMPRACE",
+         "sex" = SEXVAR,
+        "MentalIllness" = ACEDEPRS,
+         "Alcoholic" = ACEDRINK,
+         "SubstanceAddiction" = ACEDRUGS,
+         "Incarcerated" = ACEPRISN,
+         "SeparationDivorce" = ACEDIVRC,
+         "DomesticViolence" = ACEPUNCH,
+         "PhysicalAbuse" = ACEHURT1,
+         "EmotionalAbuse" = ACESWEAR,
+         "SexualAbuse1" = ACETOUCH,
+         "SexualAbuse2" = ACETTHEM,
+         "SexualAbuse3" = ACEHVSEX)
+
+smoke119 = twenty019 |> select(IYEAR, '_STATE', "_AGE_G","_IMPRACE", SEXVAR, ACEDEPRS, ACEDRINK, ACEDRUGS, ACEPRISN, ACEDIVRC, ACEPUNCH, ACEHURT1, ACESWEAR, ACETOUCH, ACETTHEM, ACEHVSEX, SMOKE100) |>
+  rename("state" = "_STATE",
+         "age" = "_AGE_G",
+         "race" = "_IMPRACE",
+         "sex" = SEXVAR,
+        "MentalIllness" = ACEDEPRS,
+         "Alcoholic" = ACEDRINK,
+         "SubstanceAddiction" = ACEDRUGS,
+         "Incarcerated" = ACEPRISN,
+         "SeparationDivorce" = ACEDIVRC,
+         "DomesticViolence" = ACEPUNCH,
+         "PhysicalAbuse" = ACEHURT1,
+         "EmotionalAbuse" = ACESWEAR,
+         "SexualAbuse1" = ACETOUCH,
+         "SexualAbuse2" = ACETTHEM,
+         "SexualAbuse3" = ACEHVSEX)
+
+smoke1full = full_join(smoke119, full_join(smoke120, full_join(smoke122, smoke121, relationship = "many-to-many"), relationship = "many-to-many"), relationship = "many-to-many")
+
+smokefull2 = smoke1full |> mutate(MentalIllness = case_when(
+  MentalIllness == 1 ~ 1,
+  MentalIllness == 2 ~ 0,
+  MentalIllness == 7 ~ 0,
+  MentalIllness == 9 ~ NA)) |>
+  mutate(Alcoholic = case_when(
+    Alcoholic == 1 ~ 1,
+    Alcoholic == 2 ~ 0,
+    Alcoholic == 7 ~ 0,
+    Alcoholic == 9 ~ NA)) |> 
+  mutate(SubstanceAddiction = case_when(
+    SubstanceAddiction == 1 ~ 1,
+    SubstanceAddiction == 2 ~ 0,
+    SubstanceAddiction == 7 ~ 0,
+    SubstanceAddiction == 9 ~ NA)) |>
+  mutate(Incarcerated = case_when(
+    Incarcerated == 1 ~ 1,
+    Incarcerated == 2 ~ 0,
+    Incarcerated == 7 ~ 0,
+    Incarcerated == 9 ~ NA)) |> 
+  mutate(SeparationDivorce = case_when(
+    SeparationDivorce == 1 ~ 1,
+    SeparationDivorce == 2 ~ 0,
+    SeparationDivorce == 7 ~ 0,
+    SeparationDivorce == 8 ~ 0,
+    SeparationDivorce == 9 ~ NA)) |>
+  mutate(DomesticViolence = case_when(
+    DomesticViolence == 1 ~ 0,
+    DomesticViolence == 2 ~ 1, 
+    DomesticViolence == 3 ~ 1,
+    DomesticViolence == 7 ~ 0,
+    DomesticViolence == 9 ~ NA)) |>
+  mutate(PhysicalAbuse = case_when(
+    PhysicalAbuse == 1 ~ 0,
+    PhysicalAbuse == 2 ~ 1,
+    PhysicalAbuse == 3 ~ 1,
+    PhysicalAbuse == 7 ~ 0,
+    PhysicalAbuse == 9 ~ NA)) |>
+  mutate(EmotionalAbuse = case_when(
+    EmotionalAbuse == 1 ~ 0,
+    EmotionalAbuse == 2 ~ 1, 
+    EmotionalAbuse == 3 ~ 1,
+    EmotionalAbuse == 7 ~ 0,
+    EmotionalAbuse == 9 ~ NA)) |>
+  mutate(SexualAbuse1 = case_when(
+    SexualAbuse1 == 1 ~ 0,
+    SexualAbuse1 == 2 ~ 1,
+    SexualAbuse1 == 3 ~ 1,
+    SexualAbuse1 == 7 ~ 0,
+    SexualAbuse1 == 9 ~ NA)) |>
+  mutate(SexualAbuse2 = case_when(
+    SexualAbuse2 == 1 ~ 0,
+    SexualAbuse2 == 2 ~ 1,
+    SexualAbuse2 == 3 ~ 1,
+    SexualAbuse2 == 7 ~ 0,
+    SexualAbuse2 == 9 ~ NA)) |> 
+  mutate(SexualAbuse3 = case_when(
+    SexualAbuse3 == 1 ~ 0,
+    SexualAbuse3 == 2 ~ 1,
+    SexualAbuse3 == 3 ~ 1,
+    SexualAbuse3 == 7 ~ 0,
+    SexualAbuse3 == 9 ~ NA)) |>
+  mutate(Neglect1 = case_when(
+    Neglect1 == NA ~ NA,
+    Neglect1 == 1 ~ 0,
+    Neglect1 == 2 ~ 1,
+    Neglect1 == 3 ~ 1,
+    Neglect1 == 4 ~ 1,
+    Neglect1 == 5 ~ 1,
+    Neglect1 == 7 ~ 0,
+    Neglect1 == 9 ~ NA)) |>
+  mutate(Neglect2 = case_when(
+    Neglect2 == 1 ~ 0,
+    Neglect2 == 2 ~ 1,
+    Neglect2 == 3 ~ 1,
+    Neglect2 == 4 ~ 1,
+    Neglect2 == 5 ~ 1,
+    Neglect2 == NA ~ NA,
+    Neglect2 == 7 ~ 0,
+    Neglect2 == 9 ~ NA)) |>
+  mutate(SMOKE100 = case_when(
+    SMOKE100 == 1 ~ 1,
+    SMOKE100 == 2 ~ 0,
+    SMOKE100 == 7 ~ 0,
+    SMOKE100 == 9 ~ NA))
+  
+smokefull2 = smokefull2 |> filter(!is.na(SMOKE100))
+
+smokefullsummary = smokefull2 |> 
+  group_by(state, IYEAR, age, sex) |> 
+  summarise(MentalIllness = sum(MentalIllness, na.rm = TRUE),
+            Alcoholic = sum(Alcoholic, na.rm = TRUE),
+            SubstanceAddiction = sum(SubstanceAddiction, na.rm = TRUE),
+            Incarcerated = sum(Incarcerated, na.rm = TRUE),
+            SeparationDivorce = sum(SeparationDivorce, na.rm = TRUE),
+            DomesticViolence = sum(DomesticViolence, na.rm = TRUE),
+            PhysicalAbuse = sum(PhysicalAbuse, na.rm = TRUE),
+            EmotionalAbuse = sum(EmotionalAbuse, na.rm = TRUE),
+            SexualAbuse1 = sum(SexualAbuse1, na.rm = TRUE),
+            SexualAbuse2 = sum(SexualAbuse2, na.rm = TRUE),
+            SexualAbuse3 = sum(SexualAbuse3, na.rm = TRUE),
+            Neglect1 = sum(Neglect1, na.rm = TRUE),
+            Neglect2 = sum(Neglect2, na.rm = TRUE))
+
+
+smokefullsummary |> ggplot(aes(x = age, y = MentalIllness, col = sex, group = age)) +
+  geom_boxplot() +
+  geom_jitter() +
+  facet_wrap(~IYEAR)
+
+smokefullsummary |> ggplot(aes(x = age, y = Alcoholic, col = sex, group = age)) +
+  geom_boxplot() +
+  geom_jitter() +
+  facet_wrap(~IYEAR)
+
+smokefullsummary |> ggplot(aes(x = age, y = SubstanceAddiction, col = sex, group = age)) +
+  geom_boxplot() +
+  geom_jitter() +
+  facet_wrap(~IYEAR)
+
+smokefullsummary |> ggplot(aes(x = age, y = Incarcerated, col = sex, group = age)) +
+  geom_boxplot() +
+  geom_jitter() +
+  facet_wrap(~IYEAR)
+
+
+# smokefull2 = smokefull2 |> mutate(smoke100YES = if_else(SMOKE100 == 1, 1, 0)) |> 
+#   mutate(smoke100NO = if_else(SMOKE100 == 0, 1, 0)) |>
+#   mutate(sex = as.factor(sex)) |>
+#   mutate(age = as.factor(age))
+
+############################
+# graphs: 
+
+smokefull2 |> group_by(sex) |> summarise(MentalIllness = sum(MentalIllness, na.rm = TRUE),
+            Alcoholic = sum(Alcoholic, na.rm = TRUE),
+            SubstanceAddiction = sum(SubstanceAddiction, na.rm = TRUE),
+            Incarcerated = sum(Incarcerated, na.rm = TRUE),
+            SeparationDivorce = sum(SeparationDivorce, na.rm = TRUE),
+            DomesticViolence = sum(DomesticViolence, na.rm = TRUE),
+            PhysicalAbuse = sum(PhysicalAbuse, na.rm = TRUE),
+            EmotionalAbuse = sum(EmotionalAbuse, na.rm = TRUE),
+            SexualAbuse1 = sum(SexualAbuse1, na.rm = TRUE),
+            SexualAbuse2 = sum(SexualAbuse2, na.rm = TRUE),
+            SexualAbuse3 = sum(SexualAbuse3, na.rm = TRUE),
+            Neglect1 = sum(Neglect1, na.rm = TRUE),
+            Neglect2 = sum(Neglect2, na.rm = TRUE)) |> 
+  pivot_longer(c(2:14), names_to = "category", values_to = "n") |>
+  ggplot(aes(x = category, y = n, col = sex)) +
+  geom_point() +
+  geom_line(aes(group = sex))
+
+smokefull2 |> group_by(sex, age) |> summarise(MentalIllness = sum(MentalIllness, na.rm = TRUE),
+            Alcoholic = sum(Alcoholic, na.rm = TRUE),
+            SubstanceAddiction = sum(SubstanceAddiction, na.rm = TRUE),
+            Incarcerated = sum(Incarcerated, na.rm = TRUE),
+            SeparationDivorce = sum(SeparationDivorce, na.rm = TRUE),
+            DomesticViolence = sum(DomesticViolence, na.rm = TRUE),
+            PhysicalAbuse = sum(PhysicalAbuse, na.rm = TRUE),
+            EmotionalAbuse = sum(EmotionalAbuse, na.rm = TRUE),
+            SexualAbuse1 = sum(SexualAbuse1, na.rm = TRUE),
+            SexualAbuse2 = sum(SexualAbuse2, na.rm = TRUE),
+            SexualAbuse3 = sum(SexualAbuse3, na.rm = TRUE),
+            Neglect1 = sum(Neglect1, na.rm = TRUE),
+            Neglect2 = sum(Neglect2, na.rm = TRUE)) |> 
+  pivot_longer(c(3:15), names_to = "category", values_to = "n") |>
+  ggplot(aes(x = category, y = n, col = sex)) +
+  geom_point() +
+  geom_line(aes(group = sex)) +
+  facet_wrap(~age)
+
+smokefull2 |> group_by(sex, age, race) |> summarise(MentalIllness = sum(MentalIllness, na.rm = TRUE),
+            Alcoholic = sum(Alcoholic, na.rm = TRUE),
+            SubstanceAddiction = sum(SubstanceAddiction, na.rm = TRUE),
+            Incarcerated = sum(Incarcerated, na.rm = TRUE),
+            SeparationDivorce = sum(SeparationDivorce, na.rm = TRUE),
+            DomesticViolence = sum(DomesticViolence, na.rm = TRUE),
+            PhysicalAbuse = sum(PhysicalAbuse, na.rm = TRUE),
+            EmotionalAbuse = sum(EmotionalAbuse, na.rm = TRUE),
+            SexualAbuse1 = sum(SexualAbuse1, na.rm = TRUE),
+            SexualAbuse2 = sum(SexualAbuse2, na.rm = TRUE),
+            SexualAbuse3 = sum(SexualAbuse3, na.rm = TRUE),
+            Neglect1 = sum(Neglect1, na.rm = TRUE),
+            Neglect2 = sum(Neglect2, na.rm = TRUE)) |> 
+  pivot_longer(c(4:16), names_to = "category", values_to = "n") |>
+  ggplot(aes(x = category, y = n, col = sex)) +
+  geom_point() +
+  geom_line(aes(group = sex)) +
+  facet_wrap(vars(race, age))
+  
+
+##########################################
+# Models: 
+
+
+
+
+
+
+
+smoke100modmentalIllness = glm(cbind(smoke100YES, smoke100NO) ~ age + sex + MentalIllness + MentalIllness*sex + MentalIllness*age + MentalIllness*age*sex, family = "quasibinomial", data = smokefull2)
+summary(smoke100modmentalIllness)
+
+smoke100modAlcoholic = glm(cbind(smoke100YES, smoke100NO) ~ age + sex + Alcoholic + Alcoholic*sex + Alcoholic*age + Alcoholic*age*sex, family = "quasibinomial", data = smokefull2)
+summary(smoke100modAlcoholic)
+
+
+
+smoke100intersections = glm(cbind(smoke100YES, smoke100NO) ~ MentalIllness*Alcoholic*SubstanceAddiction*Incarcerated*SeparationDivorce*DomesticViolence*PhysicalAbuse*EmotionalAbuse*SexualAbuse1*SexualAbuse2*SexualAbuse3*SexualAbuse3*Neglect1*Neglect2, family = "quasibinomial", data = smokefull2)
+summary(smoke100intersection)
+
+```
+
+
+
+
+```{r SMOKE100}
+smoke100all = glm(SMOKE100 ~ 
+                    MentalIllness + 
+                    Alcoholic + 
+                    SubstanceAddiction + 
+                    Incarcerated + 
+                    SeparationDivorce + 
+                    DomesticViolence +
+                    PhysicalAbuse + 
+                    EmotionalAbuse + 
+                    SexualAbuse1 + 
+                    SexualAbuse2 + 
+                    SexualAbuse3 + 
+                    Neglect1 + 
+                    Neglect2, 
+                  family = "quasibinomial", data = smokefull2)
+summary(smoke100all)
+           
+
+
+          
+smoke100all2 = glm(SMOKE100 ~ 
+                    MentalIllness + MentalIllness*sex + 
+                    Alcoholic + Alcoholic*sex + 
+                    SubstanceAddiction + SubstanceAddiction*sex + 
+                    Incarcerated + Incarcerated*sex + 
+                    SeparationDivorce + SeparationDivorce*sex + 
+                    DomesticViolence + DomesticViolence*sex + 
+                    PhysicalAbuse + PhysicalAbuse*sex  + 
+                    EmotionalAbuse + EmotionalAbuse*sex + 
+                    SexualAbuse1 + SexualAbuse1*sex + 
+                    SexualAbuse2 + SexualAbuse2*sex +
+                    SexualAbuse3 + SexualAbuse3*sex + 
+                    Neglect1 + Neglect1*sex + 
+                    Neglect2 + Neglect2*sex, 
+                  family = "quasibinomial", data = smokefull2)
+summary(smoke100all2)
+
+smoke100all3 = glm(SMOKE100 ~ 
+                    MentalIllness + MentalIllness*sex + MentalIllness*age + 
+                    Alcoholic + Alcoholic*sex + Alcoholic*age + 
+                    SubstanceAddiction + SubstanceAddiction*sex + SubstanceAddiction*age + 
+                    Incarcerated + Incarcerated*sex + Incarcerated*age + 
+                    SeparationDivorce + SeparationDivorce*sex + SeparationDivorce*age + 
+                    DomesticViolence + DomesticViolence*sex + DomesticViolence*age + 
+                    PhysicalAbuse + PhysicalAbuse*sex  + PhysicalAbuse*age + 
+                    EmotionalAbuse + EmotionalAbuse*sex + EmotionalAbuse*age + 
+                    SexualAbuse1 + SexualAbuse1*sex + SexualAbuse1*age + 
+                    SexualAbuse2 + SexualAbuse2*sex + SexualAbuse2*age + 
+                    SexualAbuse3 + SexualAbuse3*sex + SexualAbuse3*age + 
+                    Neglect1 + Neglect1*sex + Neglect1*age + 
+                    Neglect2 + Neglect2*sex + Neglect2*age, 
+                  family = "quasibinomial", data = smokefull2)
+summary(smoke100all3)
+
+smoke100all4 = glm(SMOKE100 ~
+                    MentalIllness + MentalIllness*sex + MentalIllness*age + MentalIllness*age*sex + 
+                    Alcoholic + Alcoholic*sex + Alcoholic*age + Alcoholic*age*sex + 
+                    SubstanceAddiction + SubstanceAddiction*sex + SubstanceAddiction*age + SubstanceAddiction*age*sex + 
+                    Incarcerated + Incarcerated*sex + Incarcerated*age + Incarcerated*age*sex + 
+                    SeparationDivorce + SeparationDivorce*sex + SeparationDivorce*age + SeparationDivorce*age*sex + 
+                    DomesticViolence + DomesticViolence*sex + DomesticViolence*age + DomesticViolence*age*sex + 
+                    PhysicalAbuse + PhysicalAbuse*sex  + PhysicalAbuse*age + PhysicalAbuse*age*sex + 
+                    EmotionalAbuse + EmotionalAbuse*sex + EmotionalAbuse*age + EmotionalAbuse*age*sex + 
+                    SexualAbuse1 + SexualAbuse1*sex + SexualAbuse1*age + SexualAbuse1*age*sex + 
+                    SexualAbuse2 + SexualAbuse2*sex + SexualAbuse2*age + SexualAbuse2*age*sex + 
+                    SexualAbuse3 + SexualAbuse3*sex + SexualAbuse3*age + SexualAbuse3*age*sex + 
+                    Neglect1 + Neglect1*sex + Neglect1*age + Neglect1*age*sex + 
+                    Neglect2 + Neglect2*sex + Neglect2*age + Neglect2*age*sex, 
+                  family = "quasibinomial", data = smokefull2)
+summary(smoke100all4)
+
+
+anova(smoke100all, smoke100all2, smoke100all3, smoke100all4, test = "Chisq")
+anova(smoke100all3, smoke100all4, test = "Chisq")
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+```{r}
+
+# categorization of states and territories in the US
+states = tibble(state = state.name) |> mutate(number = c(1, 2, 4, 5, 6, 8, 9, 10, 12, 13, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 44, 45, 46, 47, 48, 49, 50, 51, 53, 54, 55, 56))
+otherstates = tibble(state = c("District of Columbia", "Guam", "Puerto Rico", "Virgin Islands"),
+       number = c(11, 66, 72, 78))
+states = full_join(states, otherstates)
+
+location = twenty022 |> select('_STATE') |>
+  rename("number" = '_STATE') 
+
+location = left_join(location, states)
+
+# MARITAL
+married = tibble(MARITAL = c(1, 2, 3, 4, 5, 6, 9, "BLANK"), 
+       marital_status = c("Married", "Divorced", "Widowed", "Separated", "Not_Married", "Unmarrried_Couple", "Refused", "Missed"))
+
+# VETERAN3
+veteran = tibble(VETERAN3 = c(1, 2, 7, 9, "BLANK"),
+       veteran_status = c("Yes", "No", "DK/NS", "Refused", "Missed"))
+
+
+# INCOME3
+income = tibble(INCOME3 = c(1:11, 77, 99, "BLANK"),
+       household_income = c("<$10,000", 
+                            "$10,000 to <$15,000", 
+                            "$15,000 to <$20,000",
+                            "$20,000 to <$25,000", 
+                            "$25,000 to <$35,000",
+                            "$35,000 to <$50,000",
+                            "$50,000 to <$75,000",
+                            "$75,000 to <$100,000",
+                            "$100,000 to <$150,000",
+                            "$150,000 to <$200,000",
+                            "$200,000 or more",
+                            "DK/NS",
+                            "Refused",
+                            "Missing"))
+
+# EDUCA
+education = tibble(EDUCA = c(1:6, 9, "BLANK"),
+       education_level = c("Never attended school or only kindergarten",
+                           "Grades 1-8",
+                           "Grades 9-11",
+                           "Grade 12 or GED",
+                           "Some college or technical school",
+                           "College graduate",
+                           "Refused",
+                           "Missing"))
+
+# RENTHOM1
+home = tibble(RENTHOM1 = c(1, 2, 3, 7, 9, "BLANK"),
+       rentOwn = c("Own", "Rent", "Other arrangement", "DK/NS", "Refused", "Missing"))
+
+# EMPLOY1
+employment = tibble(EMPLOY1 = c(1:9, "BLANK"),
+       employment = c("Employed for wages",
+                      "Self-employed",
+                      "Out of work for 1 year or more",
+                      "Out of work for less than 1 year",
+                      "A homemaker",
+                      "A student",
+                      "Retired",
+                      "Unable to work",
+                      "Refused",
+                      "Missing"))
+
+
+twenty022 |> select(EMPLOY1) |> filter(is.na(EMPLOY1))
+```
+
+
+
+
+
+
+
+
+

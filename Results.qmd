@@ -1,0 +1,148 @@
+---
+title: "Results"
+format: html
+---
+
+
+## Question: Have you smoked at least 100 cigarettes in your entire life? [Note: 5 packs = 100 cigarettes]
+
+### Mental Illness in the household:  
+Model: glm(cbind(smoke100YES, smoke100NO) ~ age + sex + MentalIllness + MentalIllness*sex + MentalIllness*age + MentalIllness*age*sex, family = "quasibinomial", data = smokefull2)   
+
+Interpretation summary:  
+* **age**: Each age group was a predictor for increased odds of smoking 100 cigarettes.  
+* **sex**: Females had lower odds of reporting to smoke 100 cigarettes.  
+* **Mental Illness**: Those who reported to have had a person in the household that had a mental illness were at increased odds of have smoking at least 100 cigarettes.  
+* **sex $\times$ Mental Illness**: Females who report mental illness in the household are at increased odds for reporting smoking at least 100 cigarettes.  
+* **age $\times$ sex $\times$ Mental Illness**: There are no interaction differences between age1 males who report no mental illness in the household besides the oldest age group which reports increased odds of smoking at least 100 cigarettes.  
+
+```{=latex}
+\begin{tabular}{ c }
+Coefficients: 
+                         Estimate Std. Error t value Pr(>|t|)    
+(Intercept)             -1.704671   0.031742 -53.703  < 2e-16 ***
+age2                     1.059416   0.036827  28.767  < 2e-16 ***
+age3                     1.454482   0.035417  41.068  < 2e-16 ***
+age4                     1.259557   0.034608  36.395  < 2e-16 ***
+age5                     1.289241   0.033569  38.405  < 2e-16 ***
+age6                     1.756498   0.032270  54.432  < 2e-16 ***
+sex2                    -0.689935   0.058898 -11.714  < 2e-16 ***
+MentalIllness            0.752807   0.051458  14.630  < 2e-16 ***
+sex2:MentalIllness       0.298313   0.083162   3.587 0.000334 ***
+age2:MentalIllness      -0.005836   0.063021  -0.093 0.926214    
+age3:MentalIllness      -0.084498   0.063144  -1.338 0.180839    
+age4:MentalIllness      -0.132070   0.064095  -2.061 0.039346 *  
+age5:MentalIllness      -0.089657   0.062966  -1.424 0.154480    
+age6:MentalIllness      -0.470024   0.061199  -7.680 1.59e-14 ***
+age2:sex2                0.157227   0.065799   2.390 0.016871 *  
+age3:sex2                0.091958   0.063211   1.455 0.145729    
+age4:sex2                0.094234   0.062109   1.517 0.129207    
+age5:sex2                0.369793   0.060795   6.083 1.18e-09 ***
+age6:sex2               -0.493032   0.059410  -8.299  < 2e-16 ***
+age2:sex2:MentalIllness -0.157834   0.097393  -1.621 0.105106    
+age3:sex2:MentalIllness -0.008109   0.095811  -0.085 0.932551    
+age4:sex2:MentalIllness  0.105107   0.096200   1.093 0.274578    
+age5:sex2:MentalIllness -0.084327   0.094584  -0.892 0.372631    
+age6:sex2:MentalIllness  0.425749   0.092394   4.608 4.07e-06 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+(Dispersion parameter for quasibinomial family taken to be 1.00005)
+
+    Null deviance: 743979  on 573412  degrees of freedom
+Residual deviance: 706850  on 573389  degrees of freedom
+  (3842 observations deleted due to missingness)
+AIC: NA
+
+Number of Fisher Scoring iterations: 4 \\
+
+\end{tabular}
+```
+
+### Alocholic in the household:  
+Model: glm(cbind(smoke100YES, smoke100NO) ~ age + sex + Alcoholic + Alcoholic*sex + Alcoholic*age + Alcoholic*age*sex, family = "quasibinomial", data = smokefull2)  
+
+Interpretation Summary:  
+* **age**: Each age category was a predictor for smoking at least 100 cigarettes.  
+* **sex**: Females reported a decreased odds of smoking at least 100 cigarettes.  
+* **Alcoholic**: Those who report growing up with someone in the household with alcohol problems were also at an increased risk for reporting to smoke at least 100 cigarettes.  
+
+
+
+
+
+
+
+
+```{=latex}
+\begin{tabular}{ c } 
+Coefficients:
+                     Estimate Std. Error t value Pr(>|t|)    
+(Intercept)         -1.703739   0.030605 -55.669  < 2e-16 ***
+age2                 1.002091   0.035936  27.886  < 2e-16 ***
+age3                 1.380379   0.034590  39.907  < 2e-16 ***
+age4                 1.175283   0.033910  34.659  < 2e-16 ***
+age5                 1.194438   0.032720  36.505  < 2e-16 ***
+age6                 1.723974   0.031178  55.295  < 2e-16 ***
+sex2                -0.579784   0.053502 -10.837  < 2e-16 ***
+Alcoholic            0.896648   0.053430  16.782  < 2e-16 ***
+sex2:Alcoholic       0.167796   0.084105   1.995   0.0460 *  
+age2:Alcoholic       0.066888   0.064848   1.031   0.3023    
+age3:Alcoholic       0.005337   0.063915   0.083   0.9335    
+age4:Alcoholic      -0.116828   0.062094  -1.881   0.0599 .  
+age5:Alcoholic      -0.017061   0.060180  -0.284   0.7768    
+age6:Alcoholic      -0.361338   0.057852  -6.246 4.22e-10 ***
+age2:sex2            0.092170   0.060823   1.515   0.1297    
+age3:sex2            0.025963   0.058354   0.445   0.6564    
+age4:sex2           -0.013197   0.057397  -0.230   0.8182    
+age5:sex2            0.239151   0.055845   4.282 1.85e-05 ***
+age6:sex2           -0.630430   0.054100 -11.653  < 2e-16 ***
+age2:sex2:Alcoholic -0.098599   0.098704  -0.999   0.3178    
+age3:sex2:Alcoholic -0.005108   0.096128  -0.053   0.9576    
+age4:sex2:Alcoholic  0.176819   0.094013   1.881   0.0600 .  
+age5:sex2:Alcoholic  0.044253   0.091490   0.484   0.6286    
+age6:sex2:Alcoholic  0.405100   0.088530   4.576 4.74e-06 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+(Dispersion parameter for quasibinomial family taken to be 1.000046)
+
+    Null deviance: 743719  on 573223  degrees of freedom
+Residual deviance: 699805  on 573200  degrees of freedom
+  (4031 observations deleted due to missingness)
+AIC: NA 
+
+Number of Fisher Scoring iterations: 4 \\
+\end{tabular}
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
