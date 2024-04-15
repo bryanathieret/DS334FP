@@ -265,7 +265,9 @@ alldeomcor |> ggplot(aes(x = columnname, y = rowname)) +
   theme_classic() +
   theme(
     axis.title = element_blank(),
-    axis.text = element_text(color = "black", size = 9, family = "Avenir")
+    axis.text = element_text(color = "black", size = 9, family = "Avenir"),
+    legend.text = element_text(color = "black", size = 10, family = "Avenir"),
+    legend.title = element_text(color = "black", size = 11, family = "Avenir")
   )
 
 
