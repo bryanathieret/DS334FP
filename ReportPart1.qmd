@@ -479,8 +479,6 @@ alldeomcor |> ggplot(aes(x = columnname, y = rowname)) +
 alldeomcor |> filter(correlation > 0.5 & correlation != 1)
 ```
 
-
-
 # Adverse Childhood Events and Addiction
 
 ## ACEs  
@@ -1219,7 +1217,6 @@ exp(lcsnumcgall1$coefficients)
 ```
 
 
-
 ```{r perweek and permonth}
 # ALCDAY4 ~ 1
 ## During the past 30 days, how many days per week or per month did you have at least one drink of any alcoholic
@@ -1576,13 +1573,198 @@ summary(DRNK3GE5all4)
 
 anova(DRNK3GE5all, DRNK3GE5all1, DRNK3GE5all3, DRNK3GE5all4, test = "Chisq") # DRNK3GE5all1 is the best model.
 
-
-
-
+summary(DRNK3GE5all1)
+exp(DRNK3GE5all1$coefficients)
 
 ```
 
 
+```{r MAXDRNKS}
+# MAXDRNKS
+## Question: During the past 30 days, what is the largest number of drinks you had on any occasion?
+
+maxdrinks = everything |> select(MentalIllness, Alcoholic, Incarcerated, SeparationDivorce, DomesticViolence, PhysicalAbuse, EmotionalAbuse, SexualAbuse1, SexualAbuse2, SexualAbuse3, Neglect1, Neglect2, SubstanceAddiction, MAXDRNKS, sex, age, race, number) |>
+  filter(MAXDRNKS != 77 ) |>
+  filter(MAXDRNKS != 99) |>
+  filter(!is.na(MAXDRNKS))
+
+maxdrinks |> ggplot(aes(x = MAXDRNKS)) + geom_density()
+
+############################################
+# Models: 
+## response variable is number of drinks which is a count. Going to use a quasipoisson distribution. 
+
+maxdrinksall = glm(MAXDRNKS ~ 
+                    MentalIllness + 
+                    Alcoholic + 
+                    SubstanceAddiction + 
+                    Incarcerated + 
+                    SeparationDivorce + 
+                    DomesticViolence +
+                    PhysicalAbuse + 
+                    EmotionalAbuse + 
+                    SexualAbuse1 + 
+                    SexualAbuse2 + 
+                    SexualAbuse3 + 
+                    Neglect1 + 
+                    Neglect2, 
+                  family = "quasipoisson", data = maxdrinks)
+summary(maxdrinksall)
+
+maxdrinksall1 = glm(MAXDRNKS ~ age + sex + race +
+                    MentalIllness + 
+                    Alcoholic + 
+                    SubstanceAddiction + 
+                    Incarcerated + 
+                    SeparationDivorce + 
+                    DomesticViolence +
+                    PhysicalAbuse + 
+                    EmotionalAbuse + 
+                    SexualAbuse1 + 
+                    SexualAbuse2 + 
+                    SexualAbuse3 + 
+                    Neglect1 + 
+                    Neglect2, 
+                  family = "quasipoisson", data = maxdrinks)
+summary(maxdrinksall1)
+
+
+
+maxdrinksall3 = glm(MAXDRNKS ~ 
+                    MentalIllness + MentalIllness*sex + MentalIllness*age + 
+                    Alcoholic + Alcoholic*sex + Alcoholic*age + 
+                    SubstanceAddiction + SubstanceAddiction*sex + SubstanceAddiction*age + 
+                    Incarcerated + Incarcerated*sex + Incarcerated*age + 
+                    SeparationDivorce + SeparationDivorce*sex + SeparationDivorce*age + 
+                    DomesticViolence + DomesticViolence*sex + DomesticViolence*age + 
+                    PhysicalAbuse + PhysicalAbuse*sex  + PhysicalAbuse*age + 
+                    EmotionalAbuse + EmotionalAbuse*sex + EmotionalAbuse*age + 
+                    SexualAbuse1 + SexualAbuse1*sex + SexualAbuse1*age + 
+                    SexualAbuse2 + SexualAbuse2*sex + SexualAbuse2*age + 
+                    SexualAbuse3 + SexualAbuse3*sex + SexualAbuse3*age + 
+                    Neglect1 + Neglect1*sex + Neglect1*age + 
+                    Neglect2 + Neglect2*sex + Neglect2*age, 
+                  family = "quasipoisson", data = maxdrinks)
+summary(maxdrinksall3)
+
+maxdrinksall4 = glm(MAXDRNKS ~
+                    MentalIllness + MentalIllness*sex + MentalIllness*age + MentalIllness*age*sex + 
+                    Alcoholic + Alcoholic*sex + Alcoholic*age + Alcoholic*age*sex + 
+                    SubstanceAddiction + SubstanceAddiction*sex + SubstanceAddiction*age + SubstanceAddiction*age*sex + 
+                    Incarcerated + Incarcerated*sex + Incarcerated*age + Incarcerated*age*sex + 
+                    SeparationDivorce + SeparationDivorce*sex + SeparationDivorce*age + SeparationDivorce*age*sex + 
+                    DomesticViolence + DomesticViolence*sex + DomesticViolence*age + DomesticViolence*age*sex + 
+                    PhysicalAbuse + PhysicalAbuse*sex  + PhysicalAbuse*age + PhysicalAbuse*age*sex + 
+                    EmotionalAbuse + EmotionalAbuse*sex + EmotionalAbuse*age + EmotionalAbuse*age*sex + 
+                    SexualAbuse1 + SexualAbuse1*sex + SexualAbuse1*age + SexualAbuse1*age*sex + 
+                    SexualAbuse2 + SexualAbuse2*sex + SexualAbuse2*age + SexualAbuse2*age*sex + 
+                    SexualAbuse3 + SexualAbuse3*sex + SexualAbuse3*age + SexualAbuse3*age*sex + 
+                    Neglect1 + Neglect1*sex + Neglect1*age + Neglect1*age*sex + 
+                    Neglect2 + Neglect2*sex + Neglect2*age + Neglect2*age*sex, 
+                  family = "quasipoisson", data = maxdrinks)
+summary(maxdrinksall4)
+
+
+anova(maxdrinksall, maxdrinksall1, maxdrinksall3, maxdrinksall4, test = "Chisq") # maxdrinksall4 is the best model.
+
+summary(maxdrinksall4)
+exp(maxdrinksall4$coefficients)
+
+```
+
+
+```{r MARIJAN1}
+# MARIJAN1
+## Question: During the past 30 days, on how many days did you use marijuana or cannabis?
+### Coded: For those who use marijuana. 
+
+marijan1 = everything |> select(MentalIllness, Alcoholic, Incarcerated, SeparationDivorce, DomesticViolence, PhysicalAbuse, EmotionalAbuse, SexualAbuse1, SexualAbuse2, SexualAbuse3, Neglect1, Neglect2, SubstanceAddiction, MARIJAN1, sex, age, race, number) |>
+  filter(MARIJAN1 != 88) |>
+  filter(MARIJAN1 != 77) |>
+  filter(MARIJAN1 != 99) |>
+  filter(!is.na(MARIJAN1))
+
+############################################
+# Models: 
+## response variable is number of days which is a count. Going to use a quasipoisson distribution. 
+
+marijan1all = glm(MARIJAN1 ~ 
+                    MentalIllness + 
+                    Alcoholic + 
+                    SubstanceAddiction + 
+                    Incarcerated + 
+                    SeparationDivorce + 
+                    DomesticViolence +
+                    PhysicalAbuse + 
+                    EmotionalAbuse + 
+                    SexualAbuse1 + 
+                    SexualAbuse2 + 
+                    SexualAbuse3 + 
+                    Neglect1 + 
+                    Neglect2, 
+                  family = "quasipoisson", data = marijan1)
+summary(marijan1all)
+
+marijan1all1 = glm(MARIJAN1 ~ age + sex + race +
+                    MentalIllness + 
+                    Alcoholic + 
+                    SubstanceAddiction + 
+                    Incarcerated + 
+                    SeparationDivorce + 
+                    DomesticViolence +
+                    PhysicalAbuse + 
+                    EmotionalAbuse + 
+                    SexualAbuse1 + 
+                    SexualAbuse2 + 
+                    SexualAbuse3 + 
+                    Neglect1 + 
+                    Neglect2, 
+                  family = "quasipoisson", data = marijan1)
+summary(marijan1all1)
+
+
+
+marijan1all3 = glm(MARIJAN1 ~ 
+                    MentalIllness + MentalIllness*sex + MentalIllness*age + 
+                    Alcoholic + Alcoholic*sex + Alcoholic*age + 
+                    SubstanceAddiction + SubstanceAddiction*sex + SubstanceAddiction*age + 
+                    Incarcerated + Incarcerated*sex + Incarcerated*age + 
+                    SeparationDivorce + SeparationDivorce*sex + SeparationDivorce*age + 
+                    DomesticViolence + DomesticViolence*sex + DomesticViolence*age + 
+                    PhysicalAbuse + PhysicalAbuse*sex  + PhysicalAbuse*age + 
+                    EmotionalAbuse + EmotionalAbuse*sex + EmotionalAbuse*age + 
+                    SexualAbuse1 + SexualAbuse1*sex + SexualAbuse1*age + 
+                    SexualAbuse2 + SexualAbuse2*sex + SexualAbuse2*age + 
+                    SexualAbuse3 + SexualAbuse3*sex + SexualAbuse3*age + 
+                    Neglect1 + Neglect1*sex + Neglect1*age + 
+                    Neglect2 + Neglect2*sex + Neglect2*age, 
+                  family = "quasipoisson", data = marijan1)
+summary(marijan1all3)
+
+marijan1all4 = glm(MARIJAN1 ~
+                    MentalIllness + MentalIllness*sex + MentalIllness*age + MentalIllness*age*sex + 
+                    Alcoholic + Alcoholic*sex + Alcoholic*age + Alcoholic*age*sex + 
+                    SubstanceAddiction + SubstanceAddiction*sex + SubstanceAddiction*age + SubstanceAddiction*age*sex + 
+                    Incarcerated + Incarcerated*sex + Incarcerated*age + Incarcerated*age*sex + 
+                    SeparationDivorce + SeparationDivorce*sex + SeparationDivorce*age + SeparationDivorce*age*sex + 
+                    DomesticViolence + DomesticViolence*sex + DomesticViolence*age + DomesticViolence*age*sex + 
+                    PhysicalAbuse + PhysicalAbuse*sex  + PhysicalAbuse*age + PhysicalAbuse*age*sex + 
+                    EmotionalAbuse + EmotionalAbuse*sex + EmotionalAbuse*age + EmotionalAbuse*age*sex + 
+                    SexualAbuse1 + SexualAbuse1*sex + SexualAbuse1*age + SexualAbuse1*age*sex + 
+                    SexualAbuse2 + SexualAbuse2*sex + SexualAbuse2*age + SexualAbuse2*age*sex + 
+                    SexualAbuse3 + SexualAbuse3*sex + SexualAbuse3*age + SexualAbuse3*age*sex + 
+                    Neglect1 + Neglect1*sex + Neglect1*age + Neglect1*age*sex + 
+                    Neglect2 + Neglect2*sex + Neglect2*age + Neglect2*age*sex, 
+                  family = "quasipoisson", data = marijan1)
+summary(marijan1all4)
+
+
+anova(marijan1all, marijan1all1, marijan1all3, marijan1all4, test = "Chisq") # marijan1all1 is the best model.
+
+summary(marijan1all1)
+exp(marijan1all1$coefficients)
+
+```
 
 
 
