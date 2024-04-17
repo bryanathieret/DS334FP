@@ -55,64 +55,64 @@ twenty022 = twenty022 |> select(
 mutate(MentalIllness = case_when(
   MentalIllness == 1 ~ 1,
   MentalIllness == 2 ~ 0,
-  MentalIllness == 7 ~ 0,
+  MentalIllness == 7 ~ NA,
   MentalIllness == 9 ~ NA)) |>
   mutate(Alcoholic = case_when(
     Alcoholic == 1 ~ 1,
     Alcoholic == 2 ~ 0,
-    Alcoholic == 7 ~ 0,
+    Alcoholic == 7 ~ NA,
     Alcoholic == 9 ~ NA)) |> 
   mutate(SubstanceAddiction = case_when(
     SubstanceAddiction == 1 ~ 1,
     SubstanceAddiction == 2 ~ 0,
-    SubstanceAddiction == 7 ~ 0,
+    SubstanceAddiction == 7 ~ NA,
     SubstanceAddiction == 9 ~ NA)) |>
   mutate(Incarcerated = case_when(
     Incarcerated == 1 ~ 1,
     Incarcerated == 2 ~ 0,
-    Incarcerated == 7 ~ 0,
+    Incarcerated == 7 ~ NA,
     Incarcerated == 9 ~ NA)) |> 
   mutate(SeparationDivorce = case_when(
     SeparationDivorce == 1 ~ 1,
     SeparationDivorce == 2 ~ 0,
-    SeparationDivorce == 7 ~ 0,
-    SeparationDivorce == 8 ~ 0,
+    SeparationDivorce == 7 ~ NA,
+    SeparationDivorce == 8 ~ NA,
     SeparationDivorce == 9 ~ NA)) |>
   mutate(DomesticViolence = case_when(
     DomesticViolence == 1 ~ 0,
     DomesticViolence == 2 ~ 1, 
     DomesticViolence == 3 ~ 1,
-    DomesticViolence == 7 ~ 0,
+    DomesticViolence == 7 ~ NA,
     DomesticViolence == 9 ~ NA)) |>
   mutate(PhysicalAbuse = case_when(
     PhysicalAbuse == 1 ~ 0,
     PhysicalAbuse == 2 ~ 1,
     PhysicalAbuse == 3 ~ 1,
-    PhysicalAbuse == 7 ~ 0,
+    PhysicalAbuse == 7 ~ NA,
     PhysicalAbuse == 9 ~ NA)) |>
   mutate(EmotionalAbuse = case_when(
     EmotionalAbuse == 1 ~ 0,
     EmotionalAbuse == 2 ~ 1, 
     EmotionalAbuse == 3 ~ 1,
-    EmotionalAbuse == 7 ~ 0,
+    EmotionalAbuse == 7 ~ NA,
     EmotionalAbuse == 9 ~ NA)) |>
   mutate(SexualAbuse1 = case_when(
     SexualAbuse1 == 1 ~ 0,
     SexualAbuse1 == 2 ~ 1,
     SexualAbuse1 == 3 ~ 1,
-    SexualAbuse1 == 7 ~ 0,
+    SexualAbuse1 == 7 ~ NA,
     SexualAbuse1 == 9 ~ NA)) |>
   mutate(SexualAbuse2 = case_when(
     SexualAbuse2 == 1 ~ 0,
     SexualAbuse2 == 2 ~ 1,
     SexualAbuse2 == 3 ~ 1,
-    SexualAbuse2 == 7 ~ 0,
+    SexualAbuse2 == 7 ~ NA,
     SexualAbuse2 == 9 ~ NA)) |> 
   mutate(SexualAbuse3 = case_when(
     SexualAbuse3 == 1 ~ 0,
     SexualAbuse3 == 2 ~ 1,
     SexualAbuse3 == 3 ~ 1,
-    SexualAbuse3 == 7 ~ 0,
+    SexualAbuse3 == 7 ~ NA,
     SexualAbuse3 == 9 ~ NA)) |>
   mutate(Neglect1 = case_when(
     Neglect1 == NA ~ NA,
@@ -121,7 +121,7 @@ mutate(MentalIllness = case_when(
     Neglect1 == 3 ~ 1,
     Neglect1 == 4 ~ 1,
     Neglect1 == 5 ~ 1,
-    Neglect1 == 7 ~ 0,
+    Neglect1 == 7 ~ NA,
     Neglect1 == 9 ~ NA)) |>
   mutate(Neglect2 = case_when(
     Neglect2 == 1 ~ 0,
@@ -130,15 +130,16 @@ mutate(MentalIllness = case_when(
     Neglect2 == 4 ~ 1,
     Neglect2 == 5 ~ 1,
     Neglect2 == NA ~ NA,
-    Neglect2 == 7 ~ 0,
-    Neglect2 == 9 ~ NA))
+    Neglect2 == 7 ~ NA,
+    Neglect2 == 9 ~ NA)) |>
+  mutate(number = 1)
 
 ## 2021: 
 twenty021 = twenty021 |> select(
                     IYEAR, '_STATE', SEXVAR, MARITAL, VETERAN3, INCOME3, "_BMI5",
                     EDUCA, RENTHOM1, EMPLOY1, CHILDREN, CAREGIV1, CRGVREL4, CRGVLNG1, CRGVPRB3, SOMALE, TRNSGNDR, "_METSTAT", "_URBSTAT", "_IMPRACE", "_AGE_G",
                     GENHLTH, PHYSHLTH, MENTHLTH, POORHLTH, EXERANY2, CVDINFR4, CVDCRHD4, CVDSTRK3, ASTHMA3, ADDEPEV3, CHCKDNY2, DIABETE4, DEAF, BLIND, DIFFWALK, DIFFDRES, DIFFALON,
-                    SMOKE100, SMOKDAY2, USENOW3, LCSFIRST, LCSLAST, LCSNUMCG, AVEDRNK3, DRNK3GE5, MAXDRNKS, MARIJAN1, LASTSMK2, 
+                    SMOKE100, SMOKDAY2, USENOW3, LCSFIRST, LCSLAST, LCSNUMCG, ECIGNOW1, AVEDRNK3, ALCDAY5, DRNK3GE5, MAXDRNKS, MARIJAN1, LASTSMK2, 
                     PRIMINSR, MEDCOST1, 
                     ACEDEPRS, ACEDRINK, ACEDRUGS, ACEPRISN, 
                     ACEDIVRC, ACEPUNCH, ACEHURT1, ACESWEAR,
@@ -168,64 +169,64 @@ twenty021 = twenty021 |> select(
   mutate(MentalIllness = case_when(
   MentalIllness == 1 ~ 1,
   MentalIllness == 2 ~ 0,
-  MentalIllness == 7 ~ 0,
+  MentalIllness == 7 ~ NA,
   MentalIllness == 9 ~ NA)) |>
   mutate(Alcoholic = case_when(
     Alcoholic == 1 ~ 1,
     Alcoholic == 2 ~ 0,
-    Alcoholic == 7 ~ 0,
+    Alcoholic == 7 ~ NA,
     Alcoholic == 9 ~ NA)) |> 
   mutate(SubstanceAddiction = case_when(
     SubstanceAddiction == 1 ~ 1,
     SubstanceAddiction == 2 ~ 0,
-    SubstanceAddiction == 7 ~ 0,
+    SubstanceAddiction == 7 ~ NA,
     SubstanceAddiction == 9 ~ NA)) |>
   mutate(Incarcerated = case_when(
     Incarcerated == 1 ~ 1,
     Incarcerated == 2 ~ 0,
-    Incarcerated == 7 ~ 0,
+    Incarcerated == 7 ~ NA,
     Incarcerated == 9 ~ NA)) |> 
   mutate(SeparationDivorce = case_when(
     SeparationDivorce == 1 ~ 1,
     SeparationDivorce == 2 ~ 0,
-    SeparationDivorce == 7 ~ 0,
-    SeparationDivorce == 8 ~ 0,
+    SeparationDivorce == 7 ~ NA,
+    SeparationDivorce == 8 ~ NA,
     SeparationDivorce == 9 ~ NA)) |>
   mutate(DomesticViolence = case_when(
     DomesticViolence == 1 ~ 0,
     DomesticViolence == 2 ~ 1, 
     DomesticViolence == 3 ~ 1,
-    DomesticViolence == 7 ~ 0,
+    DomesticViolence == 7 ~ NA,
     DomesticViolence == 9 ~ NA)) |>
   mutate(PhysicalAbuse = case_when(
     PhysicalAbuse == 1 ~ 0,
     PhysicalAbuse == 2 ~ 1,
     PhysicalAbuse == 3 ~ 1,
-    PhysicalAbuse == 7 ~ 0,
+    PhysicalAbuse == 7 ~ NA,
     PhysicalAbuse == 9 ~ NA)) |>
   mutate(EmotionalAbuse = case_when(
     EmotionalAbuse == 1 ~ 0,
     EmotionalAbuse == 2 ~ 1, 
     EmotionalAbuse == 3 ~ 1,
-    EmotionalAbuse == 7 ~ 0,
+    EmotionalAbuse == 7 ~ NA,
     EmotionalAbuse == 9 ~ NA)) |>
   mutate(SexualAbuse1 = case_when(
     SexualAbuse1 == 1 ~ 0,
     SexualAbuse1 == 2 ~ 1,
     SexualAbuse1 == 3 ~ 1,
-    SexualAbuse1 == 7 ~ 0,
+    SexualAbuse1 == 7 ~ NA,
     SexualAbuse1 == 9 ~ NA)) |>
   mutate(SexualAbuse2 = case_when(
     SexualAbuse2 == 1 ~ 0,
     SexualAbuse2 == 2 ~ 1,
     SexualAbuse2 == 3 ~ 1,
-    SexualAbuse2 == 7 ~ 0,
+    SexualAbuse2 == 7 ~ NA,
     SexualAbuse2 == 9 ~ NA)) |> 
   mutate(SexualAbuse3 = case_when(
     SexualAbuse3 == 1 ~ 0,
     SexualAbuse3 == 2 ~ 1,
     SexualAbuse3 == 3 ~ 1,
-    SexualAbuse3 == 7 ~ 0,
+    SexualAbuse3 == 7 ~ NA,
     SexualAbuse3 == 9 ~ NA)) |>
   mutate(Neglect1 = case_when(
     Neglect1 == NA ~ NA,
@@ -234,7 +235,7 @@ twenty021 = twenty021 |> select(
     Neglect1 == 3 ~ 1,
     Neglect1 == 4 ~ 1,
     Neglect1 == 5 ~ 1,
-    Neglect1 == 7 ~ 0,
+    Neglect1 == 7 ~ NA,
     Neglect1 == 9 ~ NA)) |>
   mutate(Neglect2 = case_when(
     Neglect2 == 1 ~ 0,
@@ -243,8 +244,9 @@ twenty021 = twenty021 |> select(
     Neglect2 == 4 ~ 1,
     Neglect2 == 5 ~ 1,
     Neglect2 == NA ~ NA,
-    Neglect2 == 7 ~ 0,
-    Neglect2 == 9 ~ NA))
+    Neglect2 == 7 ~ NA,
+    Neglect2 == 9 ~ NA)) |>
+  mutate(number = 2)
 
 ## 2020: 
 
@@ -252,7 +254,7 @@ twenty020 = twenty020 |> select(
                     IYEAR, '_STATE', SEXVAR, MARITAL, VETERAN3, INCOME2, WEIGHT2, HEIGHT3, 
                     EDUCA, RENTHOM1, EMPLOY1, CHILDREN, CAREGIV1, CRGVREL4, CRGVLNG1, CRGVPRB3, SOMALE, TRNSGNDR, "_METSTAT", "_URBSTAT", "_IMPRACE", "_AGE_G",
                     GENHLTH, PHYSHLTH, MENTHLTH, POORHLTH, EXERANY2, CVDINFR4, CVDCRHD4, CVDSTRK3, ASTHMA3, ADDEPEV3, CHCKDNY2, DIABETE4, DEAF, BLIND, DIFFWALK, DIFFDRES, DIFFALON,
-                    SMOKE100, SMOKDAY2, USENOW3, LCSFIRST, LCSLAST, LCSNUMCG, AVEDRNK3, DRNK3GE5, MAXDRNKS, MARIJAN1, LASTSMK2, 
+                    SMOKE100, SMOKDAY2, USENOW3, LCSFIRST, LCSLAST, LCSNUMCG, ECIGNOW, AVEDRNK3, ALCDAY5, DRNK3GE5, MAXDRNKS, MARIJAN1, LASTSMK2, 
                     HLTHCVR1,
                     ACEDEPRS, ACEDRINK, ACEDRUGS, ACEPRISN, 
                     ACEDIVRC, ACEPUNCH, ACEHURT1, ACESWEAR,
@@ -278,65 +280,66 @@ twenty020 = twenty020 |> select(
   mutate(MentalIllness = case_when(
   MentalIllness == 1 ~ 1,
   MentalIllness == 2 ~ 0,
-  MentalIllness == 7 ~ 0,
+  MentalIllness == 7 ~ NA,
   MentalIllness == 9 ~ NA)) |>
   mutate(Alcoholic = case_when(
     Alcoholic == 1 ~ 1,
     Alcoholic == 2 ~ 0,
-    Alcoholic == 7 ~ 0,
+    Alcoholic == 7 ~ NA,
     Alcoholic == 9 ~ NA)) |> 
   mutate(SubstanceAddiction = case_when(
     SubstanceAddiction == 1 ~ 1,
     SubstanceAddiction == 2 ~ 0,
-    SubstanceAddiction == 7 ~ 0,
+    SubstanceAddiction == 7 ~ NA,
     SubstanceAddiction == 9 ~ NA)) |>
   mutate(Incarcerated = case_when(
     Incarcerated == 1 ~ 1,
     Incarcerated == 2 ~ 0,
-    Incarcerated == 7 ~ 0,
+    Incarcerated == 7 ~ NA,
     Incarcerated == 9 ~ NA)) |> 
   mutate(SeparationDivorce = case_when(
     SeparationDivorce == 1 ~ 1,
     SeparationDivorce == 2 ~ 0,
-    SeparationDivorce == 7 ~ 0,
-    SeparationDivorce == 8 ~ 0,
+    SeparationDivorce == 7 ~ NA,
+    SeparationDivorce == 8 ~ NA,
     SeparationDivorce == 9 ~ NA)) |>
   mutate(DomesticViolence = case_when(
     DomesticViolence == 1 ~ 0,
     DomesticViolence == 2 ~ 1, 
     DomesticViolence == 3 ~ 1,
-    DomesticViolence == 7 ~ 0,
+    DomesticViolence == 7 ~ NA,
     DomesticViolence == 9 ~ NA)) |>
   mutate(PhysicalAbuse = case_when(
     PhysicalAbuse == 1 ~ 0,
     PhysicalAbuse == 2 ~ 1,
     PhysicalAbuse == 3 ~ 1,
-    PhysicalAbuse == 7 ~ 0,
+    PhysicalAbuse == 7 ~ NA,
     PhysicalAbuse == 9 ~ NA)) |>
   mutate(EmotionalAbuse = case_when(
     EmotionalAbuse == 1 ~ 0,
     EmotionalAbuse == 2 ~ 1, 
     EmotionalAbuse == 3 ~ 1,
-    EmotionalAbuse == 7 ~ 0,
+    EmotionalAbuse == 7 ~ NA,
     EmotionalAbuse == 9 ~ NA)) |>
   mutate(SexualAbuse1 = case_when(
     SexualAbuse1 == 1 ~ 0,
     SexualAbuse1 == 2 ~ 1,
     SexualAbuse1 == 3 ~ 1,
-    SexualAbuse1 == 7 ~ 0,
+    SexualAbuse1 == 7 ~ NA,
     SexualAbuse1 == 9 ~ NA)) |>
   mutate(SexualAbuse2 = case_when(
     SexualAbuse2 == 1 ~ 0,
     SexualAbuse2 == 2 ~ 1,
     SexualAbuse2 == 3 ~ 1,
-    SexualAbuse2 == 7 ~ 0,
+    SexualAbuse2 == 7 ~ NA,
     SexualAbuse2 == 9 ~ NA)) |> 
   mutate(SexualAbuse3 = case_when(
     SexualAbuse3 == 1 ~ 0,
     SexualAbuse3 == 2 ~ 1,
     SexualAbuse3 == 3 ~ 1,
-    SexualAbuse3 == 7 ~ 0,
-    SexualAbuse3 == 9 ~ NA)) 
+    SexualAbuse3 == 7 ~ NA,
+    SexualAbuse3 == 9 ~ NA)) |>
+  mutate(number = 3)
 
 # 2019: 
 
@@ -344,7 +347,7 @@ twenty019 = twenty019 |> select(
                     IYEAR, '_STATE', SEXVAR, MARITAL, VETERAN3, INCOME2, WEIGHT2, HEIGHT3, 
                     EDUCA, RENTHOM1, EMPLOY1, CHILDREN, CAREGIV1, CRGVLNG1, CRGVPRB3, SOMALE, TRNSGNDR, "_METSTAT", "_URBSTAT", "_IMPRACE", "_AGE_G",
                     GENHLTH, PHYSHLTH, MENTHLTH, POORHLTH, EXERANY2, CVDINFR4, CVDCRHD4, CVDSTRK3, ASTHMA3, ADDEPEV3, CHCKDNY2, DIABETE4, DEAF, BLIND, DIFFWALK, DIFFDRES, DIFFALON,
-                    SMOKE100, SMOKDAY2, USENOW3, LCSFIRST, LCSLAST, LCSNUMCG, AVEDRNK3, DRNK3GE5, MAXDRNKS, MARIJAN1, LASTSMK2, 
+                    SMOKE100, SMOKDAY2, USENOW3, LCSFIRST, LCSLAST, LCSNUMCG, ALCDAY5, AVEDRNK3, DRNK3GE5, MAXDRNKS, MARIJAN1, LASTSMK2, 
                     HLTHCVR1,
                     ACEDEPRS, ACEDRINK, ACEDRUGS, ACEPRISN, 
                     ACEDIVRC, ACEPUNCH, ACEHURT1, ACESWEAR,
@@ -370,65 +373,66 @@ twenty019 = twenty019 |> select(
   mutate(MentalIllness = case_when(
   MentalIllness == 1 ~ 1,
   MentalIllness == 2 ~ 0,
-  MentalIllness == 7 ~ 0,
+  MentalIllness == 7 ~ NA,
   MentalIllness == 9 ~ NA)) |>
   mutate(Alcoholic = case_when(
     Alcoholic == 1 ~ 1,
     Alcoholic == 2 ~ 0,
-    Alcoholic == 7 ~ 0,
+    Alcoholic == 7 ~ NA,
     Alcoholic == 9 ~ NA)) |> 
   mutate(SubstanceAddiction = case_when(
     SubstanceAddiction == 1 ~ 1,
     SubstanceAddiction == 2 ~ 0,
-    SubstanceAddiction == 7 ~ 0,
+    SubstanceAddiction == 7 ~ NA,
     SubstanceAddiction == 9 ~ NA)) |>
   mutate(Incarcerated = case_when(
     Incarcerated == 1 ~ 1,
     Incarcerated == 2 ~ 0,
-    Incarcerated == 7 ~ 0,
+    Incarcerated == 7 ~ NA,
     Incarcerated == 9 ~ NA)) |> 
   mutate(SeparationDivorce = case_when(
     SeparationDivorce == 1 ~ 1,
     SeparationDivorce == 2 ~ 0,
-    SeparationDivorce == 7 ~ 0,
-    SeparationDivorce == 8 ~ 0,
+    SeparationDivorce == 7 ~ NA,
+    SeparationDivorce == 8 ~ NA,
     SeparationDivorce == 9 ~ NA)) |>
   mutate(DomesticViolence = case_when(
     DomesticViolence == 1 ~ 0,
     DomesticViolence == 2 ~ 1, 
     DomesticViolence == 3 ~ 1,
-    DomesticViolence == 7 ~ 0,
+    DomesticViolence == 7 ~ NA,
     DomesticViolence == 9 ~ NA)) |>
   mutate(PhysicalAbuse = case_when(
     PhysicalAbuse == 1 ~ 0,
     PhysicalAbuse == 2 ~ 1,
     PhysicalAbuse == 3 ~ 1,
-    PhysicalAbuse == 7 ~ 0,
+    PhysicalAbuse == 7 ~ NA,
     PhysicalAbuse == 9 ~ NA)) |>
   mutate(EmotionalAbuse = case_when(
     EmotionalAbuse == 1 ~ 0,
     EmotionalAbuse == 2 ~ 1, 
     EmotionalAbuse == 3 ~ 1,
-    EmotionalAbuse == 7 ~ 0,
+    EmotionalAbuse == 7 ~ NA,
     EmotionalAbuse == 9 ~ NA)) |>
   mutate(SexualAbuse1 = case_when(
     SexualAbuse1 == 1 ~ 0,
     SexualAbuse1 == 2 ~ 1,
     SexualAbuse1 == 3 ~ 1,
-    SexualAbuse1 == 7 ~ 0,
+    SexualAbuse1 == 7 ~ NA,
     SexualAbuse1 == 9 ~ NA)) |>
   mutate(SexualAbuse2 = case_when(
     SexualAbuse2 == 1 ~ 0,
     SexualAbuse2 == 2 ~ 1,
     SexualAbuse2 == 3 ~ 1,
-    SexualAbuse2 == 7 ~ 0,
+    SexualAbuse2 == 7 ~ NA,
     SexualAbuse2 == 9 ~ NA)) |> 
   mutate(SexualAbuse3 = case_when(
     SexualAbuse3 == 1 ~ 0,
     SexualAbuse3 == 2 ~ 1,
     SexualAbuse3 == 3 ~ 1,
-    SexualAbuse3 == 7 ~ 0,
-    SexualAbuse3 == 9 ~ NA))
+    SexualAbuse3 == 7 ~ NA,
+    SexualAbuse3 == 9 ~ NA)) |>
+  mutate(number = 4)
 
 ## Dataset that inclueds everything: 
 everything = full_join(twenty019, full_join(twenty020, full_join(twenty021, twenty022)))
@@ -807,6 +811,7 @@ usenow3all1 = glm(USENOW3 ~ age + sex + race +
 summary(usenow3all1)
 
 
+
 usenow3all3 = glm(USENOW3 ~ 
                     MentalIllness + MentalIllness*sex + MentalIllness*age + 
                     Alcoholic + Alcoholic*sex + Alcoholic*age + 
@@ -844,26 +849,738 @@ summary(usenow3all4)
 
 anova(usenow3all,usenow3all1, usenow3all3, usenow3all4, test = "Chisq")
 
-#anova(usenow3all1, usenow3all2, test = "Chisq") #usenow3all2 is the best model. 
+anova(usenow3all1, usenow3all3, test = "Chisq") #usenow3all3 is the best model. 
 
 
+summary(usenow3all3)
+exp(usenow3all3$coefficients)
+
+usenow3 |> group_by(sex) |> summarise(MentalIllness = sum(MentalIllness, na.rm = TRUE),
+            Alcoholic = sum(Alcoholic, na.rm = TRUE),
+            SubstanceAddiction = sum(SubstanceAddiction, na.rm = TRUE),
+            Incarcerated = sum(Incarcerated, na.rm = TRUE),
+            SeparationDivorce = sum(SeparationDivorce, na.rm = TRUE),
+            DomesticViolence = sum(DomesticViolence, na.rm = TRUE),
+            PhysicalAbuse = sum(PhysicalAbuse, na.rm = TRUE),
+            EmotionalAbuse = sum(EmotionalAbuse, na.rm = TRUE),
+            SexualAbuse1 = sum(SexualAbuse1, na.rm = TRUE),
+            SexualAbuse2 = sum(SexualAbuse2, na.rm = TRUE),
+            SexualAbuse3 = sum(SexualAbuse3, na.rm = TRUE),
+            Neglect1 = sum(Neglect1, na.rm = TRUE),
+            Neglect2 = sum(Neglect2, na.rm = TRUE)) |> 
+  pivot_longer(c(2:14), names_to = "category", values_to = "n") |>
+  mutate(sex = as.factor(sex)) |>
+  ggplot(aes(x = category, y = n, col = sex)) +
+  geom_point() +
+  coord_flip() +
+  theme_minimal()
+
+
+```
+
+
+```{r ECIGNOW}
+# ECIGNOW2 ~ 2022/2023
+## Question: Would you say you have never used e-cigarettes or other electronic vaping products in your entire life or now use them every day, use them some days. 
+### Coded: Use every day or some days.
+
+# ECIGNOW1 ~ 2021/2020
+## Question: Do you now use e-cigarettes or other electronic vaping products every day, some days, or not at all?
+### Coded: Use every day or some days. 
+
+# ECIGNOW ~ 2020/2019
+## Question: Do you now use e-cigarettes or other electronic vaping products every day, some days, or not at all?
+### Coded: Use every day or some days. 
+
+ecig = everything |> 
+  mutate(IYEAR = as.factor(IYEAR)) |>
+  filter(number != 4) |>
+  select(MentalIllness, Alcoholic, Incarcerated, SeparationDivorce, DomesticViolence, PhysicalAbuse, EmotionalAbuse, SexualAbuse1, SexualAbuse2, SexualAbuse3, Neglect1, Neglect2, SubstanceAddiction, ECIGNOW, ECIGNOW1, ECIGNOW2, sex, age, race, number) |>
+  mutate(ECIG = case_when(
+    number == 1 & ECIGNOW2 == 1 ~ 0,
+    number == 1 & ECIGNOW2 == 2 ~ 1,
+    number == 1 & ECIGNOW2 == 3 ~ 1,
+    number == 1 & ECIGNOW2 == 4 ~ NA,
+    number == 1 & ECIGNOW2 == 7 ~ NA,
+    number == 1 & ECIGNOW2 == 9 ~ NA,
+    number == 1 & ECIGNOW2 == NA ~ NA,
+    number == 2 & ECIGNOW1 == 1 ~ 1,
+    number == 2 & ECIGNOW1 == 2 ~ 1, 
+    number == 2 & ECIGNOW1 == 3 ~ 0,
+    number == 2 & ECIGNOW1 == 4 ~ NA,
+    number == 2 & ECIGNOW1 == 7 ~ NA,
+    number == 2 & ECIGNOW1 == 9 ~ NA,
+    number == 3 & ECIGNOW == 1 ~ 1,
+    number == 3 & ECIGNOW == 2 ~ 1, 
+    number == 3 & ECIGNOW == 3 ~ 0, 
+    number == 3 & ECIGNOW == 7 ~ NA,
+    number == 3 & ECIGNOW == 9 ~ NA
+  )) |> 
+  filter(!is.na(ECIG))
+
+############################################
+# Models: 
+
+ecigall = glm(ECIG ~ 
+                    MentalIllness + 
+                    Alcoholic + 
+                    SubstanceAddiction + 
+                    Incarcerated + 
+                    SeparationDivorce + 
+                    DomesticViolence +
+                    PhysicalAbuse + 
+                    EmotionalAbuse + 
+                    SexualAbuse1 + 
+                    SexualAbuse2 + 
+                    SexualAbuse3 + 
+                    Neglect1 + 
+                    Neglect2, 
+                  family = "quasibinomial", data = ecig)
+summary(ecigall)
+
+ecigall1 = glm(ECIG ~ age + sex + race +
+                    MentalIllness + 
+                    Alcoholic + 
+                    SubstanceAddiction + 
+                    Incarcerated + 
+                    SeparationDivorce + 
+                    DomesticViolence +
+                    PhysicalAbuse + 
+                    EmotionalAbuse + 
+                    SexualAbuse1 + 
+                    SexualAbuse2 + 
+                    SexualAbuse3 + 
+                    Neglect1 + 
+                    Neglect2, 
+                  family = "quasibinomial", data = ecig)
+summary(ecigall1)
+
+
+
+ecigall3 = glm(ECIG ~ 
+                    MentalIllness + MentalIllness*sex + MentalIllness*age + 
+                    Alcoholic + Alcoholic*sex + Alcoholic*age + 
+                    SubstanceAddiction + SubstanceAddiction*sex + SubstanceAddiction*age + 
+                    Incarcerated + Incarcerated*sex + Incarcerated*age + 
+                    SeparationDivorce + SeparationDivorce*sex + SeparationDivorce*age + 
+                    DomesticViolence + DomesticViolence*sex + DomesticViolence*age + 
+                    PhysicalAbuse + PhysicalAbuse*sex  + PhysicalAbuse*age + 
+                    EmotionalAbuse + EmotionalAbuse*sex + EmotionalAbuse*age + 
+                    SexualAbuse1 + SexualAbuse1*sex + SexualAbuse1*age + 
+                    SexualAbuse2 + SexualAbuse2*sex + SexualAbuse2*age + 
+                    SexualAbuse3 + SexualAbuse3*sex + SexualAbuse3*age + 
+                    Neglect1 + Neglect1*sex + Neglect1*age + 
+                    Neglect2 + Neglect2*sex + Neglect2*age, 
+                  family = "quasibinomial", data = ecig)
+summary(ecigall3)
+
+ecigall4 = glm(ECIG ~
+                    MentalIllness + MentalIllness*sex + MentalIllness*age + MentalIllness*age*sex + 
+                    Alcoholic + Alcoholic*sex + Alcoholic*age + Alcoholic*age*sex + 
+                    SubstanceAddiction + SubstanceAddiction*sex + SubstanceAddiction*age + SubstanceAddiction*age*sex + 
+                    Incarcerated + Incarcerated*sex + Incarcerated*age + Incarcerated*age*sex + 
+                    SeparationDivorce + SeparationDivorce*sex + SeparationDivorce*age + SeparationDivorce*age*sex + 
+                    DomesticViolence + DomesticViolence*sex + DomesticViolence*age + DomesticViolence*age*sex + 
+                    PhysicalAbuse + PhysicalAbuse*sex  + PhysicalAbuse*age + PhysicalAbuse*age*sex + 
+                    EmotionalAbuse + EmotionalAbuse*sex + EmotionalAbuse*age + EmotionalAbuse*age*sex + 
+                    SexualAbuse1 + SexualAbuse1*sex + SexualAbuse1*age + SexualAbuse1*age*sex + 
+                    SexualAbuse2 + SexualAbuse2*sex + SexualAbuse2*age + SexualAbuse2*age*sex + 
+                    SexualAbuse3 + SexualAbuse3*sex + SexualAbuse3*age + SexualAbuse3*age*sex + 
+                    Neglect1 + Neglect1*sex + Neglect1*age + Neglect1*age*sex + 
+                    Neglect2 + Neglect2*sex + Neglect2*age + Neglect2*age*sex, 
+                  family = "quasibinomial", data = ecig)
+summary(ecigall4)
+
+
+anova(ecigall, ecigall1, ecigall3, ecigall4, test = "Chisq")
+anova(ecigall3, ecigall4, test = "Chisq") # model ecigall4 is best.
+
+summary(ecigall4)
+exp(ecigall4$coefficients)
+
+
+ecig |> group_by(sex, age) |> summarise(MentalIllness = sum(MentalIllness, na.rm = TRUE),
+            Alcoholic = sum(Alcoholic, na.rm = TRUE),
+            SubstanceAddiction = sum(SubstanceAddiction, na.rm = TRUE),
+            Incarcerated = sum(Incarcerated, na.rm = TRUE),
+            SeparationDivorce = sum(SeparationDivorce, na.rm = TRUE),
+            DomesticViolence = sum(DomesticViolence, na.rm = TRUE),
+            PhysicalAbuse = sum(PhysicalAbuse, na.rm = TRUE),
+            EmotionalAbuse = sum(EmotionalAbuse, na.rm = TRUE),
+            SexualAbuse1 = sum(SexualAbuse1, na.rm = TRUE),
+            SexualAbuse2 = sum(SexualAbuse2, na.rm = TRUE),
+            SexualAbuse3 = sum(SexualAbuse3, na.rm = TRUE),
+            Neglect1 = sum(Neglect1, na.rm = TRUE),
+            Neglect2 = sum(Neglect2, na.rm = TRUE)) |> 
+  pivot_longer(c(3:15), names_to = "category", values_to = "n") |>
+  mutate(sex = as.factor(sex)) |>
+  ggplot(aes(x = category, y = n, col = sex)) +
+  geom_point() +
+  facet_wrap(~age) + 
+  coord_flip() +
+  theme_minimal()
+```
+
+
+```{r LCSFIRST}
+# LSCFIRST
+## Question: How old were you when you first started to smoke cigarettes regularly
+
+lcsfirst = everything |> 
+  select(MentalIllness, Alcoholic, Incarcerated, SeparationDivorce, DomesticViolence, PhysicalAbuse, EmotionalAbuse, SexualAbuse1, SexualAbuse2, SexualAbuse3, Neglect1, Neglect2, SubstanceAddiction, LCSFIRST, sex, age, race, number) |>
+  mutate(LCSFIRST = as.factor(LCSFIRST)) |> 
+  filter(LCSFIRST != "777") |>
+  filter(LCSFIRST != "999") |>
+  filter(!is.na(LCSFIRST)) |>
+  mutate(LCSFIRST = as.integer(LCSFIRST))
+
+lcsfirst |> ggplot(aes(x = LCSFIRST)) + geom_density()
+
+############################################
+# Models: 
+## response variable is age which is a count. Going to use a quasipoisson distribution. 
+
+lcsfirstall = glm(LCSFIRST ~ 
+                    MentalIllness + 
+                    Alcoholic + 
+                    SubstanceAddiction + 
+                    Incarcerated + 
+                    SeparationDivorce + 
+                    DomesticViolence +
+                    PhysicalAbuse + 
+                    EmotionalAbuse + 
+                    SexualAbuse1 + 
+                    SexualAbuse2 + 
+                    SexualAbuse3 + 
+                    Neglect1 + 
+                    Neglect2, 
+                  family = "quasipoisson", data = lcsfirst)
+summary(lcsfirstall)
+
+lcsfirstall1 = glm(LCSFIRST ~ age + sex + race +
+                    MentalIllness + 
+                    Alcoholic + 
+                    SubstanceAddiction + 
+                    Incarcerated + 
+                    SeparationDivorce + 
+                    DomesticViolence +
+                    PhysicalAbuse + 
+                    EmotionalAbuse + 
+                    SexualAbuse1 + 
+                    SexualAbuse2 + 
+                    SexualAbuse3 + 
+                    Neglect1 + 
+                    Neglect2, 
+                  family = "quasipoisson", data = lcsfirst)
+summary(lcsfirstall1)
+
+
+
+lcsfirstall3 = glm(LCSFIRST ~ 
+                    MentalIllness + MentalIllness*sex + MentalIllness*age + 
+                    Alcoholic + Alcoholic*sex + Alcoholic*age + 
+                    SubstanceAddiction + SubstanceAddiction*sex + SubstanceAddiction*age + 
+                    Incarcerated + Incarcerated*sex + Incarcerated*age + 
+                    SeparationDivorce + SeparationDivorce*sex + SeparationDivorce*age + 
+                    DomesticViolence + DomesticViolence*sex + DomesticViolence*age + 
+                    PhysicalAbuse + PhysicalAbuse*sex  + PhysicalAbuse*age + 
+                    EmotionalAbuse + EmotionalAbuse*sex + EmotionalAbuse*age + 
+                    SexualAbuse1 + SexualAbuse1*sex + SexualAbuse1*age + 
+                    SexualAbuse2 + SexualAbuse2*sex + SexualAbuse2*age + 
+                    SexualAbuse3 + SexualAbuse3*sex + SexualAbuse3*age + 
+                    Neglect1 + Neglect1*sex + Neglect1*age + 
+                    Neglect2 + Neglect2*sex + Neglect2*age, 
+                  family = "quasipoisson", data = lcsfirst)
+summary(lcsfirstall3)
+
+lcsfirstall4 = glm(LCSFIRST ~
+                    MentalIllness + MentalIllness*sex + MentalIllness*age + MentalIllness*age*sex + 
+                    Alcoholic + Alcoholic*sex + Alcoholic*age + Alcoholic*age*sex + 
+                    SubstanceAddiction + SubstanceAddiction*sex + SubstanceAddiction*age + SubstanceAddiction*age*sex + 
+                    Incarcerated + Incarcerated*sex + Incarcerated*age + Incarcerated*age*sex + 
+                    SeparationDivorce + SeparationDivorce*sex + SeparationDivorce*age + SeparationDivorce*age*sex + 
+                    DomesticViolence + DomesticViolence*sex + DomesticViolence*age + DomesticViolence*age*sex + 
+                    PhysicalAbuse + PhysicalAbuse*sex  + PhysicalAbuse*age + PhysicalAbuse*age*sex + 
+                    EmotionalAbuse + EmotionalAbuse*sex + EmotionalAbuse*age + EmotionalAbuse*age*sex + 
+                    SexualAbuse1 + SexualAbuse1*sex + SexualAbuse1*age + SexualAbuse1*age*sex + 
+                    SexualAbuse2 + SexualAbuse2*sex + SexualAbuse2*age + SexualAbuse2*age*sex + 
+                    SexualAbuse3 + SexualAbuse3*sex + SexualAbuse3*age + SexualAbuse3*age*sex + 
+                    Neglect1 + Neglect1*sex + Neglect1*age + Neglect1*age*sex + 
+                    Neglect2 + Neglect2*sex + Neglect2*age + Neglect2*age*sex, 
+                  family = "quasipoisson", data = lcsfirst)
+summary(lcsfirstall4)
+
+
+anova(lcsfirstall, lcsfirstall1, lcsfirstall3, lcsfirstall4, test = "Chisq")
+anova(lcsfirstall1, lcsfirstall4, test = "Chisq") # lcsfirstall4 is the best model. 
+
+summary(lcsfirstall4)
+exp(lcsfirstall4$coefficients)
+
+## Still have to create a figure here. 
+
+```
+
+
+```{r LCSNUMCG}
+# LCSNUMCG
+## Question: On average, when you smoke/smoked regularly, about how many cigarettes do/did you usually smoke each day?
+
+
+lcsnumcg = everything |> select(MentalIllness, Alcoholic, Incarcerated, SeparationDivorce, DomesticViolence, PhysicalAbuse, EmotionalAbuse, SexualAbuse1, SexualAbuse2, SexualAbuse3, Neglect1, Neglect2, SubstanceAddiction, LCSNUMCG, sex, age, race, number) |>
+  filter(LCSNUMCG != "777") |>
+  filter(LCSNUMCG != "999") |>
+  filter(!is.na(LCSNUMCG)) |>
+  mutate(LCSNUMCG = as.integer(LCSNUMCG))
+
+############################################
+# Models: 
+## response variable is number of cigarettes smoked which is a count. Going to use a quasipoisson distribution. 
+
+lcsnumcgall = glm(LCSNUMCG ~ 
+                    MentalIllness + 
+                    Alcoholic + 
+                    SubstanceAddiction + 
+                    Incarcerated + 
+                    SeparationDivorce + 
+                    DomesticViolence +
+                    PhysicalAbuse + 
+                    EmotionalAbuse + 
+                    SexualAbuse1 + 
+                    SexualAbuse2 + 
+                    SexualAbuse3 + 
+                    Neglect1 + 
+                    Neglect2, 
+                  family = "quasipoisson", data = lcsnumcg)
+summary(lcsnumcgall)
+
+lcsnumcgall1 = glm(LCSNUMCG ~ age + sex + race +
+                    MentalIllness + 
+                    Alcoholic + 
+                    SubstanceAddiction + 
+                    Incarcerated + 
+                    SeparationDivorce + 
+                    DomesticViolence +
+                    PhysicalAbuse + 
+                    EmotionalAbuse + 
+                    SexualAbuse1 + 
+                    SexualAbuse2 + 
+                    SexualAbuse3 + 
+                    Neglect1 + 
+                    Neglect2, 
+                  family = "quasipoisson", data = lcsnumcg)
+summary(lcsnumcgall1)
+
+
+
+lcsnumcgall3 = glm(LCSNUMCG ~ 
+                    MentalIllness + MentalIllness*sex + MentalIllness*age + 
+                    Alcoholic + Alcoholic*sex + Alcoholic*age + 
+                    SubstanceAddiction + SubstanceAddiction*sex + SubstanceAddiction*age + 
+                    Incarcerated + Incarcerated*sex + Incarcerated*age + 
+                    SeparationDivorce + SeparationDivorce*sex + SeparationDivorce*age + 
+                    DomesticViolence + DomesticViolence*sex + DomesticViolence*age + 
+                    PhysicalAbuse + PhysicalAbuse*sex  + PhysicalAbuse*age + 
+                    EmotionalAbuse + EmotionalAbuse*sex + EmotionalAbuse*age + 
+                    SexualAbuse1 + SexualAbuse1*sex + SexualAbuse1*age + 
+                    SexualAbuse2 + SexualAbuse2*sex + SexualAbuse2*age + 
+                    SexualAbuse3 + SexualAbuse3*sex + SexualAbuse3*age + 
+                    Neglect1 + Neglect1*sex + Neglect1*age + 
+                    Neglect2 + Neglect2*sex + Neglect2*age, 
+                  family = "quasipoisson", data = lcsnumcg)
+summary(lcsnumcgall3)
+
+lcsnumcgall4 = glm(LCSNUMCG ~
+                    MentalIllness + MentalIllness*sex + MentalIllness*age + MentalIllness*age*sex + 
+                    Alcoholic + Alcoholic*sex + Alcoholic*age + Alcoholic*age*sex + 
+                    SubstanceAddiction + SubstanceAddiction*sex + SubstanceAddiction*age + SubstanceAddiction*age*sex + 
+                    Incarcerated + Incarcerated*sex + Incarcerated*age + Incarcerated*age*sex + 
+                    SeparationDivorce + SeparationDivorce*sex + SeparationDivorce*age + SeparationDivorce*age*sex + 
+                    DomesticViolence + DomesticViolence*sex + DomesticViolence*age + DomesticViolence*age*sex + 
+                    PhysicalAbuse + PhysicalAbuse*sex  + PhysicalAbuse*age + PhysicalAbuse*age*sex + 
+                    EmotionalAbuse + EmotionalAbuse*sex + EmotionalAbuse*age + EmotionalAbuse*age*sex + 
+                    SexualAbuse1 + SexualAbuse1*sex + SexualAbuse1*age + SexualAbuse1*age*sex + 
+                    SexualAbuse2 + SexualAbuse2*sex + SexualAbuse2*age + SexualAbuse2*age*sex + 
+                    SexualAbuse3 + SexualAbuse3*sex + SexualAbuse3*age + SexualAbuse3*age*sex + 
+                    Neglect1 + Neglect1*sex + Neglect1*age + Neglect1*age*sex + 
+                    Neglect2 + Neglect2*sex + Neglect2*age + Neglect2*age*sex, 
+                  family = "quasipoisson", data = lcsnumcg)
+summary(lcsnumcgall4)
+
+
+anova(lcsnumcgall, lcsnumcgall1, lcsnumcgall3, lcsnumcgall4, test = "Chisq") # lcsnumcgall1 is the best model.
+
+summary(lcsnumcgall1)
+exp(lcsnumcgall1$coefficients)
+
+
+## Still have to create a figure here. 
+
+```
+
+
+
+```{r perweek and permonth}
+# ALCDAY4 ~ 1
+## During the past 30 days, how many days per week or per month did you have at least one drink of any alcoholic
+### Coded: perweek ~ days per week out of 7, permonth ~ days per month out of 30
+# ALCDAY5 ~ 2/3/4
+## Question: During the past 30 days, how many days per week or per month did you have at least one drink of any alcoholic beverage such as beer, wine, a malt beverage or liquor?
+### Coded: perweek ~ days per week out of 7, permonth ~ days per month out of 30
+
+perweek = everything |> select(MentalIllness, Alcoholic, Incarcerated, SeparationDivorce, DomesticViolence, PhysicalAbuse, EmotionalAbuse, SexualAbuse1, SexualAbuse2, SexualAbuse3, Neglect1, Neglect2, SubstanceAddiction, ALCDAY4, ALCDAY5, sex, age, race, number) |>
+  mutate(perweek = case_when(
+    ALCDAY5 == 101 ~ 1,
+    ALCDAY5 == 102 ~ 2, 
+    ALCDAY5 == 103 ~ 3,
+    ALCDAY5 == 104 ~ 4, 
+    ALCDAY5 == 105 ~ 5,
+    ALCDAY5 == 106 ~ 6,
+    ALCDAY5 == 107 ~ 7,
+    ALCDAY4 == 101 ~ 1,
+    ALCDAY4 == 102 ~ 2,
+    ALCDAY4 == 103 ~ 3,
+    ALCDAY4 == 104 ~ 4,
+    ALCDAY4 == 105 ~ 5,
+    ALCDAY4 == 106 ~ 6,
+    ALCDAY4 == 107 ~ 7)) |>
+  filter(!is.na(perweek))
+
+perweek |> ggplot(aes(x = perweek)) + geom_density()
+    
+permonth = everything |> select(MentalIllness, Alcoholic, Incarcerated, SeparationDivorce, DomesticViolence, PhysicalAbuse, EmotionalAbuse, SexualAbuse1, SexualAbuse2, SexualAbuse3, Neglect1, Neglect2, SubstanceAddiction, ALCDAY4, ALCDAY5, sex, age, race, number) |>
+  mutate(permonth = case_when(
+    ALCDAY5 == 201 ~ 1, 
+    ALCDAY5 == 202 ~ 2,
+    ALCDAY5 == 203 ~ 3,
+    ALCDAY5 == 204 ~ 4,
+    ALCDAY5 == 205 ~ 5,
+    ALCDAY5 == 206 ~ 6,
+    ALCDAY5 == 207 ~ 7,
+    ALCDAY5 == 208 ~ 8,
+    ALCDAY5 == 209 ~ 9,
+    ALCDAY5 == 210 ~ 10, 
+    ALCDAY5 == 211 ~ 11,
+    ALCDAY5 == 212 ~ 12,
+    ALCDAY5 == 213 ~ 13,
+    ALCDAY5 == 214 ~ 14,
+    ALCDAY5 == 215 ~ 15,
+    ALCDAY5 == 216 ~ 16,
+    ALCDAY5 == 217 ~ 17,
+    ALCDAY5 == 218 ~ 18,
+    ALCDAY5 == 219 ~ 19,
+    ALCDAY5 == 220 ~ 20,
+    ALCDAY5 == 221 ~ 21,
+    ALCDAY5 == 222 ~ 22,
+    ALCDAY5 == 223 ~ 23,
+    ALCDAY5 == 224 ~ 24,
+    ALCDAY5 == 225 ~ 25,
+    ALCDAY5 == 226 ~ 26,
+    ALCDAY5 == 227 ~ 27,
+    ALCDAY5 == 228 ~ 28,
+    ALCDAY5 == 229 ~ 29,
+    ALCDAY5 == 230 ~ 30, 
+    
+    ALCDAY4 == 201 ~ 1, 
+    ALCDAY4 == 202 ~ 2,
+    ALCDAY4 == 203 ~ 3,
+    ALCDAY4 == 204 ~ 4,
+    ALCDAY4 == 205 ~ 5,
+    ALCDAY4 == 206 ~ 6,
+    ALCDAY4 == 207 ~ 7,
+    ALCDAY4 == 208 ~ 8,
+    ALCDAY4 == 209 ~ 9,
+    ALCDAY4 == 210 ~ 10, 
+    ALCDAY4 == 211 ~ 11,
+    ALCDAY4 == 212 ~ 12,
+    ALCDAY4 == 213 ~ 13,
+    ALCDAY4 == 214 ~ 14,
+    ALCDAY4 == 215 ~ 15,
+    ALCDAY4 == 216 ~ 16,
+    ALCDAY4 == 217 ~ 17,
+    ALCDAY4 == 218 ~ 18,
+    ALCDAY4 == 219 ~ 19,
+    ALCDAY4 == 220 ~ 20,
+    ALCDAY4 == 221 ~ 21,
+    ALCDAY4 == 222 ~ 22,
+    ALCDAY4 == 223 ~ 23,
+    ALCDAY4 == 224 ~ 24,
+    ALCDAY4 == 225 ~ 25,
+    ALCDAY4 == 226 ~ 26,
+    ALCDAY4 == 227 ~ 27,
+    ALCDAY4 == 228 ~ 28,
+    ALCDAY4 == 229 ~ 29,
+    ALCDAY4 == 230 ~ 30)) |>
+  filter(!is.na(permonth))
+
+permonth |> ggplot(aes(x = permonth)) + geom_density()
+
+############################################
+# Models for perweek: 
+## response variable is number of days which is a count. Going to use a quasipoisson distribution. 
+
+perweekall = glm(perweek ~ 
+                    MentalIllness + 
+                    Alcoholic + 
+                    SubstanceAddiction + 
+                    Incarcerated + 
+                    SeparationDivorce + 
+                    DomesticViolence +
+                    PhysicalAbuse + 
+                    EmotionalAbuse + 
+                    SexualAbuse1 + 
+                    SexualAbuse2 + 
+                    SexualAbuse3 + 
+                    Neglect1 + 
+                    Neglect2, 
+                  family = "quasipoisson", data = perweek)
+summary(perweekall)
+
+perweekall1 = glm(perweek ~ age + sex + race +
+                    MentalIllness + 
+                    Alcoholic + 
+                    SubstanceAddiction + 
+                    Incarcerated + 
+                    SeparationDivorce + 
+                    DomesticViolence +
+                    PhysicalAbuse + 
+                    EmotionalAbuse + 
+                    SexualAbuse1 + 
+                    SexualAbuse2 + 
+                    SexualAbuse3 + 
+                    Neglect1 + 
+                    Neglect2, 
+                  family = "quasipoisson", data = perweek)
+summary(perweekall1)
+
+
+
+perweekall3 = glm(perweek ~ 
+                    MentalIllness + MentalIllness*sex + MentalIllness*age + 
+                    Alcoholic + Alcoholic*sex + Alcoholic*age + 
+                    SubstanceAddiction + SubstanceAddiction*sex + SubstanceAddiction*age + 
+                    Incarcerated + Incarcerated*sex + Incarcerated*age + 
+                    SeparationDivorce + SeparationDivorce*sex + SeparationDivorce*age + 
+                    DomesticViolence + DomesticViolence*sex + DomesticViolence*age + 
+                    PhysicalAbuse + PhysicalAbuse*sex  + PhysicalAbuse*age + 
+                    EmotionalAbuse + EmotionalAbuse*sex + EmotionalAbuse*age + 
+                    SexualAbuse1 + SexualAbuse1*sex + SexualAbuse1*age + 
+                    SexualAbuse2 + SexualAbuse2*sex + SexualAbuse2*age + 
+                    SexualAbuse3 + SexualAbuse3*sex + SexualAbuse3*age + 
+                    Neglect1 + Neglect1*sex + Neglect1*age + 
+                    Neglect2 + Neglect2*sex + Neglect2*age, 
+                  family = "quasipoisson", data = perweek)
+summary(perweekall3)
+
+perweekall4 = glm(perweek ~
+                    MentalIllness + MentalIllness*sex + MentalIllness*age + MentalIllness*age*sex + 
+                    Alcoholic + Alcoholic*sex + Alcoholic*age + Alcoholic*age*sex + 
+                    SubstanceAddiction + SubstanceAddiction*sex + SubstanceAddiction*age + SubstanceAddiction*age*sex + 
+                    Incarcerated + Incarcerated*sex + Incarcerated*age + Incarcerated*age*sex + 
+                    SeparationDivorce + SeparationDivorce*sex + SeparationDivorce*age + SeparationDivorce*age*sex + 
+                    DomesticViolence + DomesticViolence*sex + DomesticViolence*age + DomesticViolence*age*sex + 
+                    PhysicalAbuse + PhysicalAbuse*sex  + PhysicalAbuse*age + PhysicalAbuse*age*sex + 
+                    EmotionalAbuse + EmotionalAbuse*sex + EmotionalAbuse*age + EmotionalAbuse*age*sex + 
+                    SexualAbuse1 + SexualAbuse1*sex + SexualAbuse1*age + SexualAbuse1*age*sex + 
+                    SexualAbuse2 + SexualAbuse2*sex + SexualAbuse2*age + SexualAbuse2*age*sex + 
+                    SexualAbuse3 + SexualAbuse3*sex + SexualAbuse3*age + SexualAbuse3*age*sex + 
+                    Neglect1 + Neglect1*sex + Neglect1*age + Neglect1*age*sex + 
+                    Neglect2 + Neglect2*sex + Neglect2*age + Neglect2*age*sex, 
+                  family = "quasipoisson", data = perweek)
+summary(perweekall4)
+
+
+anova(perweekall, perweekall1, perweekall3, perweekall4, test = "Chisq") # perweekall1 is the best model. 
+
+summary(perweekall1)
+exp(perweekall1$coefficients)
+
+## Still have to create a figure here. 
+
+
+############################################
+# Models for permonth: 
+## response variable is number of days is a count. Going to use a quasipoisson distribution. 
+
+permonthall = glm(permonth ~ 
+                    MentalIllness + 
+                    Alcoholic + 
+                    SubstanceAddiction + 
+                    Incarcerated + 
+                    SeparationDivorce + 
+                    DomesticViolence +
+                    PhysicalAbuse + 
+                    EmotionalAbuse + 
+                    SexualAbuse1 + 
+                    SexualAbuse2 + 
+                    SexualAbuse3 + 
+                    Neglect1 + 
+                    Neglect2, 
+                  family = "quasipoisson", data = permonth)
+summary(permonthall)
+
+permonthall1 = glm(permonth ~ age + sex + race +
+                    MentalIllness + 
+                    Alcoholic + 
+                    SubstanceAddiction + 
+                    Incarcerated + 
+                    SeparationDivorce + 
+                    DomesticViolence +
+                    PhysicalAbuse + 
+                    EmotionalAbuse + 
+                    SexualAbuse1 + 
+                    SexualAbuse2 + 
+                    SexualAbuse3 + 
+                    Neglect1 + 
+                    Neglect2, 
+                  family = "quasipoisson", data = permonth)
+summary(permonthall1)
+
+
+
+permonthall3 = glm(permonth ~ 
+                    MentalIllness + MentalIllness*sex + MentalIllness*age + 
+                    Alcoholic + Alcoholic*sex + Alcoholic*age + 
+                    SubstanceAddiction + SubstanceAddiction*sex + SubstanceAddiction*age + 
+                    Incarcerated + Incarcerated*sex + Incarcerated*age + 
+                    SeparationDivorce + SeparationDivorce*sex + SeparationDivorce*age + 
+                    DomesticViolence + DomesticViolence*sex + DomesticViolence*age + 
+                    PhysicalAbuse + PhysicalAbuse*sex  + PhysicalAbuse*age + 
+                    EmotionalAbuse + EmotionalAbuse*sex + EmotionalAbuse*age + 
+                    SexualAbuse1 + SexualAbuse1*sex + SexualAbuse1*age + 
+                    SexualAbuse2 + SexualAbuse2*sex + SexualAbuse2*age + 
+                    SexualAbuse3 + SexualAbuse3*sex + SexualAbuse3*age + 
+                    Neglect1 + Neglect1*sex + Neglect1*age + 
+                    Neglect2 + Neglect2*sex + Neglect2*age, 
+                  family = "quasipoisson", data = permonth)
+summary(permonthall3)
+
+permonthall4 = glm(permonth ~
+                    MentalIllness + MentalIllness*sex + MentalIllness*age + MentalIllness*age*sex + 
+                    Alcoholic + Alcoholic*sex + Alcoholic*age + Alcoholic*age*sex + 
+                    SubstanceAddiction + SubstanceAddiction*sex + SubstanceAddiction*age + SubstanceAddiction*age*sex + 
+                    Incarcerated + Incarcerated*sex + Incarcerated*age + Incarcerated*age*sex + 
+                    SeparationDivorce + SeparationDivorce*sex + SeparationDivorce*age + SeparationDivorce*age*sex + 
+                    DomesticViolence + DomesticViolence*sex + DomesticViolence*age + DomesticViolence*age*sex + 
+                    PhysicalAbuse + PhysicalAbuse*sex  + PhysicalAbuse*age + PhysicalAbuse*age*sex + 
+                    EmotionalAbuse + EmotionalAbuse*sex + EmotionalAbuse*age + EmotionalAbuse*age*sex + 
+                    SexualAbuse1 + SexualAbuse1*sex + SexualAbuse1*age + SexualAbuse1*age*sex + 
+                    SexualAbuse2 + SexualAbuse2*sex + SexualAbuse2*age + SexualAbuse2*age*sex + 
+                    SexualAbuse3 + SexualAbuse3*sex + SexualAbuse3*age + SexualAbuse3*age*sex + 
+                    Neglect1 + Neglect1*sex + Neglect1*age + Neglect1*age*sex + 
+                    Neglect2 + Neglect2*sex + Neglect2*age + Neglect2*age*sex, 
+                  family = "quasipoisson", data = permonth)
+summary(permonthall4)
+
+
+anova(permonthall, permonthall1, permonthall3, permonthall4, test = "Chisq") # permonthall1 is the best model.
+
+
+summary(permonthall1)
+exp(permonthall1$coefficients)
+
+
+## Still have to create a figure here. 
+
+```
+
+
+```{r DRNK3GE5}
+# DRNK3GE5
+## Question: Considering all types of alcoholic beverages, how many times during the past 30 days did you have 5 or more drinks for men or 4 or more drinks for women on an occasion?
+### Coded: Number of time between 1-76. 
+
+DRNK3GE5 = everything |> select(MentalIllness, Alcoholic, Incarcerated, SeparationDivorce, DomesticViolence, PhysicalAbuse, EmotionalAbuse, SexualAbuse1, SexualAbuse2, SexualAbuse3, Neglect1, Neglect2, SubstanceAddiction, DRNK3GE5, sex, age, race, number) |>
+  filter(DRNK3GE5 != 88) |>
+  filter(DRNK3GE5 != 77) |>
+  filter(DRNK3GE5 != 99) |>
+  filter(!is.na(DRNK3GE5))
+
+
+DRNK3GE5 |> ggplot(aes(x = DRNK3GE5)) + geom_density()
+
+############################################
+# Models: 
+## response variable is number of days which is a count. Going to use a quasipoisson distribution. 
+
+DRNK3GE5all = glm(DRNK3GE5 ~ 
+                    MentalIllness + 
+                    Alcoholic + 
+                    SubstanceAddiction + 
+                    Incarcerated + 
+                    SeparationDivorce + 
+                    DomesticViolence +
+                    PhysicalAbuse + 
+                    EmotionalAbuse + 
+                    SexualAbuse1 + 
+                    SexualAbuse2 + 
+                    SexualAbuse3 + 
+                    Neglect1 + 
+                    Neglect2, 
+                  family = "quasipoisson", data = DRNK3GE5)
+summary(DRNK3GE5all)
+
+DRNK3GE5all1 = glm(DRNK3GE5 ~ age + sex + race +
+                    MentalIllness + 
+                    Alcoholic + 
+                    SubstanceAddiction + 
+                    Incarcerated + 
+                    SeparationDivorce + 
+                    DomesticViolence +
+                    PhysicalAbuse + 
+                    EmotionalAbuse + 
+                    SexualAbuse1 + 
+                    SexualAbuse2 + 
+                    SexualAbuse3 + 
+                    Neglect1 + 
+                    Neglect2, 
+                  family = "quasipoisson", data = DRNK3GE5)
+summary(DRNK3GE5all1)
+
+
+
+DRNK3GE5all3 = glm(DRNK3GE5 ~ 
+                    MentalIllness + MentalIllness*sex + MentalIllness*age + 
+                    Alcoholic + Alcoholic*sex + Alcoholic*age + 
+                    SubstanceAddiction + SubstanceAddiction*sex + SubstanceAddiction*age + 
+                    Incarcerated + Incarcerated*sex + Incarcerated*age + 
+                    SeparationDivorce + SeparationDivorce*sex + SeparationDivorce*age + 
+                    DomesticViolence + DomesticViolence*sex + DomesticViolence*age + 
+                    PhysicalAbuse + PhysicalAbuse*sex  + PhysicalAbuse*age + 
+                    EmotionalAbuse + EmotionalAbuse*sex + EmotionalAbuse*age + 
+                    SexualAbuse1 + SexualAbuse1*sex + SexualAbuse1*age + 
+                    SexualAbuse2 + SexualAbuse2*sex + SexualAbuse2*age + 
+                    SexualAbuse3 + SexualAbuse3*sex + SexualAbuse3*age + 
+                    Neglect1 + Neglect1*sex + Neglect1*age + 
+                    Neglect2 + Neglect2*sex + Neglect2*age, 
+                  family = "quasipoisson", data = DRNK3GE5)
+summary(DRNK3GE5all3)
+
+DRNK3GE5all4 = glm(DRNK3GE5 ~
+                    MentalIllness + MentalIllness*sex + MentalIllness*age + MentalIllness*age*sex + 
+                    Alcoholic + Alcoholic*sex + Alcoholic*age + Alcoholic*age*sex + 
+                    SubstanceAddiction + SubstanceAddiction*sex + SubstanceAddiction*age + SubstanceAddiction*age*sex + 
+                    Incarcerated + Incarcerated*sex + Incarcerated*age + Incarcerated*age*sex + 
+                    SeparationDivorce + SeparationDivorce*sex + SeparationDivorce*age + SeparationDivorce*age*sex + 
+                    DomesticViolence + DomesticViolence*sex + DomesticViolence*age + DomesticViolence*age*sex + 
+                    PhysicalAbuse + PhysicalAbuse*sex  + PhysicalAbuse*age + PhysicalAbuse*age*sex + 
+                    EmotionalAbuse + EmotionalAbuse*sex + EmotionalAbuse*age + EmotionalAbuse*age*sex + 
+                    SexualAbuse1 + SexualAbuse1*sex + SexualAbuse1*age + SexualAbuse1*age*sex + 
+                    SexualAbuse2 + SexualAbuse2*sex + SexualAbuse2*age + SexualAbuse2*age*sex + 
+                    SexualAbuse3 + SexualAbuse3*sex + SexualAbuse3*age + SexualAbuse3*age*sex + 
+                    Neglect1 + Neglect1*sex + Neglect1*age + Neglect1*age*sex + 
+                    Neglect2 + Neglect2*sex + Neglect2*age + Neglect2*age*sex, 
+                  family = "quasipoisson", data = DRNK3GE5)
+summary(DRNK3GE5all4)
+
+
+anova(DRNK3GE5all, DRNK3GE5all1, DRNK3GE5all3, DRNK3GE5all4, test = "Chisq") # DRNK3GE5all1 is the best model.
 
 
 
 
 
 ```
-
-
-
-
-
-
-
-
-
-
-
 
 
 
