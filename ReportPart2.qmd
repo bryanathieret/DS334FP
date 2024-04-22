@@ -35,6 +35,8 @@ library(lmerTest)
 library(lme4)
 library(plotly)
 library(maps)
+library(mapproj)
+library(usmap)
 
 twenty022 <- read_xpt(here::here("LLCP2022.XPT ")) ## space after T 
 twenty021 <- read_xpt(here::here("LLCP2021.XPT"))
@@ -466,29 +468,120 @@ everything = full_join(twenty019, full_join(twenty020, full_join(twenty021, twen
 It is important to understand the demographics of those who make up our data set in order to generalize the findings to a larger population. To do this we will look at data collected by year, state, age, sex, and race.  
 
 
-### Year  
+### Surveys by Year  
 
 ```{r}
 year = everything |> mutate(IYEAR = as.factor(IYEAR)) |>
-  group_by(IYEAR) |>
+  group_by(IYEAR, sex) |>
   summarise(Surveys = n()) |>
-  ggplot(aes(x = IYEAR, y = Surveys, label = Surveys)) +
-  geom_col(fill = NA, color = "black") +
+  mutate(sex = if_else(sex == 1, "Male", "Female")) |>
+  
+  ggplot(aes(x = IYEAR, y = Surveys, label = Surveys, fill = sex)) +
+  geom_col( color = "black", position = position_dodge(0.9)) +
   coord_flip() +
   labs(y = "Surveys Completed", x = "Year") +
   theme_minimal() +
-  ylim(0, 135000) +
+  scale_fill_brewer(palette = "Dark2") +
+  ylim(0, 80000) +
   theme(
     axis.title = element_text(color = "black", family = "Avenir", size = 22),
-    axis.text = element_text(color = "black", family = "Avenir", size = 18)
+    axis.text = element_text(color = "black", family = "Avenir", size = 18),
+    legend.title = element_text(color = "white"),
+    legend.text = element_text(color = "black", size = 13, family = "Avenir"),
+    legend.position = "top"
   )
 ggplotly(year, tooltip = "label")
 ```
 
+## Surveys by State
+```{r}
+library(maps)
+library(ggmaps)
+state_df <- ggplot2::map_data("state")
+ggplot2::map_data()
+
+maps::usa()
+
+states = tibble(state.name = state.name) |> mutate(number = c(1, 2, 4, 5, 6, 8, 9, 10, 12, 13, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 44, 45, 46, 47, 48, 49, 50, 51, 53, 54, 55, 56))
+otherstates = tibble(state.name = c("District of Columbia", "Guam", "Puerto Rico", "Virgin Islands"),
+       number = c(11, 66, 72, 78))
+states = full_join(states, otherstates)
+
+ace_state = left_join(everything, states, by = c("state" = "number")) 
+ace_state = ace_state |> group_by(state.name) |> 
+  summarise(n = n()) |>
+  mutate(state.name = str_to_lower(state.name)) |>
+  rename("state" = "state.name", 
+         "Surveys" = n)
+
+
+ states = plot_usmap(data = ace_state, values = "Surveys") +
+  theme_void() +
+  scale_fill_distiller(palette = "PuRd", direction = 1, na.value = "black") + 
+  labs(caption = "States that are black represent NA.", title = "Surveys by State") +
+  theme(
+    legend.text = element_text(color = "black", family = "Avenir", size = 15),
+    legend.title = element_blank(),
+    legend.key.width = unit(3, "line"),
+    title = element_text(color = "black", family = "Avenir", size = 10),
+    legend.position = c(0.55, 0.98),
+    legend.direction = "horizontal",
+    plot.title = element_text(color = "black", family = "Avenir", size = 16),
+    plot.caption = element_text(color = "black", family = "Avenir", size = 11))
+
+ 
+ggplotly(states)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+state_df = data.frame(state.center, state=state.name)
+
+left_join(state_df, ace_state) |> ggplot(aes(x = x, y = y)) +
+  geom_polygon()
+
+
+
+ggplot2::map_data("usa")
+
+state_df |> distinct(region)
+
+
 
 ```{r}
-library(mapproj)
-
+library(rnaturalearth)
+library(rnaturalearthdata)
+library(sf)
 
 state_df <- ggplot2::map_data("state")
 
@@ -500,29 +593,68 @@ states = full_join(states, otherstates)
 ace_state = left_join(everything, states, by = c("state" = "number")) 
 ace_state = ace_state |> group_by(state.name) |> 
   summarise(n = n()) |>
-  mutate(state.name = str_to_lower(state.name))
+  mutate(state.name = str_to_lower(state.name)) |>
+  rename("state" = "state.name", 
+         "values" = n) |>
+  mutate(state = str_to_title(state))
 
 
-ace_state <- left_join(state_df, ace_state, by = c("region" = "state.name"))
 
+data = rnaturalearthdata::states50
+class(data)
 
-ace_state |> ggplot(aes(x = long, y = lat, group = group)) +
-  geom_polygon(colour = "black", aes(fill = n)) +
-  coord_map(projection = "albers", lat0 = 39, lat1 = 45) +
+data = data |> filter(admin == "United States of America") 
+
+data = left_join(data, ace_state, by = c("name" = "state"))
+
+data |> 
+  ggplot() +
+  geom_polygon(aes(x = geometry))
+
+(mainland = data |> 
+  ggplot(fill = values, col = values) +
   theme_void() +
-  scale_fill_distiller(palette = 8, direction = 1) +
-  labs(title ='Response') +
-  theme(
-    legend.text = element_text(color = "black", family = "Avenir", size = 14),
-    legend.title = element_blank(),
-    title = element_text(color = "black", family = "Avenir", size = 14),
-    legend.position = c(0.5, 0.95),
-    legend.direction = "horizontal"
-  )
+  scale_fill_distiller(palette = "PuRd", direction = 1, na.value = "black") +
+  geom_sf() +
+     coord_sf(crs = st_crs(2163), xlim = c(-2500000, 2500000), ylim = c(-2300000, 
+         730000)))
+
+(alaska <- ggplot(data = data) +
+     geom_sf() +
+     coord_sf(crs = st_crs(3467), xlim = c(-2400000, 1600000), ylim = c(200000, 
+         2500000), expand = FALSE, datum = NA))
+
+
+(hawaii  <- ggplot(data = data) +
+     geom_sf() +
+     coord_sf(crs = st_crs(4135), xlim = c(-161, -154), ylim = c(18, 
+         23), expand = FALSE, datum = NA))
+
+
+mainland +
+ annotation_custom(
+      grob = ggplotGrob(alaska),
+      xmin = -2750000,
+      xmax = -2750000 + (1600000 - (-2400000))/2.5,
+      ymin = -2450000,
+      ymax = -2450000 + (2500000 - 200000)/2.5
+  ) +
+  annotation_custom(
+      grob = ggplotGrob(hawaii),
+      xmin = -1250000,
+      xmax = -1250000 + (-154 - (-161))*120000,
+      ymin = -2450000,
+      ymax = -2450000 + (23 - 18)*120000
+  ) 
+
+
+
+  
+
+
+
+  
 ```
-
-
-
 
 
 
