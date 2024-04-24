@@ -722,9 +722,9 @@ smokdays2all4 = glm(SMOKDAY2 ~
 summary(smokdays2all4)
 
 
-anova(smokdays2all,smokdays2all1, smokdays2all2, smokdays2all3, smokdays2all4, test = "Chisq")
+anova(smokdays2all,smokdays2all1, smokdays2all3, smokdays2all4, test = "Chisq")
 
-anova(smokdays2all1, smokdays2all2, test = "Chisq") #smokdays2all2 is the best model. 
+anova(smokdays2all1, smokdays2all3, test = "Chisq") #smokdays2all3 is the best model. 
 
 summary(smokdays2all2)
 exp(smokdays2all2$coefficients)
