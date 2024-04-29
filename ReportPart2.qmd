@@ -38,6 +38,7 @@ library(maps)
 library(mapproj)
 library(usmap)
 library(knitr)
+library(broom)
 
 twenty022 <- read_xpt(here::here("LLCP2022.XPT ")) ## space after T 
 twenty021 <- read_xpt(here::here("LLCP2021.XPT"))
@@ -749,44 +750,29 @@ This question was answered by 99.37% of the previously established population.
 
 ### Model:  
 
+Quasibinomial regressions were compared through chi-square tests to evaluate which model was a significantly better fit which is based on null and residual deviance. Quasibinomial was used instead of binomial to avoid overfitting. The dispersion parameter for the best model was 1.0012. 
+
+
 ```{=tex, model equation for SMOKE100}
-\begin{equation*}
-\begin{split}
-log(\frac{1-p}{p}) = &\beta_1 (\text{MentalIllness}) + \beta_2 (\text{MentalIllness} \cdot \text{age}) + \beta_3 (\text{MentalIllness} \cdot \text{sex}) + \beta_4 (\text{MentalIllness} \cdot \text{age} \cdot \text{sex}) + \\
-                  &\beta_5 (\text{Alcohol}) + \beta_6 (\text{Alcohol} \cdot \text{age}) + \beta_7 (\text{Alcohol} \cdot \text{sex}) + \beta_8 (\text{Alcohol} \cdot \text{age} \cdot \text{sex}) + \\
-                  &\beta_9 (\text{Incarcerated}) + \beta_{10} (\text{Incarcerated} \cdot \text{age}) + \beta_{11} (\text{Incarcerated} \cdot \text{sex}) + \beta_{12} (\text{Incarcerated} \cdot \text{age} \cdot \text{sex}) + \\
-                  &\beta_{13} (\text{SeparationDivorce}) + \beta_{14} (\text{SeparationDivorce} \cdot \text{age}) + \beta_{15} (\text{SeparationDivorce} \cdot \text{sex}) + \beta_{16} (\text{SeparationDivorce} \cdot \text{age} \cdot \text{sex}) + \\
-                  &\beta_{17} (\text{DomesticViolence}) + \beta_{18} (\text{DomesticViolence} \cdot \text{age}) + \beta_{19} (\text{DomesticViolence} \cdot \text{sex}) + \beta_{20} (\text{DomesticViolence} \cdot \text{age} \cdot \text{sex}) + \\
-                  &\beta_{21} (\text{PhysicalAbuse}) + \beta_{22} (\text{PhysicalAbuse} \cdot \text{age}) + \beta_{23} (\text{PhysicalAbuse} \cdot \text{sex}) + \beta_{24} (\text{PhysicalAbuse} \cdot \text{age} \cdot \text{sex}) + \\
-                  &\beta_{25} (\text{EmotionalAbuse}) + \beta_{26} (\text{EmotionalAbuse} \cdot \text{age}) + \beta_{27} (\text{EmotionalAbuse} \cdot \text{sex}) + \beta_{28} (\text{EmotionalAbuse} \cdot \text{age} \cdot \text{sex}) + \\
-                  &\beta_{29} (\text{SexualAbuse1}) + \beta_{30} (\text{SexualAbuse1} \cdot \text{age}) + \beta_{31} (\text{SexualAbuse1} \cdot \text{sex}) + \beta_{32} (\text{SexualAbuse1} \cdot \text{age} \cdot \text{sex}) + \\
-                  &\beta_{33} (\text{SexualAbuse2}) + \beta_{34} (\text{SexualAbuse2} \cdot \text{age}) + \beta_{35} (\text{SexualAbuse2} \cdot \text{sex}) + \beta_{36} (\text{SexualAbuse2} \cdot \text{age} \cdot \text{sex}) + \\
-                  &\beta_{37} (\text{SexualAbuse3}) + \beta_{38} (\text{SexualAbuse3} \cdot \text{age}) + \beta_{39} (\text{SexualAbuse3} \cdot \text{sex}) + \beta_{40} (\text{SexualAbuse3} \cdot \text{age} \cdot \text{sex}) + \\
-                  &\beta_{41} (\text{Neglect1}) + \beta_{42} (\text{Neglect1} \cdot \text{age}) + \beta_{43} (\text{Neglect1} \cdot \text{sex}) + \beta_{44} (\text{Neglect1} \cdot \text{age} \cdot \text{sex}) + \\
-                  &\beta_{45} (\text{Neglect2}) + \beta_{46} (\text{Neglect2} \cdot \text{age}) + \beta_{47} (\text{Neglect2} \cdot \text{sex}) + \beta_{48} (\text{Neglect2} \cdot \text{age} \cdot \text{sex}) + \\
-                  &\beta_{49} (\text{SubstanceAddiction}) + \beta_{50} (\text{SubstanceAddiction} \cdot \text{age}) + \beta_{51} (\text{SubstanceAddiction} \cdot \text{sex}) + \beta_{52} (\text{SubstanceAddiction} \cdot \text{age} \cdot \text{sex}) \\
-\end{split}
-\end{equation*}
-
+\begin{align*}
+log(\frac{\pi_i}{1 - \pi_i}) = \\
+  &\beta_1 (\text{sex}) + \\
+  &\beta_2 (\text{age}) + \\
+  &\beta_3 (\text{MentalIllness}) + \beta_4 (\text{MentalIllness} \cdot \text{sex}) + \beta_5 (\text{MentalIllness} \cdot \text{age}) + \beta_6 (\text{MentalIllness} \cdot \text{sex} \cdot \text{age}) + \\
+  &\beta_7 (\text{Alcohol}) + \beta_8 (\text{Alcohol} \cdot \text{sex}) + \beta_9 (\text{Alcohol} \cdot \text{age}) + \beta_{10} (\text{Alcohol} \cdot \text{sex} \cdot \text{age}) + \\
+  &\beta_{11} (\text{SubstanceAddiction}) + \beta_{12} (\text{SubstanceAddiction} \cdot \text{sex}) + \beta_{13} (\text{SubstanceAddiction} \cdot \text{age}) + \beta_{14} (\text{SubstanceAddiction} \cdot \text{sex} \cdot \text{age}) + \\
+  &\beta_{15} (\text{Incarcerated}) + \beta_{16} (\text{Incarcerated} \cdot \text{sex}) + \beta_{17} (\text{Incarcerated} \cdot \text{age}) + \beta_{18} (\text{Incarcerated} \cdot \text{sex} \cdot \text{age}) + \\
+                  &\beta_{19} (\text{SeparationDivorce}) + \beta_{20} (\text{SeparationDivorce} \cdot \text{age}) + \beta_{21} (\text{SeparationDivorce} \cdot \text{sex}) + \beta_{22} (\text{SeparationDivorce} \cdot \text{age} \cdot \text{sex}) + \\
+                  &\beta_{23} (\text{DomesticViolence}) + \beta_{24} (\text{DomesticViolence} \cdot \text{age}) + \beta_{25} (\text{DomesticViolence} \cdot \text{sex}) + \beta_{26} (\text{DomesticViolence} \cdot \text{age} \cdot \text{sex}) + \\
+                  &\beta_{27} (\text{PhysicalAbuse}) + \beta_{28} (\text{PhysicalAbuse} \cdot \text{age}) + \beta_{29} (\text{PhysicalAbuse} \cdot \text{sex}) + \beta_{30} (\text{PhysicalAbuse} \cdot \text{age} \cdot \text{sex}) + \\
+                  &\beta_{31} (\text{EmotionalAbuse}) + \beta_{32} (\text{EmotionalAbuse} \cdot \text{age}) + \beta_{33} (\text{EmotionalAbuse} \cdot \text{sex}) + \beta_{34} (\text{EmotionalAbuse} \cdot \text{age} \cdot \text{sex}) + \\
+                  &\beta_{35} (\text{SexualAbuse1}) + \beta_{36} (\text{SexualAbuse1} \cdot \text{age}) + \beta_{37} (\text{SexualAbuse1} \cdot \text{sex}) + \beta_{38} (\text{SexualAbuse1} \cdot \text{age} \cdot \text{sex}) + \\
+                  &\beta_{39} (\text{SexualAbuse2}) + \beta_{40} (\text{SexualAbuse2} \cdot \text{age}) + \beta_{41} (\text{SexualAbuse2} \cdot \text{sex}) + \beta_{42} (\text{SexualAbuse2} \cdot \text{age} \cdot \text{sex}) + \\
+                  &\beta_{43} (\text{SexualAbuse3}) + \beta_{44} (\text{SexualAbuse3} \cdot \text{age}) + \beta_{45} (\text{SexualAbuse3} \cdot \text{sex}) + \beta_{46} (\text{SexualAbuse3} \cdot \text{age} \cdot \text{sex}) + \\
+                  &\beta_{47} (\text{Neglect1}) + \beta_{48} (\text{Neglect1} \cdot \text{age}) + \beta_{49} (\text{Neglect1} \cdot \text{sex}) + \beta_{50} (\text{Neglect1} \cdot \text{age} \cdot \text{sex}) + \\
+                  &\beta_{51} (\text{Neglect2}) + \beta_{52} (\text{Neglect2} \cdot \text{age}) + \beta_{53} (\text{Neglect2} \cdot \text{sex}) + \beta_{54} (\text{Neglect2} \cdot \text{age} \cdot \text{sex}) + \\
+\end{align*}
 ```
-
-
-$$log(\frac{1-p}{p}) = \beta_1 (\text{MentalIllness}) + \beta_2 (\text{MentalIllness} \cdot \text{age}) + \beta_3 (\text{MentalIllness} \cdot \text{sex}) + \beta_4 (\text{MentalIllness} \cdot \text{age} \cdot \text{sex}) + \\
-\beta_5 (\text{Alcohol}) + \beta_6 (\text{Alcohol} \cdot \text{age}) + \beta_7 (\text{Alcohol} \cdot \text{sex}) + \beta_8 (\text{Alcohol} \cdot \text{age} \cdot \text{sex}) + \\
-\beta_9 (\text{Incarcerated}) + \beta_{10} (\text{Incarcerated} \cdot \text{age}) + \beta_{11} (\text{Incarcerated} \cdot \text{sex}) + \beta_{12} (\text{Incarcerated} \cdot \text{age} \cdot \text{sex}) + \\
-\beta_{13} (\text{SeparationDivorce}) + \beta_{14} (\text{SeparationDivorce} \cdot \text{age}) + \beta_{15} (\text{SeparationDivorce} \cdot \text{sex}) + \beta_{16} (\text{SeparationDivorce} \cdot \text{age} \cdot \text{sex}) + \\
-\beta_{17} (\text{DomesticViolence}) + \beta_{18} (\text{DomesticViolence} \cdot \text{age}) + \beta_{19} (\text{DomesticViolence} \cdot \text{sex}) + \beta_{20} (\text{DomesticViolence} \cdot \text{age} \cdot \text{sex}) + \\
-\beta_{21} (\text{PhysicalAbuse}) + \beta_{22} (\text{PhysicalAbuse} \cdot \text{age}) + \beta_{23} (\text{PhysicalAbuse} \cdot 
-\text{sex}) + \beta_{24} (\text{PhysicalAbuse} \cdot \text{age} \cdot \text{sex}) + \\
-\beta_{25} (\text{EmotionalAbuse}) + \beta_{26} (\text{EmotionalAbuse} \cdot \text{age}) + \beta_{27} (\text{EmotionalAbuse} \cdot \text{sex}) + \beta_{28} (\text{EmotionalAbuse} \cdot \text{age} \cdot \text{sex}) + \\
-\beta_{29} (\text{SexualAbuse1}) + \beta_{30} (\text{SexualAbuse1} \cdot \text{age}) + \beta_{31} (\text{SexualAbuse1} \cdot \text{sex}) + \beta_{32} (\text{SexualAbuse1} \cdot \text{age} \cdot \text{sex}) + \\
-\beta_{33} (\text{SexualAbuse2}) + \beta_{34} (\text{SexualAbuse2} \cdot \text{age}) + \beta_{35} (\text{SexualAbuse2} \cdot \text{sex}) + \beta_{36} (\text{SexualAbuse2} \cdot \text{age} \cdot \text{sex}) + \\
-\beta_{37} (\text{SexualAbuse3}) + \beta_{38} (\text{SexualAbuse3} \cdot \text{age}) + \beta_{39} (\text{SexualAbuse3} \cdot \text{sex}) + \beta_{40} (\text{SexualAbuse3} \cdot \text{age} \cdot \text{sex}) + \\
-\beta_{41} (\text{Neglect1}) + \beta_{42} (\text{Neglect1} \cdot \text{age}) + \beta_{43} (\text{Neglect1} \cdot \text{sex}) + \beta_{44} (\text{Neglect1} \cdot \text{age} \cdot \text{sex}) + \\
-\beta_{45} (\text{Neglect2}) + \beta_{46} (\text{Neglect2} \cdot \text{age}) + \beta_{47} (\text{Neglect2} \cdot \text{sex}) + \beta_{48} (\text{Neglect2} \cdot \text{age} \cdot \text{sex}) + \\
-\beta_{49} (\text{SubstanceAddiction}) + \beta_{50} (\text{SubstanceAddiction} \cdot \text{age}) + \beta_{51} (\text{SubstanceAddiction} \cdot \text{sex}) + \beta_{52} (\text{SubstanceAddiction} \cdot \text{age} \cdot \text{sex})$$
-
-
 
 
 
@@ -797,9 +783,26 @@ smoke100 = everything |> select(MentalIllness, Alcoholic, Incarcerated, Separati
     SMOKE100 == 1 ~ 1,
     SMOKE100 == 2 ~ 0,
     SMOKE100 == 7 ~ NA,
-    SMOKE100 == 9 ~ NA))
+    SMOKE100 == 9 ~ NA)) |>
+  mutate(sex = if_else(sex == 1, "Male", "Female")) |>
+  mutate(sex = as.factor(sex),
+         age = as.factor(age),
+         race = as.factor(race),
+         MentalIllness = as.factor(MentalIllness),
+         Alcoholic = as.factor(Alcoholic),
+         Incarcerated = as.factor(Incarcerated),
+         SeparationDivorce = as.factor(SeparationDivorce),
+         DomesticViolence = as.factor(DomesticViolence),
+         PhysicalAbuse = as.factor(PhysicalAbuse),
+         EmotionalAbuse = as.factor(EmotionalAbuse),
+         SexualAbuse1 = as.factor(SexualAbuse1),
+         SexualAbuse2 = as.factor(SexualAbuse2),
+         SexualAbuse3 = as.factor(SexualAbuse3),
+         Neglect1 = as.factor(Neglect1),
+         Neglect2 = as.factor(Neglect2),
+         SubstanceAddiction = as.factor(SubstanceAddiction))
 
-smoke100 = smoke100 |> filter(!is.na(SMOKE100))
+smoke100 = smoke100 |> filter(!is.na(SMOKE100)) 
 
 
 smoke100all4 = glm(SMOKE100 ~
@@ -817,13 +820,26 @@ smoke100all4 = glm(SMOKE100 ~
                     Neglect1 + Neglect1*sex + Neglect1*age + Neglect1*age*sex + 
                     Neglect2 + Neglect2*sex + Neglect2*age + Neglect2*age*sex, 
                   family = "quasibinomial", data = smoke100)
-summary(smoke100all4)
-exp(smoke100all4$coefficients)
+#summary(smoke100all4)
+
+tidy(smoke100all4) |> 
+    #filter(p.value <= 0.05) |>
+    mutate(estimate = exp(estimate)) |> kable()
+
 
 ```
 
 
 ### Results:  
+
+Those who do not report a history of any ACE have a 0.0253 lower odds of reporting having smoked at least 100 cigarettes. 
+
+
+
+
+
+
+
 
 
 
@@ -1035,6 +1051,13 @@ mainland +
 
 
 
+
+
+
+
+
+
+
 ## Do you now smoke cigarettes every day, some days, or not at all?  
 
 I recategorized this question so it was binary by combining responses that were some days and every day as the same (1) while not at all was categorized as the opposite (0).  
@@ -1045,8 +1068,7 @@ I recategorized this question so it was binary by combining responses that were 
 ### Model:  
 
 ```{=tex}
-\begin{equation}
-\begin{split}
+\begin{align*}
 log(\frac{1-p}{p}) = &\beta_1 (\text{sex}) + \\
                      &\beta_2 (\text{age}) + \\
                      &\beta_3 (\text{MentalIllness}) + \beta_4 (\text{MentalIllness} \cdot \text{age}) + \beta_5 (\text{MentalIllness} \cdot \text{sex}) + \\
@@ -1060,10 +1082,9 @@ log(\frac{1-p}{p}) = &\beta_1 (\text{sex}) + \\
                      &\beta_{27} (\text{SexualAbuse1}) + \beta_{28} (\text{SexualAbuse1} \cdot \text{age}) + \beta_{29} (text{SexualAbuse1} \cdot \text{sex}) + \\
                      &\beta_{30} (\text{SexualAbuse2}) + \beta_{31} (\text{SexualAbuse2} \cdot \text{age}) + \beta_{32} (\text{SexualAbuse2} \cdot \text{sex}) + \\
                      &\beta_{33} (\text{SexualAbuse3}) + \beta_{34} (\text{SexualAbuse3} \cdot \text{age}) + \beta_{35} (\text{SexualAbuse3} \cdot \text{sex}) + \\
-                     &\beta_{36} (\text{Neglect1}) + \beta_{37} (\text{Neglect1} \cdot \text{age}) + \beta_{38} (\text{Neglect1} \cdot \text{sex}) + 
+                     &\beta_{36} (\text{Neglect1}) + \beta_{37} (\text{Neglect1} \cdot \text{age}) + \beta_{38} (\text{Neglect1} \cdot \text{sex}) + \\ 
                      &\beta_{39} (\text{Neglect2}) + \beta_{40} (\text{Neglect2} \cdot \text{age}) + \beta_{41} (\text{Neglect2} \cdot \text{sex}) \\
-\end{split}
-\end{equation}
+\end{align*}
 ```
 
 
