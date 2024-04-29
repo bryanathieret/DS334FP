@@ -832,19 +832,30 @@ tidy(smoke100all4) |>
 
 ### Results:  
 
-Those who do not report a history of any ACE have a 0.0253 lower odds of reporting having smoked at least 100 cigarettes. 
+Those who do not report a history of any ACE, that are female, and are between the ages 18-24 have a 0.0253 times lower odds of reporting having smoked at least 100 cigarettes compared to those who have reported any ACE, are female, and that are older than 24 ($\beta_0 = 0.0253$, $t = -4.554$, $p < .00001$).   
+
+On average, males report a 11.190 times greater odds of having smoked at least 100 cigarettes compared to females that have not reported any ACE and that are between the ages of 18-24 ($t = 2.667$, $p = .008$).  
 
 
+Males that report no ACE are 
 
-
-
-
-
+On average, those who report a history of mental illness in the household have a 1.724 times greater odds of reporting having smoked at least 100 cigarettes ($t = 3.056$, $p = .002$).  
 
 
 
 ```{r}
-smoke100 |> group_by(sex, age) |> summarise(MentalIllness = sum(MentalIllness, na.rm = TRUE),
+smoke100 |> 
+   mutate(age = case_when(
+    age == 1 ~ "18 to 24",
+    age == 2 ~ "25 to 34",
+    age == 3 ~ "35 to 44",
+    age == 4 ~ "45 to 54",
+    age == 5 ~ "55 to 64",
+    age == 6 ~ "65 or > 65"
+  )) |> 
+  mutate(sex = if_else(sex == 1, "Male", "Female")) |>
+  group_by(sex, age) |> 
+  summarise(MentalIllness = sum(MentalIllness, na.rm = TRUE),
             Alcoholic = sum(Alcoholic, na.rm = TRUE),
             SubstanceAddiction = sum(SubstanceAddiction, na.rm = TRUE),
             Incarcerated = sum(Incarcerated, na.rm = TRUE),
@@ -857,15 +868,6 @@ smoke100 |> group_by(sex, age) |> summarise(MentalIllness = sum(MentalIllness, n
             SexualAbuse3 = sum(SexualAbuse3, na.rm = TRUE),
             Neglect1 = sum(Neglect1, na.rm = TRUE),
             Neglect2 = sum(Neglect2, na.rm = TRUE)) |> 
-  mutate(age = case_when(
-    age == 1 ~ "18 to 24",
-    age == 2 ~ "25 to 34",
-    age == 3 ~ "35 to 44",
-    age == 4 ~ "45 to 54",
-    age == 5 ~ "55 to 64",
-    age == 6 ~ "65 or > 65"
-  )) |> 
-  mutate(sex = if_else(sex == 1, "Male", "Female")) |>
   pivot_longer(c(3:15), names_to = "category", values_to = "n") |>
   mutate(sex = as.factor(sex)) |>
   ggplot(aes(x = category, y = n, col = sex)) +
@@ -892,6 +894,273 @@ smoke100 |> group_by(sex, age) |> summarise(MentalIllness = sum(MentalIllness, n
 
 
 
+
+## Do you now smoke cigarettes every day, some days, or not at all?  
+
+I recategorized this question so it was binary by combining responses that were some days and every day as the same (1) while not at all was categorized as the opposite (0).  
+
+### Prior Information:  
+
+
+### Model:  
+
+```{=tex}
+\begin{align*}
+log(\frac{1-p}{p}) = &\beta_1 (\text{sex}) + \\
+                     &\beta_2 (\text{age}) + \\
+                     &\beta_3 (\text{MentalIllness}) + \beta_4 (\text{MentalIllness} \cdot \text{age}) + \beta_5 (\text{MentalIllness} \cdot \text{sex}) + \\
+                     &\beta_6 (\text{Alcohol}) + \beta_7 (\text{Alcohol} \cdot \text{age}) + \beta_8 (\text{Alcohol} \cdot \text{sex}) + \\
+                     &\beta_9 (\text{SubstanceAddiction}) + \beta_{10} (\text{SubstanceAddiction} \cdot \text{age}) + \beta_{11} (\text{SubstanceAddiction} \cdot \text{sex}) + \\
+                     &\beta_{12} (\text{Incarcerated}) + \beta_{13} (\text{Incarcerated} \cdot \text{age}) + \beta_{14} (\text{Incarcerated} \cdot \text{sex}) + \\
+                     &\beta_{15} (\text{SeparationDivorce}) + \beta_{16} (\text{SeparationDivorce} \cdot \text{age}) + \beta_{17} (\text{SeparationDivorce} \cdot \text{sex}) + \\
+                     &\beta_{18} (\text{DomesticViolence}) + \beta_{19} (\text{DomesticViolence} \cdot \text{age}) + \beta_{20} (\text{DomesticViolence} \cdot \text{sex}) + \\
+                     &\beta_{21} (\text{PhysicalAbuse}) + \beta_{22} (\text{PhysicalAbuse} \cdot \text{age}) + \beta_{23} (\text{PhysicalAbuse} \cdot \text{sex}) + \\
+                     &\beta_{24} (\text{EmotionalAbuse}) + \beta_{25} (\text{EmotionalAbuse} \cdot \text{age}) + \beta_{26} (\text{EmotionalAbuse} \cdot \text{sex}) + \\
+                     &\beta_{27} (\text{SexualAbuse1}) + \beta_{28} (\text{SexualAbuse1} \cdot \text{age}) + \beta_{29} (text{SexualAbuse1} \cdot \text{sex}) + \\
+                     &\beta_{30} (\text{SexualAbuse2}) + \beta_{31} (\text{SexualAbuse2} \cdot \text{age}) + \beta_{32} (\text{SexualAbuse2} \cdot \text{sex}) + \\
+                     &\beta_{33} (\text{SexualAbuse3}) + \beta_{34} (\text{SexualAbuse3} \cdot \text{age}) + \beta_{35} (\text{SexualAbuse3} \cdot \text{sex}) + \\
+                     &\beta_{36} (\text{Neglect1}) + \beta_{37} (\text{Neglect1} \cdot \text{age}) + \beta_{38} (\text{Neglect1} \cdot \text{sex}) + \\ 
+                     &\beta_{39} (\text{Neglect2}) + \beta_{40} (\text{Neglect2} \cdot \text{age}) + \beta_{41} (\text{Neglect2} \cdot \text{sex}) \\
+\end{align*}
+```
+
+
+
+
+
+
+
+```{r}
+smokdays2 = everything |> select(MentalIllness, Alcoholic, Incarcerated, SeparationDivorce, DomesticViolence, PhysicalAbuse, EmotionalAbuse, SexualAbuse1, SexualAbuse2, SexualAbuse3, Neglect1, Neglect2, SubstanceAddiction, SMOKDAY2, sex, age, race) |>
+  mutate(SMOKDAY2 = case_when(
+    SMOKDAY2 == 1 ~ 1,
+    SMOKDAY2 == 2 ~ 1,
+    SMOKDAY2 == 3 ~ 0,
+    SMOKDAY2 == 7 ~ NA,
+    SMOKDAY2 == 9 ~ NA,
+    SMOKDAY2 == NA ~ NA
+  )) |>
+  mutate(sex = if_else(sex == 1, "Male", "Female")) |>
+  mutate(sex = as.factor(sex),
+         age = as.factor(age),
+         race = as.factor(race),
+         MentalIllness = as.factor(MentalIllness),
+         Alcoholic = as.factor(Alcoholic),
+         Incarcerated = as.factor(Incarcerated),
+         SeparationDivorce = as.factor(SeparationDivorce),
+         DomesticViolence = as.factor(DomesticViolence),
+         PhysicalAbuse = as.factor(PhysicalAbuse),
+         EmotionalAbuse = as.factor(EmotionalAbuse),
+         SexualAbuse1 = as.factor(SexualAbuse1),
+         SexualAbuse2 = as.factor(SexualAbuse2),
+         SexualAbuse3 = as.factor(SexualAbuse3),
+         Neglect1 = as.factor(Neglect1),
+         Neglect2 = as.factor(Neglect2),
+         SubstanceAddiction = as.factor(SubstanceAddiction)) |>
+  filter(!is.na(SMOKDAY2)) 
+
+smokdays2all3 = glm(SMOKDAY2 ~ 
+                    MentalIllness + MentalIllness*sex + MentalIllness*age + 
+                    Alcoholic + Alcoholic*sex + Alcoholic*age + 
+                    SubstanceAddiction + SubstanceAddiction*sex + SubstanceAddiction*age + 
+                    Incarcerated + Incarcerated*sex + Incarcerated*age + 
+                    SeparationDivorce + SeparationDivorce*sex + SeparationDivorce*age + 
+                    DomesticViolence + DomesticViolence*sex + DomesticViolence*age + 
+                    PhysicalAbuse + PhysicalAbuse*sex  + PhysicalAbuse*age + 
+                    EmotionalAbuse + EmotionalAbuse*sex + EmotionalAbuse*age + 
+                    SexualAbuse1 + SexualAbuse1*sex + SexualAbuse1*age + 
+                    SexualAbuse2 + SexualAbuse2*sex + SexualAbuse2*age + 
+                    SexualAbuse3 + SexualAbuse3*sex + SexualAbuse3*age + 
+                    Neglect1 + Neglect1*sex + Neglect1*age + 
+                    Neglect2 + Neglect2*sex + Neglect2*age, 
+                  family = "quasibinomial", data = smokdays2)
+summary(smokdays2all3)
+
+tidy(smokdays2all3) |> 
+  #filter(p.value <= 0.05)
+  mutate(estimate = exp(estimate)) |>
+  kable()
+```
+
+
+
+### Results  
+
+
+
+## During the past 30 days, how many days per week or per month did you have at least one drink of any alcoholic bevarage?  
+
+
+### Prior Information:  
+
+
+### Model: 
+
+
+
+
+
+
+
+```{r}
+# ALCDAY4 ~ 1
+## During the past 30 days, how many days per week or per month did you have at least one drink of any alcoholic
+### Coded: perweek ~ days per week out of 7, permonth ~ days per month out of 30
+# ALCDAY5 ~ 2/3/4
+## Question: During the past 30 days, how many days per week or per month did you have at least one drink of any alcoholic beverage such as beer, wine, a malt beverage or liquor?
+### Coded: perweek ~ days per week out of 7, permonth ~ days per month out of 30
+
+perweek = everything |> select(MentalIllness, Alcoholic, Incarcerated, SeparationDivorce, DomesticViolence, PhysicalAbuse, EmotionalAbuse, SexualAbuse1, SexualAbuse2, SexualAbuse3, Neglect1, Neglect2, SubstanceAddiction, ALCDAY4, ALCDAY5, sex, age, race, number) |>
+  mutate(perweek = case_when(
+    ALCDAY5 == 101 ~ 1,
+    ALCDAY5 == 102 ~ 2, 
+    ALCDAY5 == 103 ~ 3,
+    ALCDAY5 == 104 ~ 4, 
+    ALCDAY5 == 105 ~ 5,
+    ALCDAY5 == 106 ~ 6,
+    ALCDAY5 == 107 ~ 7,
+    ALCDAY4 == 101 ~ 1,
+    ALCDAY4 == 102 ~ 2,
+    ALCDAY4 == 103 ~ 3,
+    ALCDAY4 == 104 ~ 4,
+    ALCDAY4 == 105 ~ 5,
+    ALCDAY4 == 106 ~ 6,
+    ALCDAY4 == 107 ~ 7)) |>
+  mutate(sex = if_else(sex == 1, "Male", "Female")) |>
+  mutate(sex = as.factor(sex),
+         age = as.factor(age),
+         race = as.factor(race),
+         MentalIllness = as.factor(MentalIllness),
+         Alcoholic = as.factor(Alcoholic),
+         Incarcerated = as.factor(Incarcerated),
+         SeparationDivorce = as.factor(SeparationDivorce),
+         DomesticViolence = as.factor(DomesticViolence),
+         PhysicalAbuse = as.factor(PhysicalAbuse),
+         EmotionalAbuse = as.factor(EmotionalAbuse),
+         SexualAbuse1 = as.factor(SexualAbuse1),
+         SexualAbuse2 = as.factor(SexualAbuse2),
+         SexualAbuse3 = as.factor(SexualAbuse3),
+         Neglect1 = as.factor(Neglect1),
+         Neglect2 = as.factor(Neglect2),
+         SubstanceAddiction = as.factor(SubstanceAddiction)) |>
+  filter(!is.na(perweek)) 
+
+perweek |> ggplot(aes(x = perweek)) + geom_histogram(stat = "count")
+
+
+perweekall1 = glm(perweek ~ age + sex + race +
+                    MentalIllness + 
+                    Alcoholic + 
+                    SubstanceAddiction + 
+                    Incarcerated + 
+                    SeparationDivorce + 
+                    DomesticViolence +
+                    PhysicalAbuse + 
+                    EmotionalAbuse + 
+                    SexualAbuse1 + 
+                    SexualAbuse2 + 
+                    SexualAbuse3 + 
+                    Neglect1 + 
+                    Neglect2, 
+                  family = "quasipoisson", data = perweek)
+summary(perweekall1)
+    
+tidy(perweekall1) |> 
+  mutate(estimate = exp(estimate)) |>
+  kable()
+
+
+```
+
+mutate(age = case_when(
+    age == 1 ~ "18 to 24",
+    age == 2 ~ "25 to 34",
+    age == 3 ~ "35 to 44",
+    age == 4 ~ "45 to 54",
+    age == 5 ~ "55 to 64",
+    age == 6 ~ "65 or > 65"
+  ))
+
+mutate(race = case_when(
+    race == 1 ~ "White",
+    race == 2 ~ "Black",
+    race == 3 ~ "Asian",
+    race == 4 ~ "AI/AN",
+    race == 5 ~ "Hispanic",
+    race == 6 ~ "Other"
+  ))
+### Results  
+
+Those who report no ACE, between the ages of 18-24, are white, and are female drink on average 2.12 more days compared to those who report an ACE, above the age of 24, are a different race then white, and are male. 
+
+
+
+
+```{r}
+everything |> select(MentalIllness, Alcoholic, Incarcerated, SeparationDivorce, DomesticViolence, PhysicalAbuse, EmotionalAbuse, SexualAbuse1, SexualAbuse2, SexualAbuse3, Neglect1, Neglect2, SubstanceAddiction, ALCDAY4, ALCDAY5, sex, age, race, number) |>
+  mutate(perweek = case_when(
+    ALCDAY5 == 101 ~ 1,
+    ALCDAY5 == 102 ~ 2, 
+    ALCDAY5 == 103 ~ 3,
+    ALCDAY5 == 104 ~ 4, 
+    ALCDAY5 == 105 ~ 5,
+    ALCDAY5 == 106 ~ 6,
+    ALCDAY5 == 107 ~ 7,
+    ALCDAY4 == 101 ~ 1,
+    ALCDAY4 == 102 ~ 2,
+    ALCDAY4 == 103 ~ 3,
+    ALCDAY4 == 104 ~ 4,
+    ALCDAY4 == 105 ~ 5,
+    ALCDAY4 == 106 ~ 6,
+    ALCDAY4 == 107 ~ 7)) |>
+  group_by(age, sex, perweek) |>
+  summarise(MentalIllness = sum(MentalIllness, na.rm = TRUE),
+            Alcoholic = sum(Alcoholic, na.rm = TRUE),
+            SubstanceAddiction = sum(SubstanceAddiction, na.rm = TRUE),
+            Incarcerated = sum(Incarcerated, na.rm = TRUE),
+            SeparationDivorce = sum(SeparationDivorce, na.rm = TRUE),
+            DomesticViolence = sum(DomesticViolence, na.rm = TRUE),
+            PhysicalAbuse = sum(PhysicalAbuse, na.rm = TRUE),
+            EmotionalAbuse = sum(EmotionalAbuse, na.rm = TRUE),
+            SexualAbuse1 = sum(SexualAbuse1, na.rm = TRUE),
+            SexualAbuse2 = sum(SexualAbuse2, na.rm = TRUE),
+            SexualAbuse3 = sum(SexualAbuse3, na.rm = TRUE),
+            Neglect1 = sum(Neglect1, na.rm = TRUE),
+            Neglect2 = sum(Neglect2, na.rm = TRUE)) |>
+  pivot_longer(c(4:16), names_to = "Category", values_to = "n") |>
+  # mutate(race = case_when(
+  #   race == 1 ~ "White",
+  #   race == 2 ~ "Black",
+  #   race == 3 ~ "Asian",
+  #   race == 4 ~ "AI/AN",
+  #   race == 5 ~ "Hispanic",
+  #   race == 6 ~ "Other"
+  # )) |>
+  mutate(age = case_when(
+    age == 1 ~ "18 to 24",
+    age == 2 ~ "25 to 34",
+    age == 3 ~ "35 to 44",
+    age == 4 ~ "45 to 54",
+    age == 5 ~ "55 to 64",
+    age == 6 ~ "65 or > 65"
+  )) |>
+  mutate(sex = if_else(sex == 1, "Male", "Female")) |>
+  ggplot(aes(x = perweek, fill = age, y = n)) + 
+  geom_point() +
+  scale_fill_viridis_d(option = "plasma") +
+  facet_wrap(~Category)
+  
+  
+  geom_col(aes(fill = age, col = sex)) +
+  theme_minimal() +
+  scale_color_brewer(palette = "Pastel1", direction = -1) +
+  scale_fill_viridis_d(option = "plasma") +
+  facet_wrap(~Category)
+
+
+  facet_wrap(vars(race, sex))
+  
+```
 
 
 
@@ -1055,73 +1324,6 @@ mainland +
 
 
 
-
-
-
-## Do you now smoke cigarettes every day, some days, or not at all?  
-
-I recategorized this question so it was binary by combining responses that were some days and every day as the same (1) while not at all was categorized as the opposite (0).  
-
-### Prior Information:  
-
-
-### Model:  
-
-```{=tex}
-\begin{align*}
-log(\frac{1-p}{p}) = &\beta_1 (\text{sex}) + \\
-                     &\beta_2 (\text{age}) + \\
-                     &\beta_3 (\text{MentalIllness}) + \beta_4 (\text{MentalIllness} \cdot \text{age}) + \beta_5 (\text{MentalIllness} \cdot \text{sex}) + \\
-                     &\beta_6 (\text{Alcohol}) + \beta_7 (\text{Alcohol} \cdot \text{age}) + \beta_8 (\text{Alcohol} \cdot \text{sex}) + \\
-                     &\beta_9 (\text{SubstanceAddiction}) + \beta_{10} (\text{SubstanceAddiction} \cdot \text{age}) + \beta_{11} (\text{SubstanceAddiction} \cdot \text{sex}) + \\
-                     &\beta_{12} (\text{Incarcerated}) + \beta_{13} (\text{Incarcerated} \cdot \text{age}) + \beta_{14} (\text{Incarcerated} \cdot \text{sex}) + \\
-                     &\beta_{15} (\text{SeparationDivorce}) + \beta_{16} (\text{SeparationDivorce} \cdot \text{age}) + \beta_{17} (\text{SeparationDivorce} \cdot \text{sex}) + \\
-                     &\beta_{18} (\text{DomesticViolence}) + \beta_{19} (\text{DomesticViolence} \cdot \text{age}) + \beta_{20} (\text{DomesticViolence} \cdot \text{sex}) + \\
-                     &\beta_{21} (\text{PhysicalAbuse}) + \beta_{22} (\text{PhysicalAbuse} \cdot \text{age}) + \beta_{23} (\text{PhysicalAbuse} \cdot \text{sex}) + \\
-                     &\beta_{24} (\text{EmotionalAbuse}) + \beta_{25} (\text{EmotionalAbuse} \cdot \text{age}) + \beta_{26} (\text{EmotionalAbuse} \cdot \text{sex}) + \\
-                     &\beta_{27} (\text{SexualAbuse1}) + \beta_{28} (\text{SexualAbuse1} \cdot \text{age}) + \beta_{29} (text{SexualAbuse1} \cdot \text{sex}) + \\
-                     &\beta_{30} (\text{SexualAbuse2}) + \beta_{31} (\text{SexualAbuse2} \cdot \text{age}) + \beta_{32} (\text{SexualAbuse2} \cdot \text{sex}) + \\
-                     &\beta_{33} (\text{SexualAbuse3}) + \beta_{34} (\text{SexualAbuse3} \cdot \text{age}) + \beta_{35} (\text{SexualAbuse3} \cdot \text{sex}) + \\
-                     &\beta_{36} (\text{Neglect1}) + \beta_{37} (\text{Neglect1} \cdot \text{age}) + \beta_{38} (\text{Neglect1} \cdot \text{sex}) + \\ 
-                     &\beta_{39} (\text{Neglect2}) + \beta_{40} (\text{Neglect2} \cdot \text{age}) + \beta_{41} (\text{Neglect2} \cdot \text{sex}) \\
-\end{align*}
-```
-
-
-
-
-
-
-
-```{r}
-smokdays2 = everything |> select(MentalIllness, Alcoholic, Incarcerated, SeparationDivorce, DomesticViolence, PhysicalAbuse, EmotionalAbuse, SexualAbuse1, SexualAbuse2, SexualAbuse3, Neglect1, Neglect2, SubstanceAddiction, SMOKDAY2, sex, age, race) |>
-  mutate(SMOKDAY2 = case_when(
-    SMOKDAY2 == 1 ~ 1,
-    SMOKDAY2 == 2 ~ 1,
-    SMOKDAY2 == 3 ~ 0,
-    SMOKDAY2 == 7 ~ 0,
-    SMOKDAY2 == 9 ~ 0,
-    SMOKDAY2 == NA ~ NA
-  )) |>
-  filter(!is.na(SMOKDAY2))
-
-smokdays2all3 = glm(SMOKDAY2 ~ 
-                    MentalIllness + MentalIllness*sex + MentalIllness*age + 
-                    Alcoholic + Alcoholic*sex + Alcoholic*age + 
-                    SubstanceAddiction + SubstanceAddiction*sex + SubstanceAddiction*age + 
-                    Incarcerated + Incarcerated*sex + Incarcerated*age + 
-                    SeparationDivorce + SeparationDivorce*sex + SeparationDivorce*age + 
-                    DomesticViolence + DomesticViolence*sex + DomesticViolence*age + 
-                    PhysicalAbuse + PhysicalAbuse*sex  + PhysicalAbuse*age + 
-                    EmotionalAbuse + EmotionalAbuse*sex + EmotionalAbuse*age + 
-                    SexualAbuse1 + SexualAbuse1*sex + SexualAbuse1*age + 
-                    SexualAbuse2 + SexualAbuse2*sex + SexualAbuse2*age + 
-                    SexualAbuse3 + SexualAbuse3*sex + SexualAbuse3*age + 
-                    Neglect1 + Neglect1*sex + Neglect1*age + 
-                    Neglect2 + Neglect2*sex + Neglect2*age, 
-                  family = "quasibinomial", data = smokdays2)
-summary(smokdays2all3)
-```
 
 
 
