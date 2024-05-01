@@ -1067,6 +1067,7 @@ summary(perweekall1)
     
 tidy(perweekall1) |> 
   mutate(estimate = exp(estimate)) |>
+  filter(p.value <= 0.05) |>
   kable()
 
 
@@ -1113,7 +1114,7 @@ everything |> select(MentalIllness, Alcoholic, Incarcerated, SeparationDivorce, 
     ALCDAY4 == 105 ~ 5,
     ALCDAY4 == 106 ~ 6,
     ALCDAY4 == 107 ~ 7)) |>
-  group_by(age, sex, perweek) |>
+  group_by(age, sex, perweek, race) |>
   summarise(MentalIllness = sum(MentalIllness, na.rm = TRUE),
             Alcoholic = sum(Alcoholic, na.rm = TRUE),
             SubstanceAddiction = sum(SubstanceAddiction, na.rm = TRUE),
@@ -1127,26 +1128,534 @@ everything |> select(MentalIllness, Alcoholic, Incarcerated, SeparationDivorce, 
             SexualAbuse3 = sum(SexualAbuse3, na.rm = TRUE),
             Neglect1 = sum(Neglect1, na.rm = TRUE),
             Neglect2 = sum(Neglect2, na.rm = TRUE)) |>
-  pivot_longer(c(4:16), names_to = "Category", values_to = "n") |>
-  # mutate(race = case_when(
-  #   race == 1 ~ "White",
-  #   race == 2 ~ "Black",
-  #   race == 3 ~ "Asian",
-  #   race == 4 ~ "AI/AN",
-  #   race == 5 ~ "Hispanic",
-  #   race == 6 ~ "Other"
-  # )) |>
+  pivot_longer(c(5:17), names_to = "Category", values_to = "n") |>
+  mutate(race = case_when(
+    race == 1 ~ "White",
+    race == 2 ~ "Black",
+    race == 3 ~ "Asian",
+    race == 4 ~ "AI/AN",
+    race == 5 ~ "Hispanic",
+    race == 6 ~ "Other"
+  )) |>
   mutate(age = case_when(
     age == 1 ~ "18 to 24",
     age == 2 ~ "25 to 34",
     age == 3 ~ "35 to 44",
     age == 4 ~ "45 to 54",
     age == 5 ~ "55 to 64",
-    age == 6 ~ "65 or > 65"
+    age == 6 ~ "65 or > 65")) 
+
+
+everything |> select(MentalIllness, sex, age, race, ALCDAY4, ALCDAY5,) |>
+  mutate(perweek = case_when(
+    ALCDAY5 == 101 ~ 1,
+    ALCDAY5 == 102 ~ 2, 
+    ALCDAY5 == 103 ~ 3,
+    ALCDAY5 == 104 ~ 4, 
+    ALCDAY5 == 105 ~ 5,
+    ALCDAY5 == 106 ~ 6,
+    ALCDAY5 == 107 ~ 7,
+    ALCDAY4 == 101 ~ 1,
+    ALCDAY4 == 102 ~ 2,
+    ALCDAY4 == 103 ~ 3,
+    ALCDAY4 == 104 ~ 4,
+    ALCDAY4 == 105 ~ 5,
+    ALCDAY4 == 106 ~ 6,
+    ALCDAY4 == 107 ~ 7)) |>
+  # group_by(age, sex, perweek) |>
+  # summarise(MentalIllness = sum(MentalIllness, na.rm = TRUE),
+  #           Alcoholic = sum(Alcoholic, na.rm = TRUE),
+  #           SubstanceAddiction = sum(SubstanceAddiction, na.rm = TRUE),
+  #           Incarcerated = sum(Incarcerated, na.rm = TRUE),
+  #           SeparationDivorce = sum(SeparationDivorce, na.rm = TRUE),
+  #           DomesticViolence = sum(DomesticViolence, na.rm = TRUE),
+  #           PhysicalAbuse = sum(PhysicalAbuse, na.rm = TRUE),
+  #           EmotionalAbuse = sum(EmotionalAbuse, na.rm = TRUE),
+  #           SexualAbuse1 = sum(SexualAbuse1, na.rm = TRUE),
+  #           SexualAbuse2 = sum(SexualAbuse2, na.rm = TRUE),
+  #           SexualAbuse3 = sum(SexualAbuse3, na.rm = TRUE),
+  #           Neglect1 = sum(Neglect1, na.rm = TRUE),
+  #           Neglect2 = sum(Neglect2, na.rm = TRUE)) |>
+  # pivot_longer(c(4:16), names_to = "Category", values_to = "n") |>
+  mutate(age = case_when(
+    age == 1 ~ "18 to 24",
+    age == 2 ~ "25 to 34",
+    age == 3 ~ "35 to 44",
+    age == 4 ~ "45 to 54",
+    age == 5 ~ "55 to 64",
+    age == 6 ~ "65 or > 65")) |>
+  mutate(race = case_when(
+    race == 1 ~ "White",
+    race == 2 ~ "Black",
+    race == 3 ~ "Asian",
+    race == 4 ~ "AI/AN",
+    race == 5 ~ "Hispanic",
+    race == 6 ~ "Other"
   )) |>
+  filter(race == "White") |>
   mutate(sex = if_else(sex == 1, "Male", "Female")) |>
-  ggplot(aes(x = perweek, fill = age, y = n)) + 
-  geom_point() +
+  mutate(MentalIllness = if_else(MentalIllness == 1, "Yes", "No")) |>
+  filter(!is.na(perweek)) |>
+  filter(!is.na(MentalIllness)) |>
+  group_by(perweek, MentalIllness, sex, age, race) |>
+  summarise(n = n()) |>
+  ggplot(aes(x = perweek, y = n, col = age, alpha = MentalIllness)) + 
+  geom_line(linewidth = 1) +
+  theme_minimal() +
+  scale_color_viridis_d(option = "plasma", direction = 1, begin = 0.85, end = 0.35) +
+  scale_alpha_manual(values = c(0.35, 1)) +
+  facet_wrap(vars(race, sex)) + 
+  labs(x = "Days Per Week (Alcohol Consumption)", y = "People") +
+  theme(
+    strip.text = element_text(color = "black", size = 16, family = "Avenir"),
+    plot.title = element_text(color = "black", size = 18, family = "Avenir"),
+    legend.title = element_blank(),
+    legend.text = element_text(color = "black", size = 12, family = "Avenir"),
+    axis.text = element_text(color = "black", size = 16, family = "Avenir"),
+    axis.title = element_text(color = "black", size = 20, family = "Avenir")
+  )
+
+
+
+everything |> select(MentalIllness, sex, age, race, ALCDAY4, ALCDAY5,) |>
+  mutate(perweek = case_when(
+    ALCDAY5 == 101 ~ 1,
+    ALCDAY5 == 102 ~ 2, 
+    ALCDAY5 == 103 ~ 3,
+    ALCDAY5 == 104 ~ 4, 
+    ALCDAY5 == 105 ~ 5,
+    ALCDAY5 == 106 ~ 6,
+    ALCDAY5 == 107 ~ 7,
+    ALCDAY4 == 101 ~ 1,
+    ALCDAY4 == 102 ~ 2,
+    ALCDAY4 == 103 ~ 3,
+    ALCDAY4 == 104 ~ 4,
+    ALCDAY4 == 105 ~ 5,
+    ALCDAY4 == 106 ~ 6,
+    ALCDAY4 == 107 ~ 7)) |>
+  # group_by(age, sex, perweek) |>
+  # summarise(MentalIllness = sum(MentalIllness, na.rm = TRUE),
+  #           Alcoholic = sum(Alcoholic, na.rm = TRUE),
+  #           SubstanceAddiction = sum(SubstanceAddiction, na.rm = TRUE),
+  #           Incarcerated = sum(Incarcerated, na.rm = TRUE),
+  #           SeparationDivorce = sum(SeparationDivorce, na.rm = TRUE),
+  #           DomesticViolence = sum(DomesticViolence, na.rm = TRUE),
+  #           PhysicalAbuse = sum(PhysicalAbuse, na.rm = TRUE),
+  #           EmotionalAbuse = sum(EmotionalAbuse, na.rm = TRUE),
+  #           SexualAbuse1 = sum(SexualAbuse1, na.rm = TRUE),
+  #           SexualAbuse2 = sum(SexualAbuse2, na.rm = TRUE),
+  #           SexualAbuse3 = sum(SexualAbuse3, na.rm = TRUE),
+  #           Neglect1 = sum(Neglect1, na.rm = TRUE),
+  #           Neglect2 = sum(Neglect2, na.rm = TRUE)) |>
+  # pivot_longer(c(4:16), names_to = "Category", values_to = "n") |>
+  mutate(age = case_when(
+    age == 1 ~ "18 to 24",
+    age == 2 ~ "25 to 34",
+    age == 3 ~ "35 to 44",
+    age == 4 ~ "45 to 54",
+    age == 5 ~ "55 to 64",
+    age == 6 ~ "65 or > 65")) |>
+  mutate(race = case_when(
+    race == 1 ~ "White",
+    race == 2 ~ "Black",
+    race == 3 ~ "Asian",
+    race == 4 ~ "AI/AN",
+    race == 5 ~ "Hispanic",
+    race == 6 ~ "Other"
+  )) |>
+  filter(race == "Black") |>
+  mutate(sex = if_else(sex == 1, "Male", "Female")) |>
+  mutate(MentalIllness = if_else(MentalIllness == 1, "Yes", "No")) |>
+  filter(!is.na(perweek)) |>
+  filter(!is.na(MentalIllness)) |>
+  group_by(perweek, MentalIllness, sex, age, race) |>
+  summarise(n = n()) |>
+  ggplot(aes(x = perweek, y = n, col = age, alpha = MentalIllness)) + 
+  geom_line(linewidth = 1) +
+  theme_minimal() +
+  scale_color_viridis_d(option = "plasma", direction = 1, begin = 0.85, end = 0.35) +
+  scale_alpha_manual(values = c(0.35, 1)) +
+  facet_wrap(vars(race, sex)) + 
+  labs(x = "Days Per Week (Alcohol Consumption)", y = "People") +
+  theme(
+    strip.text = element_text(color = "black", size = 16, family = "Avenir"),
+    plot.title = element_text(color = "black", size = 18, family = "Avenir"),
+    legend.title = element_blank(),
+    legend.text = element_text(color = "black", size = 12, family = "Avenir"),
+    axis.text = element_text(color = "black", size = 16, family = "Avenir"),
+    axis.title = element_text(color = "black", size = 20, family = "Avenir")
+  )
+
+everything |> select(MentalIllness, sex, age, race, ALCDAY4, ALCDAY5,) |>
+  mutate(perweek = case_when(
+    ALCDAY5 == 101 ~ 1,
+    ALCDAY5 == 102 ~ 2, 
+    ALCDAY5 == 103 ~ 3,
+    ALCDAY5 == 104 ~ 4, 
+    ALCDAY5 == 105 ~ 5,
+    ALCDAY5 == 106 ~ 6,
+    ALCDAY5 == 107 ~ 7,
+    ALCDAY4 == 101 ~ 1,
+    ALCDAY4 == 102 ~ 2,
+    ALCDAY4 == 103 ~ 3,
+    ALCDAY4 == 104 ~ 4,
+    ALCDAY4 == 105 ~ 5,
+    ALCDAY4 == 106 ~ 6,
+    ALCDAY4 == 107 ~ 7)) |>
+  # group_by(age, sex, perweek) |>
+  # summarise(MentalIllness = sum(MentalIllness, na.rm = TRUE),
+  #           Alcoholic = sum(Alcoholic, na.rm = TRUE),
+  #           SubstanceAddiction = sum(SubstanceAddiction, na.rm = TRUE),
+  #           Incarcerated = sum(Incarcerated, na.rm = TRUE),
+  #           SeparationDivorce = sum(SeparationDivorce, na.rm = TRUE),
+  #           DomesticViolence = sum(DomesticViolence, na.rm = TRUE),
+  #           PhysicalAbuse = sum(PhysicalAbuse, na.rm = TRUE),
+  #           EmotionalAbuse = sum(EmotionalAbuse, na.rm = TRUE),
+  #           SexualAbuse1 = sum(SexualAbuse1, na.rm = TRUE),
+  #           SexualAbuse2 = sum(SexualAbuse2, na.rm = TRUE),
+  #           SexualAbuse3 = sum(SexualAbuse3, na.rm = TRUE),
+  #           Neglect1 = sum(Neglect1, na.rm = TRUE),
+  #           Neglect2 = sum(Neglect2, na.rm = TRUE)) |>
+  # pivot_longer(c(4:16), names_to = "Category", values_to = "n") |>
+  mutate(age = case_when(
+    age == 1 ~ "18 to 24",
+    age == 2 ~ "25 to 34",
+    age == 3 ~ "35 to 44",
+    age == 4 ~ "45 to 54",
+    age == 5 ~ "55 to 64",
+    age == 6 ~ "65 or > 65")) |>
+  mutate(race = case_when(
+    race == 1 ~ "White",
+    race == 2 ~ "Black",
+    race == 3 ~ "Asian",
+    race == 4 ~ "AI/AN",
+    race == 5 ~ "Hispanic",
+    race == 6 ~ "Other"
+  )) |>
+  filter(race == "Asian") |>
+  mutate(sex = if_else(sex == 1, "Male", "Female")) |>
+  mutate(MentalIllness = if_else(MentalIllness == 1, "Yes", "No")) |>
+  filter(!is.na(perweek)) |>
+  filter(!is.na(MentalIllness)) |>
+  group_by(perweek, MentalIllness, sex, age, race) |>
+  summarise(n = n()) |>
+  ggplot(aes(x = perweek, y = n, col = age, alpha = MentalIllness)) + 
+  geom_line(linewidth = 1) +
+  theme_minimal() +
+  scale_color_viridis_d(option = "plasma", direction = 1, begin = 0.85, end = 0.35) +
+  scale_alpha_manual(values = c(0.35, 1)) +
+  facet_wrap(vars(race, sex)) + 
+  labs(x = "Days Per Week (Alcohol Consumption)", y = "People") +
+  theme(
+    strip.text = element_text(color = "black", size = 16, family = "Avenir"),
+    plot.title = element_text(color = "black", size = 18, family = "Avenir"),
+    legend.title = element_blank(),
+    legend.text = element_text(color = "black", size = 12, family = "Avenir"),
+    axis.text = element_text(color = "black", size = 16, family = "Avenir"),
+    axis.title = element_text(color = "black", size = 20, family = "Avenir")
+  )
+
+everything |> select(MentalIllness, sex, age, race, ALCDAY4, ALCDAY5,) |>
+  mutate(perweek = case_when(
+    ALCDAY5 == 101 ~ 1,
+    ALCDAY5 == 102 ~ 2, 
+    ALCDAY5 == 103 ~ 3,
+    ALCDAY5 == 104 ~ 4, 
+    ALCDAY5 == 105 ~ 5,
+    ALCDAY5 == 106 ~ 6,
+    ALCDAY5 == 107 ~ 7,
+    ALCDAY4 == 101 ~ 1,
+    ALCDAY4 == 102 ~ 2,
+    ALCDAY4 == 103 ~ 3,
+    ALCDAY4 == 104 ~ 4,
+    ALCDAY4 == 105 ~ 5,
+    ALCDAY4 == 106 ~ 6,
+    ALCDAY4 == 107 ~ 7)) |>
+  # group_by(age, sex, perweek) |>
+  # summarise(MentalIllness = sum(MentalIllness, na.rm = TRUE),
+  #           Alcoholic = sum(Alcoholic, na.rm = TRUE),
+  #           SubstanceAddiction = sum(SubstanceAddiction, na.rm = TRUE),
+  #           Incarcerated = sum(Incarcerated, na.rm = TRUE),
+  #           SeparationDivorce = sum(SeparationDivorce, na.rm = TRUE),
+  #           DomesticViolence = sum(DomesticViolence, na.rm = TRUE),
+  #           PhysicalAbuse = sum(PhysicalAbuse, na.rm = TRUE),
+  #           EmotionalAbuse = sum(EmotionalAbuse, na.rm = TRUE),
+  #           SexualAbuse1 = sum(SexualAbuse1, na.rm = TRUE),
+  #           SexualAbuse2 = sum(SexualAbuse2, na.rm = TRUE),
+  #           SexualAbuse3 = sum(SexualAbuse3, na.rm = TRUE),
+  #           Neglect1 = sum(Neglect1, na.rm = TRUE),
+  #           Neglect2 = sum(Neglect2, na.rm = TRUE)) |>
+  # pivot_longer(c(4:16), names_to = "Category", values_to = "n") |>
+  mutate(age = case_when(
+    age == 1 ~ "18 to 24",
+    age == 2 ~ "25 to 34",
+    age == 3 ~ "35 to 44",
+    age == 4 ~ "45 to 54",
+    age == 5 ~ "55 to 64",
+    age == 6 ~ "65 or > 65")) |>
+  mutate(race = case_when(
+    race == 1 ~ "White",
+    race == 2 ~ "Black",
+    race == 3 ~ "Asian",
+    race == 4 ~ "AI/AN",
+    race == 5 ~ "Hispanic",
+    race == 6 ~ "Other"
+  )) |>
+  filter(race == "AI/AN") |>
+  mutate(sex = if_else(sex == 1, "Male", "Female")) |>
+  mutate(MentalIllness = if_else(MentalIllness == 1, "Yes", "No")) |>
+  filter(!is.na(perweek)) |>
+  filter(!is.na(MentalIllness)) |>
+  group_by(perweek, MentalIllness, sex, age, race) |>
+  summarise(n = n()) |>
+  ggplot(aes(x = perweek, y = n, col = age, alpha = MentalIllness)) + 
+  geom_line(linewidth = 1) +
+  theme_minimal() +
+  scale_color_viridis_d(option = "plasma", direction = 1, begin = 0.85, end = 0.35) +
+  scale_alpha_manual(values = c(0.35, 1)) +
+  facet_wrap(vars(race, sex)) + 
+  labs(x = "Days Per Week (Alcohol Consumption)", y = "People") +
+  theme(
+    strip.text = element_text(color = "black", size = 16, family = "Avenir"),
+    plot.title = element_text(color = "black", size = 18, family = "Avenir"),
+    legend.title = element_blank(),
+    legend.text = element_text(color = "black", size = 12, family = "Avenir"),
+    axis.text = element_text(color = "black", size = 16, family = "Avenir"),
+    axis.title = element_text(color = "black", size = 20, family = "Avenir")
+  )
+
+
+everything |> select(MentalIllness, sex, age, race, ALCDAY4, ALCDAY5,) |>
+  mutate(perweek = case_when(
+    ALCDAY5 == 101 ~ 1,
+    ALCDAY5 == 102 ~ 2, 
+    ALCDAY5 == 103 ~ 3,
+    ALCDAY5 == 104 ~ 4, 
+    ALCDAY5 == 105 ~ 5,
+    ALCDAY5 == 106 ~ 6,
+    ALCDAY5 == 107 ~ 7,
+    ALCDAY4 == 101 ~ 1,
+    ALCDAY4 == 102 ~ 2,
+    ALCDAY4 == 103 ~ 3,
+    ALCDAY4 == 104 ~ 4,
+    ALCDAY4 == 105 ~ 5,
+    ALCDAY4 == 106 ~ 6,
+    ALCDAY4 == 107 ~ 7)) |>
+  # group_by(age, sex, perweek) |>
+  # summarise(MentalIllness = sum(MentalIllness, na.rm = TRUE),
+  #           Alcoholic = sum(Alcoholic, na.rm = TRUE),
+  #           SubstanceAddiction = sum(SubstanceAddiction, na.rm = TRUE),
+  #           Incarcerated = sum(Incarcerated, na.rm = TRUE),
+  #           SeparationDivorce = sum(SeparationDivorce, na.rm = TRUE),
+  #           DomesticViolence = sum(DomesticViolence, na.rm = TRUE),
+  #           PhysicalAbuse = sum(PhysicalAbuse, na.rm = TRUE),
+  #           EmotionalAbuse = sum(EmotionalAbuse, na.rm = TRUE),
+  #           SexualAbuse1 = sum(SexualAbuse1, na.rm = TRUE),
+  #           SexualAbuse2 = sum(SexualAbuse2, na.rm = TRUE),
+  #           SexualAbuse3 = sum(SexualAbuse3, na.rm = TRUE),
+  #           Neglect1 = sum(Neglect1, na.rm = TRUE),
+  #           Neglect2 = sum(Neglect2, na.rm = TRUE)) |>
+  # pivot_longer(c(4:16), names_to = "Category", values_to = "n") |>
+  mutate(age = case_when(
+    age == 1 ~ "18 to 24",
+    age == 2 ~ "25 to 34",
+    age == 3 ~ "35 to 44",
+    age == 4 ~ "45 to 54",
+    age == 5 ~ "55 to 64",
+    age == 6 ~ "65 or > 65")) |>
+  mutate(race = case_when(
+    race == 1 ~ "White",
+    race == 2 ~ "Black",
+    race == 3 ~ "Asian",
+    race == 4 ~ "AI/AN",
+    race == 5 ~ "Hispanic",
+    race == 6 ~ "Other"
+  )) |>
+  filter(race == "Hispanic") |>
+  mutate(sex = if_else(sex == 1, "Male", "Female")) |>
+  mutate(MentalIllness = if_else(MentalIllness == 1, "Yes", "No")) |>
+  filter(!is.na(perweek)) |>
+  filter(!is.na(MentalIllness)) |>
+  group_by(perweek, MentalIllness, sex, age, race) |>
+  summarise(n = n()) |>
+  ggplot(aes(x = perweek, y = n, col = age, alpha = MentalIllness)) + 
+  geom_line(linewidth = 1) +
+  theme_minimal() +
+  scale_color_viridis_d(option = "plasma", direction = 1, begin = 0.85, end = 0.35) +
+  scale_alpha_manual(values = c(0.35, 1)) +
+  facet_wrap(vars(race, sex)) + 
+  labs(x = "Days Per Week (Alcohol Consumption)", y = "People") +
+  theme(
+    strip.text = element_text(color = "black", size = 16, family = "Avenir"),
+    plot.title = element_text(color = "black", size = 18, family = "Avenir"),
+    legend.title = element_blank(),
+    legend.text = element_text(color = "black", size = 12, family = "Avenir"),
+    axis.text = element_text(color = "black", size = 16, family = "Avenir"),
+    axis.title = element_text(color = "black", size = 20, family = "Avenir")
+  )
+
+
+everything |> select(MentalIllness, sex, age, race, ALCDAY4, ALCDAY5,) |>
+  mutate(perweek = case_when(
+    ALCDAY5 == 101 ~ 1,
+    ALCDAY5 == 102 ~ 2, 
+    ALCDAY5 == 103 ~ 3,
+    ALCDAY5 == 104 ~ 4, 
+    ALCDAY5 == 105 ~ 5,
+    ALCDAY5 == 106 ~ 6,
+    ALCDAY5 == 107 ~ 7,
+    ALCDAY4 == 101 ~ 1,
+    ALCDAY4 == 102 ~ 2,
+    ALCDAY4 == 103 ~ 3,
+    ALCDAY4 == 104 ~ 4,
+    ALCDAY4 == 105 ~ 5,
+    ALCDAY4 == 106 ~ 6,
+    ALCDAY4 == 107 ~ 7)) |>
+  # group_by(age, sex, perweek) |>
+  # summarise(MentalIllness = sum(MentalIllness, na.rm = TRUE),
+  #           Alcoholic = sum(Alcoholic, na.rm = TRUE),
+  #           SubstanceAddiction = sum(SubstanceAddiction, na.rm = TRUE),
+  #           Incarcerated = sum(Incarcerated, na.rm = TRUE),
+  #           SeparationDivorce = sum(SeparationDivorce, na.rm = TRUE),
+  #           DomesticViolence = sum(DomesticViolence, na.rm = TRUE),
+  #           PhysicalAbuse = sum(PhysicalAbuse, na.rm = TRUE),
+  #           EmotionalAbuse = sum(EmotionalAbuse, na.rm = TRUE),
+  #           SexualAbuse1 = sum(SexualAbuse1, na.rm = TRUE),
+  #           SexualAbuse2 = sum(SexualAbuse2, na.rm = TRUE),
+  #           SexualAbuse3 = sum(SexualAbuse3, na.rm = TRUE),
+  #           Neglect1 = sum(Neglect1, na.rm = TRUE),
+  #           Neglect2 = sum(Neglect2, na.rm = TRUE)) |>
+  # pivot_longer(c(4:16), names_to = "Category", values_to = "n") |>
+  mutate(age = case_when(
+    age == 1 ~ "18 to 24",
+    age == 2 ~ "25 to 34",
+    age == 3 ~ "35 to 44",
+    age == 4 ~ "45 to 54",
+    age == 5 ~ "55 to 64",
+    age == 6 ~ "65 or > 65")) |>
+  mutate(race = case_when(
+    race == 1 ~ "White",
+    race == 2 ~ "Black",
+    race == 3 ~ "Asian",
+    race == 4 ~ "AI/AN",
+    race == 5 ~ "Hispanic",
+    race == 6 ~ "Other"
+  )) |>
+  filter(race == "Other") |>
+  mutate(sex = if_else(sex == 1, "Male", "Female")) |>
+  mutate(MentalIllness = if_else(MentalIllness == 1, "Yes", "No")) |>
+  filter(!is.na(perweek)) |>
+  filter(!is.na(MentalIllness)) |>
+  group_by(perweek, MentalIllness, sex, age, race) |>
+  summarise(n = n()) |>
+  ggplot(aes(x = perweek, y = n, col = age, alpha = MentalIllness)) + 
+  geom_line(linewidth = 1) +
+  theme_minimal() +
+  scale_color_viridis_d(option = "plasma", direction = 1, begin = 0.85, end = 0.35) +
+  scale_alpha_manual(values = c(0.35, 1)) +
+  facet_wrap(vars(race, sex)) + 
+  labs(x = "Days Per Week (Alcohol Consumption)", y = "People") +
+  theme(
+    strip.text = element_text(color = "black", size = 16, family = "Avenir"),
+    plot.title = element_text(color = "black", size = 18, family = "Avenir"),
+    legend.title = element_blank(),
+    legend.text = element_text(color = "black", size = 12, family = "Avenir"),
+    axis.text = element_text(color = "black", size = 16, family = "Avenir"),
+    axis.title = element_text(color = "black", size = 20, family = "Avenir")
+  )
+```
+
+
+```{r}
+ggplot(aes(x = perweek, col = age, group = age, fill = age)) + 
+  geom_histogram(aes(x = perweek), bins = 7) +
+  scale_color_viridis_d(option = "plasma", direction = 1, begin = 0.85, end = 0) +
+  scale_fill_viridis_d(option = "plasma", direction = 1, begin = 0.85, end = 0) +
+  facet_wrap(~sex)
+
+
+
+  alcperweek |> select(age, sex, perweek) |>
+  mutate(sex = if_else(sex == 1, "Male", "Female")) |>
+  ggplot(aes(x = perweek, col = age, group = age)) +
+  geom_density(alpha = 0.4, n = 7, aes(col = age, group = age), linewidth = 1) +
+  scale_color_viridis_d(option = "plasma", direction = 1, begin = 0.85, end = 0) +
+  theme_minimal() +
+  facet_wrap(~sex) + 
+  labs(x = "Days Per Week (Alcohol Consumption)", y = "PDF", title = "Mental Illness in House Hold") +
+  theme(
+    strip.text = element_text(color = "black", size = 16, family = "Avenir"),
+    plot.title = element_text(color = "black", size = 18, family = "Avenir"),
+    legend.title = element_blank(),
+    legend.text = element_text(color = "black", size = 12, family = "Avenir"),
+    axis.text = element_text(color = "black", size = 16, family = "Avenir"),
+    axis.title = element_text(color = "black", size = 20, family = "Avenir")
+  )
+
+  
+  
+  two = alcperweek |> select(age, sex, perweek, Alcoholic) |>
+  mutate(sex = if_else(sex == 1, "Male", "Female")) |>
+  ggplot(aes(x = perweek, col = age, group = age)) +
+  geom_density(alpha = 0.4, n = 7, aes(col = age, group = age), linewidth = 1) +
+  scale_color_viridis_d(option = "plasma", direction = 1, begin = 0.85, end = 0) +
+  theme_minimal() +
+  facet_wrap(~sex) + 
+  labs(x = "Days Per Week (Alcohol Consumption)", y = "PDF", title = "Alcohol Abuse in House Hold") +
+  theme(
+    strip.text = element_text(color = "black", size = 16, family = "Avenir"),
+    plot.title = element_text(color = "black", size = 18, family = "Avenir"),
+    legend.title = element_blank(),
+    legend.text = element_text(color = "black", size = 12, family = "Avenir"),
+    axis.text = element_text(color = "black", size = 16, family = "Avenir"),
+    axis.title = element_text(color = "black", size = 20, family = "Avenir")
+  )
+  
+  alcperweek |> select(age, sex, perweek, SexualAbuse1) |>
+  mutate(sex = if_else(sex == 1, "Male", "Female")) |>
+  ggplot(aes(x = perweek, col = age, group = age)) +
+  geom_density(alpha = 0.4, n = 7, aes(col = age, group = age), linewidth = 1) +
+  scale_color_viridis_d(option = "plasma", direction = 1, begin = 0.85, end = 0) +
+  theme_minimal() +
+  facet_wrap(~sex) + 
+  labs(x = "Days Per Week (Alcohol Consumption)", y = "PDF", title = "Incarcerated House Hold Member") +
+  theme(
+    strip.text = element_text(color = "black", size = 16, family = "Avenir"),
+    plot.title = element_text(color = "black", size = 18, family = "Avenir"),
+    legend.title = element_blank(),
+    legend.text = element_text(color = "black", size = 12, family = "Avenir"),
+    axis.text = element_text(color = "black", size = 16, family = "Avenir"),
+    axis.title = element_text(color = "black", size = 20, family = "Avenir")
+  )
+  
+  
+  alcperweek |> select(age, sex, perweek, SeparationDivorce) |>
+  mutate(sex = if_else(sex == 1, "Male", "Female")) |>
+  ggplot(aes(x = perweek, col = age, group = age)) +
+  geom_density(alpha = 0.4, n = 7, aes(col = age, group = age), linewidth = 1) +
+  scale_color_viridis_d(option = "plasma", direction = 1, begin = 0.85, end = 0) +
+  theme_minimal() +
+  facet_wrap(~sex) + 
+  labs(x = "Days Per Week (Alcohol Consumption)", y = "PDF", title = "Parental Separation/Divorce") +
+  theme(
+    strip.text = element_text(color = "black", size = 16, family = "Avenir"),
+    plot.title = element_text(color = "black", size = 18, family = "Avenir"),
+    legend.title = element_blank(),
+    legend.text = element_text(color = "black", size = 12, family = "Avenir"),
+    axis.text = element_text(color = "black", size = 16, family = "Avenir"),
+    axis.title = element_text(color = "black", size = 20, family = "Avenir")
+  )
+  
+  
+
+
+
+
+
+geom_col() + 
+  facet_wrap(~Category)
+
+  geom_density()geom_point() +
   scale_fill_viridis_d(option = "plasma") +
   facet_wrap(~Category)
   
@@ -1167,6 +1676,69 @@ everything |> select(MentalIllness, Alcoholic, Incarcerated, SeparationDivorce, 
 
 
 
+
+
+
+
+
+
+
+
+
+```{r}
+
+## Question: Considering all types of alcoholic beverages, how many times during the past 30 days did you have 5 or more drinks for men or 4 or more drinks for women on an occasion?
+
+DRNK3GE5 = everything |> select(MentalIllness, Alcoholic, Incarcerated, SeparationDivorce, DomesticViolence, PhysicalAbuse, EmotionalAbuse, SexualAbuse1, SexualAbuse2, SexualAbuse3, Neglect1, Neglect2, SubstanceAddiction, DRNK3GE5, sex, age, race, number) |>
+  filter(DRNK3GE5 != 88) |>
+  filter(DRNK3GE5 != 77) |>
+  filter(DRNK3GE5 != 99) |>
+  filter(!is.na(DRNK3GE5))
+
+
+
+DRNK3GE5all1 = glm(DRNK3GE5 ~ age + sex + race +
+                    MentalIllness + 
+                    Alcoholic + 
+                    SubstanceAddiction + 
+                    Incarcerated + 
+                    SeparationDivorce + 
+                    DomesticViolence +
+                    PhysicalAbuse + 
+                    EmotionalAbuse + 
+                    SexualAbuse1 + 
+                    SexualAbuse2 + 
+                    SexualAbuse3 + 
+                    Neglect1 + 
+                    Neglect2, 
+                  family = "quasipoisson", data = DRNK3GE5)
+summary(DRNK3GE5all1)
+
+
+everything |> select(MentalIllness, Alcoholic, Incarcerated, SeparationDivorce, DomesticViolence, PhysicalAbuse, EmotionalAbuse, SexualAbuse1, SexualAbuse2, SexualAbuse3, Neglect1, Neglect2, SubstanceAddiction, DRNK3GE5, sex, age, race, number) |>
+  filter(DRNK3GE5 != 88) |>
+  filter(DRNK3GE5 != 77) |>
+  filter(DRNK3GE5 != 99) |>
+  filter(!is.na(DRNK3GE5)) |>
+  group_by(age, sex, perweek) |>
+summarise(MentalIllness = sum(MentalIllness, na.rm = TRUE),
+            Alcoholic = sum(Alcoholic, na.rm = TRUE),
+            SubstanceAddiction = sum(SubstanceAddiction, na.rm = TRUE),
+            Incarcerated = sum(Incarcerated, na.rm = TRUE),
+            SeparationDivorce = sum(SeparationDivorce, na.rm = TRUE),
+            DomesticViolence = sum(DomesticViolence, na.rm = TRUE),
+            PhysicalAbuse = sum(PhysicalAbuse, na.rm = TRUE),
+            EmotionalAbuse = sum(EmotionalAbuse, na.rm = TRUE),
+            SexualAbuse1 = sum(SexualAbuse1, na.rm = TRUE),
+            SexualAbuse2 = sum(SexualAbuse2, na.rm = TRUE),
+            SexualAbuse3 = sum(SexualAbuse3, na.rm = TRUE),
+            Neglect1 = sum(Neglect1, na.rm = TRUE),
+            Neglect2 = sum(Neglect2, na.rm = TRUE)) |>
+  pivot_longer(c(5:17), names_to = "Category", values_to = "n")
+
+
+
+```
 
 
 
