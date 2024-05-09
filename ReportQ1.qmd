@@ -1,0 +1,1774 @@
+---
+title: "ReportPart3"
+format:
+  html:
+    embed-resources: true
+    warning: false
+    message: false
+documentclass: article
+author: "Bryana A. S. Thieret"
+mainfont: "Cambria"
+monofont: "Cambria"
+---
+
+
+
+```{r ALL PACKAGES AND DATA}
+library(tidyverse)
+library(readr)
+library(here)
+library(haven)
+library(emmeans)
+library(lmerTest)
+library(lme4)
+library(plotly)
+library(maps)
+library(mapproj)
+library(usmap)
+library(knitr)
+library(broom)
+library(modelr)
+
+twenty022 <- read_xpt(here::here("LLCP2022.XPT ")) ## space after T 
+twenty021 <- read_xpt(here::here("LLCP2021.XPT"))
+twenty020 <- read_xpt(here::here("LLCP2020.XPT"))
+twenty019 <- read_xpt(here::here("LLCP2019.XPT"))
+
+## 2022: 
+twenty022 = twenty022 |> select(
+                    IYEAR, '_STATE', SEXVAR, MARITAL, VETERAN3, INCOME3, "_BMI5", 
+                    EDUCA, RENTHOM1, EMPLOY1, CHILDREN, CAREGIV1, CRGVREL4, CRGVLNG1, CRGVPRB3, SDHEMPLY, FOODSTMP, SDHFOOD1, SDHBILLS, SDHUTILS, SOMALE, TRNSGNDR, RRCLASS3, "_METSTAT", "_URBSTAT", "_IMPRACE", "_AGE_G",
+                    GENHLTH, PHYSHLTH, MENTHLTH, POORHLTH, EXERANY2, SLEPTIM1, LASTDEN4, CVDINFR4, CVDCRHD4, CVDSTRK3, ASTHMA3, CHCSCNC1, CHCOCNC1, CHCCOPD3, ADDEPEV3, CHCKDNY2, HAVARTH4, DIABETE4, DEAF, BLIND, DIFFWALK, DIFFDRES, DIFFALON, PREDIAB2,
+                      DIABTYPE, CNCRTYP2,  LSATISFY, EMTSUPRT, SDHISOLT, SDHSTRE1, 
+                    SMOKE100, SMOKDAY2, USENOW3, ECIGNOW2, LCSFIRST, LCSLAST, LCSNUMCG, LCSSCNCR, ALCDAY4, AVEDRNK3, DRNK3GE5, MAXDRNKS, COPDSMOK, MARIJAN1, MARJSMOK, LASTSMK2, 
+                    PRIMINSR, MEDCOST1, 
+                    ACEDEPRS, ACEDRINK, ACEDRUGS, ACEPRISN, 
+                    ACEDIVRC, ACEPUNCH, ACEHURT1, ACESWEAR,
+                    ACETOUCH, ACETTHEM, ACEHVSEX, ACEADSAF, 
+                    ACEADNED) |> 
+  filter(!is.na(ACEDEPRS) | !is.na(ACEDRINK) | !is.na(ACEDRUGS) | !is.na(ACEPRISN) | 
+           !is.na(ACEDIVRC) | !is.na(ACEPUNCH) | !is.na(ACEHURT1) | !is.na(ACESWEAR) | 
+           !is.na(ACETOUCH) | !is.na(ACETTHEM) | !is.na(ACEHVSEX) | !is.na(ACEADSAF) |
+           !is.na(ACEADNED)) |>
+  rename("state" = "_STATE",
+         "age" = "_AGE_G",
+         "race" = "_IMPRACE",
+         "sex" = SEXVAR,
+        "MentalIllness" = ACEDEPRS,
+         "Alcoholic" = ACEDRINK,
+         "SubstanceAddiction" = ACEDRUGS,
+         "Incarcerated" = ACEPRISN,
+         "SeparationDivorce" = ACEDIVRC,
+         "DomesticViolence" = ACEPUNCH,
+         "PhysicalAbuse" = ACEHURT1,
+         "EmotionalAbuse" = ACESWEAR,
+         "SexualAbuse1" = ACETOUCH,
+         "SexualAbuse2" = ACETTHEM,
+         "SexualAbuse3" = ACEHVSEX,
+         "Neglect1" = ACEADSAF,
+         "Neglect2" = ACEADNED) |>
+mutate(MentalIllness = case_when(
+  MentalIllness == 1 ~ 1,
+  MentalIllness == 2 ~ 0,
+  MentalIllness == 7 ~ NA,
+  MentalIllness == 9 ~ NA)) |>
+  mutate(Alcoholic = case_when(
+    Alcoholic == 1 ~ 1,
+    Alcoholic == 2 ~ 0,
+    Alcoholic == 7 ~ NA,
+    Alcoholic == 9 ~ NA)) |> 
+  mutate(SubstanceAddiction = case_when(
+    SubstanceAddiction == 1 ~ 1,
+    SubstanceAddiction == 2 ~ 0,
+    SubstanceAddiction == 7 ~ NA,
+    SubstanceAddiction == 9 ~ NA)) |>
+  mutate(Incarcerated = case_when(
+    Incarcerated == 1 ~ 1,
+    Incarcerated == 2 ~ 0,
+    Incarcerated == 7 ~ NA,
+    Incarcerated == 9 ~ NA)) |> 
+  mutate(SeparationDivorce = case_when(
+    SeparationDivorce == 1 ~ 1,
+    SeparationDivorce == 2 ~ 0,
+    SeparationDivorce == 7 ~ NA,
+    SeparationDivorce == 8 ~ NA,
+    SeparationDivorce == 9 ~ NA)) |>
+  mutate(DomesticViolence = case_when(
+    DomesticViolence == 1 ~ 0,
+    DomesticViolence == 2 ~ 1, 
+    DomesticViolence == 3 ~ 1,
+    DomesticViolence == 7 ~ NA,
+    DomesticViolence == 9 ~ NA)) |>
+  mutate(PhysicalAbuse = case_when(
+    PhysicalAbuse == 1 ~ 0,
+    PhysicalAbuse == 2 ~ 1,
+    PhysicalAbuse == 3 ~ 1,
+    PhysicalAbuse == 7 ~ NA,
+    PhysicalAbuse == 9 ~ NA)) |>
+  mutate(EmotionalAbuse = case_when(
+    EmotionalAbuse == 1 ~ 0,
+    EmotionalAbuse == 2 ~ 1, 
+    EmotionalAbuse == 3 ~ 1,
+    EmotionalAbuse == 7 ~ NA,
+    EmotionalAbuse == 9 ~ NA)) |>
+  mutate(SexualAbuse1 = case_when(
+    SexualAbuse1 == 1 ~ 0,
+    SexualAbuse1 == 2 ~ 1,
+    SexualAbuse1 == 3 ~ 1,
+    SexualAbuse1 == 7 ~ NA,
+    SexualAbuse1 == 9 ~ NA)) |>
+  mutate(SexualAbuse2 = case_when(
+    SexualAbuse2 == 1 ~ 0,
+    SexualAbuse2 == 2 ~ 1,
+    SexualAbuse2 == 3 ~ 1,
+    SexualAbuse2 == 7 ~ NA,
+    SexualAbuse2 == 9 ~ NA)) |> 
+  mutate(SexualAbuse3 = case_when(
+    SexualAbuse3 == 1 ~ 0,
+    SexualAbuse3 == 2 ~ 1,
+    SexualAbuse3 == 3 ~ 1,
+    SexualAbuse3 == 7 ~ NA,
+    SexualAbuse3 == 9 ~ NA)) |>
+  mutate(Neglect1 = case_when(
+    Neglect1 == NA ~ NA,
+    Neglect1 == 1 ~ 0,
+    Neglect1 == 2 ~ 1,
+    Neglect1 == 3 ~ 1,
+    Neglect1 == 4 ~ 1,
+    Neglect1 == 5 ~ 1,
+    Neglect1 == 7 ~ NA,
+    Neglect1 == 9 ~ NA)) |>
+  mutate(Neglect2 = case_when(
+    Neglect2 == 1 ~ 0,
+    Neglect2 == 2 ~ 1,
+    Neglect2 == 3 ~ 1,
+    Neglect2 == 4 ~ 1,
+    Neglect2 == 5 ~ 1,
+    Neglect2 == NA ~ NA,
+    Neglect2 == 7 ~ NA,
+    Neglect2 == 9 ~ NA)) |>
+  mutate(number = 1)
+
+## 2021: 
+twenty021 = twenty021 |> select(
+                    IYEAR, '_STATE', SEXVAR, MARITAL, VETERAN3, INCOME3, "_BMI5",
+                    EDUCA, RENTHOM1, EMPLOY1, CHILDREN, CAREGIV1, CRGVREL4, CRGVLNG1, CRGVPRB3, SOMALE, TRNSGNDR, "_METSTAT", "_URBSTAT", "_IMPRACE", "_AGE_G",
+                    GENHLTH, PHYSHLTH, MENTHLTH, POORHLTH, EXERANY2, CVDINFR4, CVDCRHD4, CVDSTRK3, ASTHMA3, ADDEPEV3, CHCKDNY2, DIABETE4, DEAF, BLIND, DIFFWALK, DIFFDRES, DIFFALON,
+                    SMOKE100, SMOKDAY2, USENOW3, LCSFIRST, LCSLAST, LCSNUMCG, ECIGNOW1, AVEDRNK3, ALCDAY5, DRNK3GE5, MAXDRNKS, MARIJAN1, LASTSMK2, 
+                    PRIMINSR, MEDCOST1, 
+                    ACEDEPRS, ACEDRINK, ACEDRUGS, ACEPRISN, 
+                    ACEDIVRC, ACEPUNCH, ACEHURT1, ACESWEAR,
+                    ACETOUCH, ACETTHEM, ACEHVSEX, ACEADSAF, 
+                    ACEADNED) |> 
+  filter(!is.na(ACEDEPRS) | !is.na(ACEDRINK) | !is.na(ACEDRUGS) | !is.na(ACEPRISN) | 
+           !is.na(ACEDIVRC) | !is.na(ACEPUNCH) | !is.na(ACEHURT1) | !is.na(ACESWEAR) | 
+           !is.na(ACETOUCH) | !is.na(ACETTHEM) | !is.na(ACEHVSEX) | !is.na(ACEADSAF) |
+           !is.na(ACEADNED)) |>
+  rename("state" = "_STATE",
+         "age" = "_AGE_G",
+         "race" = "_IMPRACE",
+         "sex" = SEXVAR,
+        "MentalIllness" = ACEDEPRS,
+         "Alcoholic" = ACEDRINK,
+         "SubstanceAddiction" = ACEDRUGS,
+         "Incarcerated" = ACEPRISN,
+         "SeparationDivorce" = ACEDIVRC,
+         "DomesticViolence" = ACEPUNCH,
+         "PhysicalAbuse" = ACEHURT1,
+         "EmotionalAbuse" = ACESWEAR,
+         "SexualAbuse1" = ACETOUCH,
+         "SexualAbuse2" = ACETTHEM,
+         "SexualAbuse3" = ACEHVSEX,
+         "Neglect1" = ACEADSAF,
+         "Neglect2" = ACEADNED) |> 
+  mutate(MentalIllness = case_when(
+  MentalIllness == 1 ~ 1,
+  MentalIllness == 2 ~ 0,
+  MentalIllness == 7 ~ NA,
+  MentalIllness == 9 ~ NA)) |>
+  mutate(Alcoholic = case_when(
+    Alcoholic == 1 ~ 1,
+    Alcoholic == 2 ~ 0,
+    Alcoholic == 7 ~ NA,
+    Alcoholic == 9 ~ NA)) |> 
+  mutate(SubstanceAddiction = case_when(
+    SubstanceAddiction == 1 ~ 1,
+    SubstanceAddiction == 2 ~ 0,
+    SubstanceAddiction == 7 ~ NA,
+    SubstanceAddiction == 9 ~ NA)) |>
+  mutate(Incarcerated = case_when(
+    Incarcerated == 1 ~ 1,
+    Incarcerated == 2 ~ 0,
+    Incarcerated == 7 ~ NA,
+    Incarcerated == 9 ~ NA)) |> 
+  mutate(SeparationDivorce = case_when(
+    SeparationDivorce == 1 ~ 1,
+    SeparationDivorce == 2 ~ 0,
+    SeparationDivorce == 7 ~ NA,
+    SeparationDivorce == 8 ~ NA,
+    SeparationDivorce == 9 ~ NA)) |>
+  mutate(DomesticViolence = case_when(
+    DomesticViolence == 1 ~ 0,
+    DomesticViolence == 2 ~ 1, 
+    DomesticViolence == 3 ~ 1,
+    DomesticViolence == 7 ~ NA,
+    DomesticViolence == 9 ~ NA)) |>
+  mutate(PhysicalAbuse = case_when(
+    PhysicalAbuse == 1 ~ 0,
+    PhysicalAbuse == 2 ~ 1,
+    PhysicalAbuse == 3 ~ 1,
+    PhysicalAbuse == 7 ~ NA,
+    PhysicalAbuse == 9 ~ NA)) |>
+  mutate(EmotionalAbuse = case_when(
+    EmotionalAbuse == 1 ~ 0,
+    EmotionalAbuse == 2 ~ 1, 
+    EmotionalAbuse == 3 ~ 1,
+    EmotionalAbuse == 7 ~ NA,
+    EmotionalAbuse == 9 ~ NA)) |>
+  mutate(SexualAbuse1 = case_when(
+    SexualAbuse1 == 1 ~ 0,
+    SexualAbuse1 == 2 ~ 1,
+    SexualAbuse1 == 3 ~ 1,
+    SexualAbuse1 == 7 ~ NA,
+    SexualAbuse1 == 9 ~ NA)) |>
+  mutate(SexualAbuse2 = case_when(
+    SexualAbuse2 == 1 ~ 0,
+    SexualAbuse2 == 2 ~ 1,
+    SexualAbuse2 == 3 ~ 1,
+    SexualAbuse2 == 7 ~ NA,
+    SexualAbuse2 == 9 ~ NA)) |> 
+  mutate(SexualAbuse3 = case_when(
+    SexualAbuse3 == 1 ~ 0,
+    SexualAbuse3 == 2 ~ 1,
+    SexualAbuse3 == 3 ~ 1,
+    SexualAbuse3 == 7 ~ NA,
+    SexualAbuse3 == 9 ~ NA)) |>
+  mutate(Neglect1 = case_when(
+    Neglect1 == NA ~ NA,
+    Neglect1 == 1 ~ 0,
+    Neglect1 == 2 ~ 1,
+    Neglect1 == 3 ~ 1,
+    Neglect1 == 4 ~ 1,
+    Neglect1 == 5 ~ 1,
+    Neglect1 == 7 ~ NA,
+    Neglect1 == 9 ~ NA)) |>
+  mutate(Neglect2 = case_when(
+    Neglect2 == 1 ~ 0,
+    Neglect2 == 2 ~ 1,
+    Neglect2 == 3 ~ 1,
+    Neglect2 == 4 ~ 1,
+    Neglect2 == 5 ~ 1,
+    Neglect2 == NA ~ NA,
+    Neglect2 == 7 ~ NA,
+    Neglect2 == 9 ~ NA)) |>
+  mutate(number = 2)
+
+## 2020: 
+
+twenty020 = twenty020 |> select(
+                    IYEAR, '_STATE', SEXVAR, MARITAL, VETERAN3, INCOME2, WEIGHT2, HEIGHT3, 
+                    EDUCA, RENTHOM1, EMPLOY1, CHILDREN, CAREGIV1, CRGVREL4, CRGVLNG1, CRGVPRB3, SOMALE, TRNSGNDR, "_METSTAT", "_URBSTAT", "_IMPRACE", "_AGE_G",
+                    GENHLTH, PHYSHLTH, MENTHLTH, POORHLTH, EXERANY2, CVDINFR4, CVDCRHD4, CVDSTRK3, ASTHMA3, ADDEPEV3, CHCKDNY2, DIABETE4, DEAF, BLIND, DIFFWALK, DIFFDRES, DIFFALON,
+                    SMOKE100, SMOKDAY2, USENOW3, LCSFIRST, LCSLAST, LCSNUMCG, ECIGNOW, AVEDRNK3, ALCDAY5, DRNK3GE5, MAXDRNKS, MARIJAN1, LASTSMK2, 
+                    HLTHCVR1,
+                    ACEDEPRS, ACEDRINK, ACEDRUGS, ACEPRISN, 
+                    ACEDIVRC, ACEPUNCH, ACEHURT1, ACESWEAR,
+                    ACETOUCH, ACETTHEM, ACEHVSEX) |> 
+  filter(!is.na(ACEDEPRS) | !is.na(ACEDRINK) | !is.na(ACEDRUGS) | !is.na(ACEPRISN) | 
+           !is.na(ACEDIVRC) | !is.na(ACEPUNCH) | !is.na(ACEHURT1) | !is.na(ACESWEAR) | 
+           !is.na(ACETOUCH) | !is.na(ACETTHEM) | !is.na(ACEHVSEX)) |>
+  rename("state" = "_STATE",
+         "age" = "_AGE_G",
+         "race" = "_IMPRACE",
+         "sex" = SEXVAR,
+        "MentalIllness" = ACEDEPRS,
+         "Alcoholic" = ACEDRINK,
+         "SubstanceAddiction" = ACEDRUGS,
+         "Incarcerated" = ACEPRISN,
+         "SeparationDivorce" = ACEDIVRC,
+         "DomesticViolence" = ACEPUNCH,
+         "PhysicalAbuse" = ACEHURT1,
+         "EmotionalAbuse" = ACESWEAR,
+         "SexualAbuse1" = ACETOUCH,
+         "SexualAbuse2" = ACETTHEM,
+         "SexualAbuse3" = ACEHVSEX) |>
+  mutate(MentalIllness = case_when(
+  MentalIllness == 1 ~ 1,
+  MentalIllness == 2 ~ 0,
+  MentalIllness == 7 ~ NA,
+  MentalIllness == 9 ~ NA)) |>
+  mutate(Alcoholic = case_when(
+    Alcoholic == 1 ~ 1,
+    Alcoholic == 2 ~ 0,
+    Alcoholic == 7 ~ NA,
+    Alcoholic == 9 ~ NA)) |> 
+  mutate(SubstanceAddiction = case_when(
+    SubstanceAddiction == 1 ~ 1,
+    SubstanceAddiction == 2 ~ 0,
+    SubstanceAddiction == 7 ~ NA,
+    SubstanceAddiction == 9 ~ NA)) |>
+  mutate(Incarcerated = case_when(
+    Incarcerated == 1 ~ 1,
+    Incarcerated == 2 ~ 0,
+    Incarcerated == 7 ~ NA,
+    Incarcerated == 9 ~ NA)) |> 
+  mutate(SeparationDivorce = case_when(
+    SeparationDivorce == 1 ~ 1,
+    SeparationDivorce == 2 ~ 0,
+    SeparationDivorce == 7 ~ NA,
+    SeparationDivorce == 8 ~ NA,
+    SeparationDivorce == 9 ~ NA)) |>
+  mutate(DomesticViolence = case_when(
+    DomesticViolence == 1 ~ 0,
+    DomesticViolence == 2 ~ 1, 
+    DomesticViolence == 3 ~ 1,
+    DomesticViolence == 7 ~ NA,
+    DomesticViolence == 9 ~ NA)) |>
+  mutate(PhysicalAbuse = case_when(
+    PhysicalAbuse == 1 ~ 0,
+    PhysicalAbuse == 2 ~ 1,
+    PhysicalAbuse == 3 ~ 1,
+    PhysicalAbuse == 7 ~ NA,
+    PhysicalAbuse == 9 ~ NA)) |>
+  mutate(EmotionalAbuse = case_when(
+    EmotionalAbuse == 1 ~ 0,
+    EmotionalAbuse == 2 ~ 1, 
+    EmotionalAbuse == 3 ~ 1,
+    EmotionalAbuse == 7 ~ NA,
+    EmotionalAbuse == 9 ~ NA)) |>
+  mutate(SexualAbuse1 = case_when(
+    SexualAbuse1 == 1 ~ 0,
+    SexualAbuse1 == 2 ~ 1,
+    SexualAbuse1 == 3 ~ 1,
+    SexualAbuse1 == 7 ~ NA,
+    SexualAbuse1 == 9 ~ NA)) |>
+  mutate(SexualAbuse2 = case_when(
+    SexualAbuse2 == 1 ~ 0,
+    SexualAbuse2 == 2 ~ 1,
+    SexualAbuse2 == 3 ~ 1,
+    SexualAbuse2 == 7 ~ NA,
+    SexualAbuse2 == 9 ~ NA)) |> 
+  mutate(SexualAbuse3 = case_when(
+    SexualAbuse3 == 1 ~ 0,
+    SexualAbuse3 == 2 ~ 1,
+    SexualAbuse3 == 3 ~ 1,
+    SexualAbuse3 == 7 ~ NA,
+    SexualAbuse3 == 9 ~ NA)) |>
+  mutate(number = 3)
+
+# 2019: 
+
+twenty019 = twenty019 |> select(
+                    IYEAR, '_STATE', SEXVAR, MARITAL, VETERAN3, INCOME2, WEIGHT2, HEIGHT3, 
+                    EDUCA, RENTHOM1, EMPLOY1, CHILDREN, CAREGIV1, CRGVLNG1, CRGVPRB3, SOMALE, TRNSGNDR, "_METSTAT", "_URBSTAT", "_IMPRACE", "_AGE_G",
+                    GENHLTH, PHYSHLTH, MENTHLTH, POORHLTH, EXERANY2, CVDINFR4, CVDCRHD4, CVDSTRK3, ASTHMA3, ADDEPEV3, CHCKDNY2, DIABETE4, DEAF, BLIND, DIFFWALK, DIFFDRES, DIFFALON,
+                    SMOKE100, SMOKDAY2, USENOW3, LCSFIRST, LCSLAST, LCSNUMCG, ALCDAY5, AVEDRNK3, DRNK3GE5, MAXDRNKS, MARIJAN1, LASTSMK2, 
+                    HLTHCVR1,
+                    ACEDEPRS, ACEDRINK, ACEDRUGS, ACEPRISN, 
+                    ACEDIVRC, ACEPUNCH, ACEHURT1, ACESWEAR,
+                    ACETOUCH, ACETTHEM, ACEHVSEX) |> 
+  filter(!is.na(ACEDEPRS) | !is.na(ACEDRINK) | !is.na(ACEDRUGS) | !is.na(ACEPRISN) | 
+           !is.na(ACEDIVRC) | !is.na(ACEPUNCH) | !is.na(ACEHURT1) | !is.na(ACESWEAR) | 
+           !is.na(ACETOUCH) | !is.na(ACETTHEM) | !is.na(ACEHVSEX)) |>
+  rename("state" = "_STATE",
+         "age" = "_AGE_G",
+         "race" = "_IMPRACE",
+         "sex" = SEXVAR,
+        "MentalIllness" = ACEDEPRS,
+         "Alcoholic" = ACEDRINK,
+         "SubstanceAddiction" = ACEDRUGS,
+         "Incarcerated" = ACEPRISN,
+         "SeparationDivorce" = ACEDIVRC,
+         "DomesticViolence" = ACEPUNCH,
+         "PhysicalAbuse" = ACEHURT1,
+         "EmotionalAbuse" = ACESWEAR,
+         "SexualAbuse1" = ACETOUCH,
+         "SexualAbuse2" = ACETTHEM,
+         "SexualAbuse3" = ACEHVSEX) |>
+  mutate(MentalIllness = case_when(
+  MentalIllness == 1 ~ 1,
+  MentalIllness == 2 ~ 0,
+  MentalIllness == 7 ~ NA,
+  MentalIllness == 9 ~ NA)) |>
+  mutate(Alcoholic = case_when(
+    Alcoholic == 1 ~ 1,
+    Alcoholic == 2 ~ 0,
+    Alcoholic == 7 ~ NA,
+    Alcoholic == 9 ~ NA)) |> 
+  mutate(SubstanceAddiction = case_when(
+    SubstanceAddiction == 1 ~ 1,
+    SubstanceAddiction == 2 ~ 0,
+    SubstanceAddiction == 7 ~ NA,
+    SubstanceAddiction == 9 ~ NA)) |>
+  mutate(Incarcerated = case_when(
+    Incarcerated == 1 ~ 1,
+    Incarcerated == 2 ~ 0,
+    Incarcerated == 7 ~ NA,
+    Incarcerated == 9 ~ NA)) |> 
+  mutate(SeparationDivorce = case_when(
+    SeparationDivorce == 1 ~ 1,
+    SeparationDivorce == 2 ~ 0,
+    SeparationDivorce == 7 ~ NA,
+    SeparationDivorce == 8 ~ NA,
+    SeparationDivorce == 9 ~ NA)) |>
+  mutate(DomesticViolence = case_when(
+    DomesticViolence == 1 ~ 0,
+    DomesticViolence == 2 ~ 1, 
+    DomesticViolence == 3 ~ 1,
+    DomesticViolence == 7 ~ NA,
+    DomesticViolence == 9 ~ NA)) |>
+  mutate(PhysicalAbuse = case_when(
+    PhysicalAbuse == 1 ~ 0,
+    PhysicalAbuse == 2 ~ 1,
+    PhysicalAbuse == 3 ~ 1,
+    PhysicalAbuse == 7 ~ NA,
+    PhysicalAbuse == 9 ~ NA)) |>
+  mutate(EmotionalAbuse = case_when(
+    EmotionalAbuse == 1 ~ 0,
+    EmotionalAbuse == 2 ~ 1, 
+    EmotionalAbuse == 3 ~ 1,
+    EmotionalAbuse == 7 ~ NA,
+    EmotionalAbuse == 9 ~ NA)) |>
+  mutate(SexualAbuse1 = case_when(
+    SexualAbuse1 == 1 ~ 0,
+    SexualAbuse1 == 2 ~ 1,
+    SexualAbuse1 == 3 ~ 1,
+    SexualAbuse1 == 7 ~ NA,
+    SexualAbuse1 == 9 ~ NA)) |>
+  mutate(SexualAbuse2 = case_when(
+    SexualAbuse2 == 1 ~ 0,
+    SexualAbuse2 == 2 ~ 1,
+    SexualAbuse2 == 3 ~ 1,
+    SexualAbuse2 == 7 ~ NA,
+    SexualAbuse2 == 9 ~ NA)) |> 
+  mutate(SexualAbuse3 = case_when(
+    SexualAbuse3 == 1 ~ 0,
+    SexualAbuse3 == 2 ~ 1,
+    SexualAbuse3 == 3 ~ 1,
+    SexualAbuse3 == 7 ~ NA,
+    SexualAbuse3 == 9 ~ NA)) |>
+  mutate(number = 4)
+
+## Dataset that inclueds everything: 
+everything = full_join(twenty019, full_join(twenty020, full_join(twenty021, twenty022)))
+
+```
+
+
+
+
+
+
+
+
+
+## During the past 30 days, how many days per week did you have at least one drink of any alcoholic bevarage?  
+
+
+```{r}
+# ALCDAY4 ~ 1
+## During the past 30 days, how many days per week or per month did you have at least one drink of any alcoholic
+### Coded: perweek ~ days per week out of 7, permonth ~ days per month out of 30
+# ALCDAY5 ~ 2/3/4
+## Question: During the past 30 days, how many days per week or per month did you have at least one drink of any alcoholic beverage such as beer, wine, a malt beverage or liquor?
+### Coded: perweek ~ days per week out of 7, permonth ~ days per month out of 30
+
+perweek = everything |> select(MentalIllness, Alcoholic, Incarcerated, SeparationDivorce, DomesticViolence, PhysicalAbuse, EmotionalAbuse, SexualAbuse1, SexualAbuse2, SexualAbuse3, Neglect1, Neglect2, SubstanceAddiction, ALCDAY4, ALCDAY5, sex, age, race, number) |>
+  mutate(perweek = case_when(
+    ALCDAY5 == 101 ~ 1,
+    ALCDAY5 == 102 ~ 2, 
+    ALCDAY5 == 103 ~ 3,
+    ALCDAY5 == 104 ~ 4, 
+    ALCDAY5 == 105 ~ 5,
+    ALCDAY5 == 106 ~ 6,
+    ALCDAY5 == 107 ~ 7,
+    ALCDAY4 == 101 ~ 1,
+    ALCDAY4 == 102 ~ 2,
+    ALCDAY4 == 103 ~ 3,
+    ALCDAY4 == 104 ~ 4,
+    ALCDAY4 == 105 ~ 5,
+    ALCDAY4 == 106 ~ 6,
+    ALCDAY4 == 107 ~ 7)) |>
+  mutate(sex = if_else(sex == 1, "Male", "Female")) |>
+  mutate(sex = as.factor(sex),
+         age = as.factor(age),
+         race = as.factor(race),
+         MentalIllness = as.factor(MentalIllness),
+         Alcoholic = as.factor(Alcoholic),
+         Incarcerated = as.factor(Incarcerated),
+         SeparationDivorce = as.factor(SeparationDivorce),
+         DomesticViolence = as.factor(DomesticViolence),
+         PhysicalAbuse = as.factor(PhysicalAbuse),
+         EmotionalAbuse = as.factor(EmotionalAbuse),
+         SexualAbuse1 = as.factor(SexualAbuse1),
+         SexualAbuse2 = as.factor(SexualAbuse2),
+         SexualAbuse3 = as.factor(SexualAbuse3),
+         Neglect1 = as.factor(Neglect1),
+         Neglect2 = as.factor(Neglect2),
+         SubstanceAddiction = as.factor(SubstanceAddiction)) |>
+  filter(!is.na(perweek)) |>
+mutate(age = case_when(
+    age == 1 ~ "18 to 24",
+    age == 2 ~ "25 to 34",
+    age == 3 ~ "35 to 44",
+    age == 4 ~ "45 to 54",
+    age == 5 ~ "55 to 64",
+    age == 6 ~ "65 or > 65"))
+
+perweek |> ggplot(aes(x = perweek)) + geom_histogram(stat = "count")
+
+
+perweekall = glm(perweek ~ 
+                    MentalIllness + 
+                    Alcoholic + 
+                    SubstanceAddiction + 
+                    Incarcerated + 
+                    SeparationDivorce + 
+                    DomesticViolence +
+                    PhysicalAbuse + 
+                    EmotionalAbuse + 
+                    SexualAbuse1 + 
+                    SexualAbuse2 + 
+                    SexualAbuse3 + 
+                    Neglect1 + 
+                    Neglect2, 
+                  family = "quasipoisson", data = perweek)
+summary(perweekall)
+
+
+perweekall1 = glm(perweek ~ age + sex + race +
+                    MentalIllness + 
+                    Alcoholic + 
+                    SubstanceAddiction + 
+                    Incarcerated + 
+                    SeparationDivorce + 
+                    DomesticViolence +
+                    PhysicalAbuse + 
+                    EmotionalAbuse + 
+                    SexualAbuse1 + 
+                    SexualAbuse2 + 
+                    SexualAbuse3 + 
+                    Neglect1 + 
+                    Neglect2, 
+                  family = "quasipoisson", data = perweek)
+summary(perweekall1)
+    
+
+perweekall2 = glm(perweek ~ 
+                    MentalIllness + MentalIllness*sex +
+                    Alcoholic + Alcoholic*sex + 
+                    SubstanceAddiction + SubstanceAddiction*sex + 
+                    Incarcerated + Incarcerated*sex + 
+                    SeparationDivorce + SeparationDivorce*sex + 
+                    DomesticViolence + DomesticViolence*sex + 
+                    PhysicalAbuse + PhysicalAbuse*sex  + 
+                    EmotionalAbuse + EmotionalAbuse*sex +  
+                    SexualAbuse1 + SexualAbuse1*sex + 
+                    SexualAbuse2 + SexualAbuse2*sex + 
+                    SexualAbuse3 + SexualAbuse3*sex + 
+                    Neglect1 + Neglect1*sex + 
+                    Neglect2 + Neglect2*sex, 
+                  family = "quasipoisson", data = perweek)
+summary(perweekall2)
+
+
+perweekall3 = glm(perweek ~ 
+                    MentalIllness + MentalIllness*age + 
+                    Alcoholic + Alcoholic*age + 
+                    SubstanceAddiction + SubstanceAddiction*age + 
+                    Incarcerated + Incarcerated*age + 
+                    SeparationDivorce + SeparationDivorce*age + 
+                    DomesticViolence + DomesticViolence*age + 
+                    PhysicalAbuse + PhysicalAbuse*age + 
+                    EmotionalAbuse + EmotionalAbuse*age + 
+                    SexualAbuse1 + SexualAbuse1*age + 
+                    SexualAbuse2 + SexualAbuse2*age + 
+                    SexualAbuse3 + SexualAbuse3*age + 
+                    Neglect1 + Neglect1*age + 
+                    Neglect2 + Neglect2*age, 
+                  family = "quasipoisson", data = perweek)
+summary(perweekall3)
+
+
+perweekall4 = glm(perweek ~ 
+                    MentalIllness + MentalIllness*sex + MentalIllness*age + 
+                    Alcoholic + Alcoholic*sex + Alcoholic*age + 
+                    SubstanceAddiction + SubstanceAddiction*sex + SubstanceAddiction*age + 
+                    Incarcerated + Incarcerated*sex + Incarcerated*age + 
+                    SeparationDivorce + SeparationDivorce*sex + SeparationDivorce*age + 
+                    DomesticViolence + DomesticViolence*sex + DomesticViolence*age + 
+                    PhysicalAbuse + PhysicalAbuse*sex  + PhysicalAbuse*age + 
+                    EmotionalAbuse + EmotionalAbuse*sex + EmotionalAbuse*age + 
+                    SexualAbuse1 + SexualAbuse1*sex + SexualAbuse1*age + 
+                    SexualAbuse2 + SexualAbuse2*sex + SexualAbuse2*age + 
+                    SexualAbuse3 + SexualAbuse3*sex + SexualAbuse3*age + 
+                    Neglect1 + Neglect1*sex + Neglect1*age + 
+                    Neglect2 + Neglect2*sex + Neglect2*age, 
+                  family = "quasipoisson", data = perweek)
+summary(perweekall4)
+
+perweekall5 = glm(perweek ~
+                    MentalIllness + MentalIllness*sex + MentalIllness*age + MentalIllness*age*sex + 
+                    Alcoholic + Alcoholic*sex + Alcoholic*age + Alcoholic*age*sex + 
+                    SubstanceAddiction + SubstanceAddiction*sex + SubstanceAddiction*age + SubstanceAddiction*age*sex + 
+                    Incarcerated + Incarcerated*sex + Incarcerated*age + Incarcerated*age*sex + 
+                    SeparationDivorce + SeparationDivorce*sex + SeparationDivorce*age + SeparationDivorce*age*sex + 
+                    DomesticViolence + DomesticViolence*sex + DomesticViolence*age + DomesticViolence*age*sex + 
+                    PhysicalAbuse + PhysicalAbuse*sex  + PhysicalAbuse*age + PhysicalAbuse*age*sex + 
+                    EmotionalAbuse + EmotionalAbuse*sex + EmotionalAbuse*age + EmotionalAbuse*age*sex + 
+                    SexualAbuse1 + SexualAbuse1*sex + SexualAbuse1*age + SexualAbuse1*age*sex + 
+                    SexualAbuse2 + SexualAbuse2*sex + SexualAbuse2*age + SexualAbuse2*age*sex + 
+                    SexualAbuse3 + SexualAbuse3*sex + SexualAbuse3*age + SexualAbuse3*age*sex + 
+                    Neglect1 + Neglect1*sex + Neglect1*age + Neglect1*age*sex + 
+                    Neglect2 + Neglect2*sex + Neglect2*age + Neglect2*age*sex, 
+                  family = "quasipoisson", data = perweek)
+summary(perweekall5)
+
+
+anova( perweekall1, perweekall, perweekall2, perweekall3, perweekall4, perweekall5, test = "Chisq") # perweekall4 is the best model. lowest deviance and df.
+
+
+summary(perweekall4)
+
+
+tidy(perweekall4) |> 
+  mutate(estimate = round(exp(estimate), 2)) |>
+  filter(p.value <= 0.01) |>
+  mutate(std.error = round(std.error, 2)) |>
+  mutate(statistic = round(statistic, 2)) |>
+  kable()
+```
+
+
+
+```{r}
+grid <- perweek |>
+  data_grid(
+    perweek = c(1, 2, 3, 4, 5, 6, 7),
+    sex = c("Female", "Male"),
+    age = c("18 to 24", "25 to 34", "35 to 44", "45 to 54", "55 to 64", "65 or > 65"),
+    MentalIllness = c("0", "1"),
+    Alcoholic = c("0", "1"),
+    SubstanceAddiction = c("0", "1"),
+    Incarcerated = c("0", "1"),
+    SeparationDivorce = c("0", "1"),
+    DomesticViolence = c("0", "1"),
+    PhysicalAbuse = c("0", "1"),
+    EmotionalAbuse = c("0", "1"),
+    SexualAbuse1 = c("0", "1"),
+    SexualAbuse2 = c("0", "1"),
+    SexualAbuse3 = c("0", "1"),
+    Neglect1 = c("0", "1"),
+    Neglect2 = c("0", "1"),
+  ) 
+grid
+
+aug_perweek <- augment(perweekall4, newdata = grid, se_fit = TRUE) |>
+  mutate(.fittedprob = exp(.fitted) / (1 + exp(.fitted)))
+
+
+one = aug_perweek |> filter(
+      MentalIllness == "1" &
+      Alcoholic == "0" & 
+      SubstanceAddiction == "0" & 
+      Incarcerated == "0" & 
+      SeparationDivorce == "0" &
+      DomesticViolence == "0" & 
+      PhysicalAbuse == "0" & 
+      EmotionalAbuse == "0" & 
+      SexualAbuse1 == "0" &
+      SexualAbuse2 == "0" & 
+      SexualAbuse3 == "0" &
+      Neglect1 == "0" &
+      Neglect2 == "0" |
+      MentalIllness == "0" &
+      Alcoholic == "1" & 
+      SubstanceAddiction == "0" & 
+      Incarcerated == "0" & 
+      SeparationDivorce == "0" &
+      DomesticViolence == "0" & 
+      PhysicalAbuse == "0" & 
+      EmotionalAbuse == "0" & 
+      SexualAbuse1 == "0" &
+      SexualAbuse2 == "0" & 
+      SexualAbuse3 == "0" &
+      Neglect1 == "0" &
+      Neglect2 == "0" |
+      MentalIllness == "0" &
+      Alcoholic == "0" & 
+      SubstanceAddiction == "1" & 
+      Incarcerated == "0" & 
+      SeparationDivorce == "0" &
+      DomesticViolence == "0" & 
+      PhysicalAbuse == "0" & 
+      EmotionalAbuse == "0" & 
+      SexualAbuse1 == "0" &
+      SexualAbuse2 == "0" & 
+      SexualAbuse3 == "0" &
+      Neglect1 == "0" &
+      Neglect2 == "0" |
+        MentalIllness == "0" &
+      Alcoholic == "0" & 
+      SubstanceAddiction == "0" & 
+      Incarcerated == "1" & 
+      SeparationDivorce == "0" &
+      DomesticViolence == "0" & 
+      PhysicalAbuse == "0" & 
+      EmotionalAbuse == "0" & 
+      SexualAbuse1 == "0" &
+      SexualAbuse2 == "0" & 
+      SexualAbuse3 == "0" &
+      Neglect1 == "0" &
+      Neglect2 == "0" |
+        MentalIllness == "0" &
+      Alcoholic == "0" & 
+      SubstanceAddiction == "0" & 
+      Incarcerated == "0" & 
+      SeparationDivorce == "1" &
+      DomesticViolence == "0" & 
+      PhysicalAbuse == "0" & 
+      EmotionalAbuse == "0" & 
+      SexualAbuse1 == "0" &
+      SexualAbuse2 == "0" & 
+      SexualAbuse3 == "0" &
+      Neglect1 == "0" &
+      Neglect2 == "0" |
+        MentalIllness == "0" &
+      Alcoholic == "0" & 
+      SubstanceAddiction == "0" & 
+      Incarcerated == "0" & 
+      SeparationDivorce == "0" &
+      DomesticViolence == "1" & 
+      PhysicalAbuse == "0" & 
+      EmotionalAbuse == "0" & 
+      SexualAbuse1 == "0" &
+      SexualAbuse2 == "0" & 
+      SexualAbuse3 == "0" &
+      Neglect1 == "0" &
+      Neglect2 == "0" |
+        MentalIllness == "0" &
+      Alcoholic == "0" & 
+      SubstanceAddiction == "0" & 
+      Incarcerated == "0" & 
+      SeparationDivorce == "0" &
+      DomesticViolence == "0" & 
+      PhysicalAbuse == "1" & 
+      EmotionalAbuse == "0" & 
+      SexualAbuse1 == "0" &
+      SexualAbuse2 == "0" & 
+      SexualAbuse3 == "0" &
+      Neglect1 == "0" &
+      Neglect2 == "0" |
+        MentalIllness == "0" &
+      Alcoholic == "0" & 
+      SubstanceAddiction == "0" & 
+      Incarcerated == "0" & 
+      SeparationDivorce == "0" &
+      DomesticViolence == "0" & 
+      PhysicalAbuse == "0" & 
+      EmotionalAbuse == "1" & 
+      SexualAbuse1 == "0" &
+      SexualAbuse2 == "0" & 
+      SexualAbuse3 == "0" &
+      Neglect1 == "0" &
+      Neglect2 == "0" |
+        MentalIllness == "0" &
+      Alcoholic == "0" & 
+      SubstanceAddiction == "0" & 
+      Incarcerated == "0" & 
+      SeparationDivorce == "0" &
+      DomesticViolence == "0" & 
+      PhysicalAbuse == "0" & 
+      EmotionalAbuse == "0" & 
+      SexualAbuse1 == "1" &
+      SexualAbuse2 == "0" & 
+      SexualAbuse3 == "0" &
+      Neglect1 == "0" &
+      Neglect2 == "0" |
+        MentalIllness == "0" &
+      Alcoholic == "1" & 
+      SubstanceAddiction == "0" & 
+      Incarcerated == "0" & 
+      SeparationDivorce == "0" &
+      DomesticViolence == "0" & 
+      PhysicalAbuse == "0" & 
+      EmotionalAbuse == "0" & 
+      SexualAbuse1 == "0" &
+      SexualAbuse2 == "1" & 
+      SexualAbuse3 == "0" &
+      Neglect1 == "0" &
+      Neglect2 == "0" |
+        MentalIllness == "0" &
+      Alcoholic == "1" & 
+      SubstanceAddiction == "0" & 
+      Incarcerated == "0" & 
+      SeparationDivorce == "0" &
+      DomesticViolence == "0" & 
+      PhysicalAbuse == "0" & 
+      EmotionalAbuse == "0" & 
+      SexualAbuse1 == "0" &
+      SexualAbuse2 == "1" & 
+      SexualAbuse3 == "0" &
+      Neglect1 == "0" &
+      Neglect2 == "0" |
+        MentalIllness == "0" &
+      Alcoholic == "0" & 
+      SubstanceAddiction == "0" & 
+      Incarcerated == "0" & 
+      SeparationDivorce == "0" &
+      DomesticViolence == "0" & 
+      PhysicalAbuse == "0" & 
+      EmotionalAbuse == "0" & 
+      SexualAbuse1 == "0" &
+      SexualAbuse2 == "0" & 
+      SexualAbuse3 == "1" &
+      Neglect1 == "0" &
+      Neglect2 == "0" |
+        MentalIllness == "0" &
+      Alcoholic == "0" & 
+      SubstanceAddiction == "0" & 
+      Incarcerated == "0" & 
+      SeparationDivorce == "0" &
+      DomesticViolence == "0" & 
+      PhysicalAbuse == "0" & 
+      EmotionalAbuse == "0" & 
+      SexualAbuse1 == "0" &
+      SexualAbuse2 == "0" & 
+      SexualAbuse3 == "0" &
+      Neglect1 == "1" &
+      Neglect2 == "0" |
+        MentalIllness == "0" &
+      Alcoholic == "0" & 
+      SubstanceAddiction == "0" & 
+      Incarcerated == "0" & 
+      SeparationDivorce == "0" &
+      DomesticViolence == "0" & 
+      PhysicalAbuse == "0" & 
+      EmotionalAbuse == "0" & 
+      SexualAbuse1 == "0" &
+      SexualAbuse2 == "0" & 
+      SexualAbuse3 == "0" &
+      Neglect1 == "0" &
+      Neglect2 == "1"
+      ) |>
+  pivot_longer(c(4:16), names_to = "Category", values_to = "yesno") |>
+  filter(yesno != "0") 
+
+two = aug_perweek |>
+  filter(
+        MentalIllness == "0" &
+      Alcoholic == "0" & 
+      SubstanceAddiction == "0" & 
+      Incarcerated == "0" & 
+      SeparationDivorce == "0" &
+      DomesticViolence == "0" & 
+      PhysicalAbuse == "0" & 
+      EmotionalAbuse == "0" & 
+      SexualAbuse1 == "0" &
+      SexualAbuse2 == "0" & 
+      SexualAbuse3 == "0" &
+      Neglect1 == "0" &
+      Neglect2 == "0") |>
+  pivot_longer(c(4:16), names_to = "Category", values_to = "yesno") |>
+  mutate(Category = "None")
+
+
+
+full_join(one, two) |> 
+  mutate(Category = case_when(
+    Category == "Neglect1" ~ "N1",
+    Category == "Neglect2" ~ "N2",
+    Category == "SexualAbuse1" ~ "SA1",
+    Category == "SexualAbuse2" ~ "SA2",
+    Category == "SexualAbuse3" ~ "SA3",
+    Category == "EmotionalAbuse" ~ "EA",
+    Category == "PhysicalAbuse" ~ "PA",
+    Category == "DomesticViolence" ~ "DV", 
+    Category == "SubstanceAddiction" ~"SubAddic",
+    Category == "Incarcerated" ~"I",
+    Category == "MentalIllness" ~"MI",
+    Category == "Alcoholic" ~ "A",
+    Category == "None" ~ "None",
+    Category == "SeparationDivorce" ~ "S/D"
+  )) |>
+  mutate(Category = fct_reorder(Category, .fittedprob)) |>
+  
+  ggplot(aes(y = Category, x = .fittedprob)) +
+  geom_boxplot(outliers = FALSE) +
+  geom_point(aes(col = age, shape = sex, stroke = 0.8)) +
+  facet_wrap(~perweek) +
+  scale_color_viridis_d(option = "plasma", direction = 1, begin = 0.85, end = 0.35) +
+  scale_shape_manual(values = c(1, 6)) +
+  theme_minimal() +
+  labs(title = "Alcohol consumption in days per week", x = "Probability to Consume Alcohol") +
+  theme(
+    strip.text = element_text(color = "black", size = 16, family = "Avenir"),
+    plot.title = element_text(color = "black", size = 20, family = "Avenir"),
+    legend.title = element_blank(),
+    legend.text = element_text(color = "black", size = 15, family = "Avenir"),
+    axis.text.y = element_text(color = "black", size = 13, family = "Avenir"),
+    axis.text.x = element_text(color = "black", size = 16, family = "Avenir", hjust = 0.8),
+    axis.ticks.x = element_line(color = "black"),
+    axis.ticks.y = element_line(color = "black"),
+    axis.title.y = element_blank(),
+    axis.title.x = element_text(color = "black", size = 20, family = "Avenir"),
+    legend.position = c(0.70, 0.2),
+    legend.direction = "horizontal",
+    #legend.direction = "vertical",
+    legend.box = "horizontal"
+  ) 
+
+
+```
+
+
+
+```{r}
+perweek2 = everything |> select(MentalIllness, Alcoholic, Incarcerated, SeparationDivorce, DomesticViolence, PhysicalAbuse, EmotionalAbuse, SexualAbuse1, SexualAbuse2, SexualAbuse3, Neglect1, Neglect2, SubstanceAddiction, ALCDAY4, ALCDAY5, sex, age, race, number) |>
+  mutate(perweek = case_when(
+    ALCDAY5 == 101 ~ 1,
+    ALCDAY5 == 102 ~ 2, 
+    ALCDAY5 == 103 ~ 3,
+    ALCDAY5 == 104 ~ 4, 
+    ALCDAY5 == 105 ~ 5,
+    ALCDAY5 == 106 ~ 6,
+    ALCDAY5 == 107 ~ 7,
+    ALCDAY4 == 101 ~ 1,
+    ALCDAY4 == 102 ~ 2,
+    ALCDAY4 == 103 ~ 3,
+    ALCDAY4 == 104 ~ 4,
+    ALCDAY4 == 105 ~ 5,
+    ALCDAY4 == 106 ~ 6,
+    ALCDAY4 == 107 ~ 7)) |>
+  mutate(sex = if_else(sex == 1, "Male", "Female")) |>
+  filter(!is.na(perweek)) 
+
+perweek2 = perweek2 |> 
+  select(c(1:13)) |>
+  mutate(
+    MentalIllness = if_else(is.na(MentalIllness), 0, MentalIllness),
+    Alcoholic = if_else(is.na(Alcoholic), 0, Alcoholic),
+    Incarcerated = if_else(is.na(Incarcerated), 0, Incarcerated),
+    SeparationDivorce = if_else(is.na(SeparationDivorce), 0, SeparationDivorce),
+    DomesticViolence = if_else(is.na(DomesticViolence), 0, DomesticViolence),
+    PhysicalAbuse = if_else(is.na(PhysicalAbuse), 0, PhysicalAbuse),
+    EmotionalAbuse = if_else(is.na(EmotionalAbuse), 0, EmotionalAbuse),
+    SexualAbuse1 = if_else(is.na(SexualAbuse1), 0, SexualAbuse1),
+    SexualAbuse2 = if_else(is.na(SexualAbuse2), 0, SexualAbuse2),
+    SexualAbuse3 = if_else(is.na(SexualAbuse3), 0, SexualAbuse3),
+    Neglect1 = if_else(is.na(Neglect1), 0, Neglect1), 
+    Neglect2 = if_else(is.na(Neglect2), 0, Neglect2),
+    SubstanceAddiction = if_else(is.na(SubstanceAddiction), 0, SubstanceAddiction)
+  )
+
+sumsACEperweek= rowSums(perweek2, na.rm = TRUE)
+
+
+Categories = c()
+
+one = ""
+two = ""
+three = ""
+four = ""
+five = ""
+six = ""
+seven = ""
+eight = ""
+nine = ""
+ten = ""
+eleven = ""
+twelve =""
+thirteen = ""
+
+for (x in 1:45565) {
+  part = perweek2 |> slice(x)
+  for (i in 1:13) {
+    part1 = as.numeric(part[i])
+    if ( part1 == 1 ) {
+      if (i == 1) {
+        one = "MI"
+      }
+      if (i == 2){
+        two = "A"
+      }
+      if (i == 3){
+        three = "I"
+      }
+      if (i == 4){
+        four = "S/D"
+      }
+      if (i == 5){
+        five = "DV"
+      }
+      if (i == 6){
+        six = "PA"
+      }
+      if (i == 7){
+        seven = "EA"
+      }
+      if (i == 8){
+        eight = "SA1"
+      }
+      if (i == 9){
+        nine = "SA2"
+      }
+      if (i == 10){
+        ten = "SA3"
+      }
+      if (i == 11){
+        eleven = "N1"
+      }
+      if (i == 12){
+        twelve = "N2"
+      }
+      if (i == 13){
+        thirteen = "SubAddic"
+      }
+    }
+    
+  }
+  Categories[x] = paste(one, two, three, four, five, six, seven, eight, nine, ten, eleven, twelve, thirteen)
+  one = ""
+  two = ""
+  three = ""
+  four = ""
+  five = ""
+  six = ""
+  seven = ""
+  eight = ""
+  nine = ""
+  ten = ""
+  eleven = ""
+  twelve =""
+  thirteen = ""
+  
+}
+
+
+
+perweek3 = perweek |>
+  mutate(Categories = Categories) |>
+  mutate(Categories = str_squish(Categories)) |>
+  mutate(Categories = as.factor(Categories)) |>
+  mutate(sum = rowSums(perweek2, na.rm = TRUE)) |>
+  select(-ALCDAY4, -ALCDAY5, -race, -number)
+
+
+perweek4 = perweek3 |> 
+  group_by(Categories, sum) |>
+  summarise(n = n()) |>
+  arrange(desc(sum)) |>
+  filter(n >= 25) 
+
+
+left_join(perweek4, perweek3) |>
+group_by(Categories, sum) |>
+  summarise(mean = mean(perweek),
+            n = n(),
+            sd = sd(perweek),
+            se = sd/sqrt(n)) |>
+  filter(n >= 15) |>
+  filter(str_detect(Categories, "MI ") | Categories == "MI") |>
+  arrange(sum) |>
+  ungroup() |>
+  mutate(Categories = fct_reorder(Categories, sum)) |>
+  mutate(sum = as.factor(sum)) |>
+  ggplot(aes(x = mean, y = Categories, col = sum)) + 
+  geom_point(shape = 21, stroke = 1) + 
+  geom_errorbar(aes(xmax = mean+se, xmin = mean-se, col = sum), width = 0.3) + 
+  scale_color_viridis_d(option = "plasma", direction = 1, begin = 0.85, end = 0.35) +
+  scale_shape_manual(values = c(1, 6)) +
+  theme_minimal() +
+  labs(x = "Average Alcoholic Drinks Per Week") +
+  theme(
+    axis.title.y = element_blank(),
+    axis.text.y = element_text(color = "black", size = 9, family = "Avenir"),
+    axis.title.x = element_text(color = "black", size = 15, family = "Avenir"),
+    axis.text.x = element_text(color = "black", size = 12, family = "Avenir"),
+    plot.title = element_text(color = "black", size = 24, family = "Avenir"),
+    legend.text = element_text(color = "black", size = 10, family = "Avenir"),
+    legend.position = "top", 
+    legend.direction = "horizontal", 
+    legend.box = "horizontal", 
+    legend.title = element_blank()
+  )
+
+
+
+left_join(perweek4, perweek3) |>
+group_by(Categories, sum, age, sex) |>
+  summarise(mean = mean(perweek),
+            n = n(),
+            sd = sd(perweek),
+            se = sd/sqrt(n)) |>
+  filter(n >= 15) |>
+  filter(sum == 2) |>
+  ungroup() |>
+  mutate(Categories = fct_reorder(Categories, mean)) |>
+  ggplot(aes(x = mean, y = Categories)) + 
+  geom_point(size = 4, stroke = 1, aes(x = mean, y = Categories, shape = sex, col = age)) +
+  geom_errorbar(aes(xmax = mean+se, xmin = mean-se, col = age, alpha = se), width = 0.3) + 
+  scale_color_viridis_d(option = "plasma", direction = 1, begin = 0.85, end = 0.35) +
+  scale_shape_manual(values = c(1, 6)) +
+  theme_minimal() +
+  labs(x = "Average Alcoholic Drinks Per Week") +
+  theme(
+    axis.title.y = element_blank(),
+    axis.text.y = element_text(color = "black", size = 9, family = "Avenir"),
+    axis.title.x = element_text(color = "black", size = 15, family = "Avenir"),
+    axis.text.x = element_text(color = "black", size = 12, family = "Avenir"),
+    plot.title = element_text(color = "black", size = 24, family = "Avenir"),
+    legend.text = element_text(color = "black", size = 10, family = "Avenir"),
+    legend.position = "top", 
+    legend.direction = "horizontal", 
+    legend.box = "horizontal", 
+    legend.title = element_blank()
+  )
+
+left_join(perweek4, perweek3) |>
+group_by(Categories, sum, age, sex) |>
+  summarise(mean = mean(perweek),
+            n = n(),
+            sd = sd(perweek),
+            se = sd/sqrt(n)) |>
+  filter(n >= 15) |>
+  filter(sum == 3) |>
+  ungroup() |>
+  mutate(Categories = fct_reorder(Categories, mean)) |>
+  ggplot(aes(x = mean, y = Categories)) + 
+  geom_point(size = 4, stroke = 1, aes(x = mean, y = Categories, shape = sex, col = age)) +
+  geom_errorbar(aes(xmax = mean+se, xmin = mean-se, col = age, alpha = se), width = 0.3) + 
+  scale_color_viridis_d(option = "plasma", direction = 1, begin = 0.85, end = 0.35) +
+  scale_shape_manual(values = c(1, 6)) +
+  theme_minimal() +
+  labs(x = "Average Alcoholic Drinks Per Week") +
+  theme(
+    axis.title.y = element_blank(),
+    axis.text.y = element_text(color = "black", size = 9, family = "Avenir"),
+    axis.title.x = element_text(color = "black", size = 15, family = "Avenir"),
+    axis.text.x = element_text(color = "black", size = 12, family = "Avenir"),
+    plot.title = element_text(color = "black", size = 24, family = "Avenir"),
+    legend.text = element_text(color = "black", size = 10, family = "Avenir"),
+    legend.position = "top", 
+    legend.direction = "horizontal", 
+    legend.box = "horizontal", 
+    legend.title = element_blank()
+  )
+
+
+left_join(perweek4, perweek3) |>
+group_by(Categories, sum, age, sex) |>
+  summarise(mean = mean(perweek),
+            n = n(),
+            sd = sd(perweek),
+            se = sd/sqrt(n)) |>
+  filter(n >= 15) |>
+  filter(sum == 4) |>
+  ungroup() |>
+  mutate(Categories = fct_reorder(Categories, mean)) |>
+  ggplot(aes(x = mean, y = Categories)) + 
+  geom_point(size = 4, stroke = 1, aes(x = mean, y = Categories, shape = sex, col = age)) +
+  geom_errorbar(aes(xmax = mean+se, xmin = mean-se, col = age, alpha = se), width = 0.3) + 
+  scale_color_viridis_d(option = "plasma", direction = 1, begin = 0.85, end = 0.35) +
+  scale_shape_manual(values = c(1, 6)) +
+  theme_minimal() +
+  labs(x = "Average Alcoholic Drinks Per Week") +
+  theme(
+    axis.title.y = element_blank(),
+    axis.text.y = element_text(color = "black", size = 9, family = "Avenir"),
+    axis.title.x = element_text(color = "black", size = 15, family = "Avenir"),
+    axis.text.x = element_text(color = "black", size = 12, family = "Avenir"),
+    plot.title = element_text(color = "black", size = 24, family = "Avenir"),
+    legend.text = element_text(color = "black", size = 10, family = "Avenir"),
+    legend.position = "top", 
+    legend.direction = "horizontal", 
+    legend.box = "horizontal", 
+    legend.title = element_blank()
+  )
+
+
+
+left_join(perweek4, perweek3) |>
+group_by(Categories, sum, age, sex) |>
+  summarise(mean = mean(perweek),
+            n = n(),
+            sd = sd(perweek),
+            se = sd/sqrt(n)) |>
+  filter(n >= 15) |>
+  filter(sum == 5) |>
+  ungroup() |>
+  mutate(Categories = fct_reorder(Categories, mean)) |>
+  ggplot(aes(x = mean, y = Categories)) + 
+  geom_point(size = 4, stroke = 1, aes(x = mean, y = Categories, shape = sex, col = age)) +
+  geom_errorbar(aes(xmax = mean+se, xmin = mean-se, col = age, alpha = se), width = 0.3) + 
+  scale_color_viridis_d(option = "plasma", direction = 1, begin = 0.85, end = 0.35) +
+  scale_shape_manual(values = c(1, 6)) +
+  theme_minimal() +
+  labs(x = "Average Alcoholic Drinks Per Week") +
+  theme(
+    axis.title.y = element_blank(),
+    axis.text.y = element_text(color = "black", size = 9, family = "Avenir"),
+    axis.title.x = element_text(color = "black", size = 15, family = "Avenir"),
+    axis.text.x = element_text(color = "black", size = 12, family = "Avenir"),
+    plot.title = element_text(color = "black", size = 24, family = "Avenir"),
+    legend.text = element_text(color = "black", size = 10, family = "Avenir"),
+    legend.position = "top", 
+    legend.direction = "horizontal", 
+    legend.box = "horizontal", 
+    legend.title = element_blank()
+  )
+
+left_join(perweek4, perweek3) |>
+group_by(Categories, sum, age, sex) |>
+  summarise(mean = mean(perweek),
+            n = n(),
+            sd = sd(perweek),
+            se = sd/sqrt(n)) |>
+  filter(n >= 15) |>
+  filter(sum >=6 ) |>
+  ungroup() |>
+  mutate(Categories = fct_reorder(Categories, mean)) |>
+  ggplot(aes(x = mean, y = Categories)) + 
+  geom_point(size = 4, stroke = 1, aes(x = mean, y = Categories, shape = sex, col = age)) +
+  geom_errorbar(aes(xmax = mean+se, xmin = mean-se, col = age, alpha = se), width = 0.3) + 
+  scale_color_viridis_d(option = "plasma", direction = 1, begin = 0.85, end = 0.35) +
+  scale_shape_manual(values = c(1, 6)) +
+  theme_minimal() +
+  labs(x = "Average Alcoholic Drinks Per Week") +
+  theme(
+    axis.title.y = element_blank(),
+    axis.text.y = element_text(color = "black", size = 9, family = "Avenir"),
+    axis.title.x = element_text(color = "black", size = 15, family = "Avenir"),
+    axis.text.x = element_text(color = "black", size = 12, family = "Avenir"),
+    plot.title = element_text(color = "black", size = 24, family = "Avenir"),
+    legend.text = element_text(color = "black", size = 10, family = "Avenir"),
+    legend.position = "top", 
+    legend.direction = "horizontal", 
+    legend.box = "horizontal", 
+    legend.title = element_blank()
+  )
+```
+
+
+```{r}
+left_join(perweek3, aug_perweek)
+
+left_join(aug_perweek, left_join(perweek4, perweek3)) |>
+  filter(sum == 1) |>
+  #mutate(Categories = fct_reorder(Categories, .fittedprob, .na_rm = TRUE)) |>
+  ggplot(aes(x = perweek, y = .fittedprob, col = age, shape = sex)) + 
+  geom_point(aes(col = age, shape = sex, stroke = 0.8))
+  
+aug_perweek2 = aug_perweek |> mutate(
+    MentalIllness = if_else(is.na(MentalIllness), 0, MentalIllness),
+    Alcoholic = if_else(is.na(Alcoholic), 0, Alcoholic),
+    Incarcerated = if_else(is.na(Incarcerated), 0, Incarcerated),
+    SeparationDivorce = if_else(is.na(SeparationDivorce), 0, SeparationDivorce),
+    DomesticViolence = if_else(is.na(DomesticViolence), 0, DomesticViolence),
+    PhysicalAbuse = if_else(is.na(PhysicalAbuse), 0, PhysicalAbuse),
+    EmotionalAbuse = if_else(is.na(EmotionalAbuse), 0, EmotionalAbuse),
+    SexualAbuse1 = if_else(is.na(SexualAbuse1), 0, SexualAbuse1),
+    SexualAbuse2 = if_else(is.na(SexualAbuse2), 0, SexualAbuse2),
+    SexualAbuse3 = if_else(is.na(SexualAbuse3), 0, SexualAbuse3),
+    Neglect1 = if_else(is.na(Neglect1), 0, Neglect1), 
+    Neglect2 = if_else(is.na(Neglect2), 0, Neglect2),
+    SubstanceAddiction = if_else(is.na(SubstanceAddiction), 0, SubstanceAddiction)
+  )
+  
+
+left_join(aug_perweek, perweek3, by = c("MentalIllness", "Alcoholic", "Incarcerated", "SeparationDivorce",
+"DomesticViolence", "PhysicalAbuse", "EmotionalAbuse", "SexualAbuse1", "SexualAbuse2", "SexualAbuse3",
+"Neglect1", "Neglect2", "SubstanceAddiction", "sex", "age", "perweek")) 
+
+  left_join(aug_perweek2, left_join(perweek4, perweek3), by = join_by("MentalIllness", "Alcoholic", "Incarcerated", "SeparationDivorce",
+"DomesticViolence", "PhysicalAbuse", "EmotionalAbuse", "SexualAbuse1", "SexualAbuse2", "SexualAbuse3",
+"Neglect1", "Neglect2", "SubstanceAddiction", "sex", "age", "perweek")) |>
+  ggplot(aes(y = Categories, x = .fittedprob)) +
+  #geom_boxplot(outliers = FALSE) +
+  geom_point(aes(col = age, shape = sex, stroke = 0.8)) +
+  geom_errorbar(aes(xmin = .fittedprob-.se.fit, xmax = .fittedprob+.se.fit, col = age)) +
+  facet_wrap(~perweek) +
+  scale_color_viridis_d(option = "plasma", direction = 1, begin = 0.85, end = 0.35) +
+  scale_shape_manual(values = c(1, 6)) +
+  theme_minimal() +
+  labs(title = "Alcohol consumption in days per week", x = "Probability to Consume Alcohol") +
+  theme(
+    strip.text = element_text(color = "black", size = 16, family = "Avenir"),
+    plot.title = element_text(color = "black", size = 20, family = "Avenir"),
+    legend.title = element_blank(),
+    legend.text = element_text(color = "black", size = 15, family = "Avenir"),
+    axis.text.y = element_text(color = "black", size = 13, family = "Avenir"),
+    axis.text.x = element_text(color = "black", size = 16, family = "Avenir", hjust = 0.8),
+    axis.ticks.x = element_line(color = "black"),
+    axis.ticks.y = element_line(color = "black"),
+    axis.title.y = element_blank(),
+    axis.title.x = element_text(color = "black", size = 20, family = "Avenir"),
+    legend.position = c(0.70, 0.2),
+    legend.direction = "horizontal",
+    #legend.direction = "vertical",
+    legend.box = "horizontal"
+  ) 
+```
+
+
+
+
+
+```{r}
+
+level1 = full_join(one, two)
+
+
+aug_perweek |>
+  as.data.frame.matrix() |>
+  rownames_to_column() |>
+  as_tibble()
+
+
+
+
+aug_perweek |> filter(
+MentalIllness == "1" & Alcoholic == "1" & SubstanceAddiction == "0" & Incarcerated == "0" & SeparationDivorce == "0" & DomesticViolence == "0" & PhysicalAbuse == "0" & EmotionalAbuse == "0" & SexualAbuse1 == "0" & SexualAbuse2 == "0" & SexualAbuse3 == "0" & Neglect1 == "0" & Neglect2 == "0" |
+MentalIllness == "1" & Alcoholic == "0" & SubstanceAddiction == "1" & Incarcerated == "0" & SeparationDivorce == "0" & DomesticViolence == "0" & PhysicalAbuse == "0" & EmotionalAbuse == "0" & SexualAbuse1 == "0" & SexualAbuse2 == "0" & SexualAbuse3 == "0" & Neglect1 == "0" & Neglect2 == "0" |
+MentalIllness == "1" & Alcoholic == "0" & SubstanceAddiction == "0" & Incarcerated == "1" & SeparationDivorce == "0" & DomesticViolence == "0" & PhysicalAbuse == "0" & EmotionalAbuse == "0" & SexualAbuse1 == "0" & SexualAbuse2 == "0" & SexualAbuse3 == "0" & Neglect1 == "0" & Neglect2 == "0" |
+MentalIllness == "1" & Alcoholic == "0" & SubstanceAddiction == "0" & Incarcerated == "0" & SeparationDivorce == "1" & DomesticViolence == "0" & PhysicalAbuse == "0" & EmotionalAbuse == "0" & SexualAbuse1 == "0" & SexualAbuse2 == "0" & SexualAbuse3 == "0" & Neglect1 == "0" & Neglect2 == "0" |
+MentalIllness == "1" & Alcoholic == "0" & SubstanceAddiction == "0" & Incarcerated == "0" & SeparationDivorce == "0" & DomesticViolence == "1" & PhysicalAbuse == "0" & EmotionalAbuse == "0" & SexualAbuse1 == "0" & SexualAbuse2 == "0" & SexualAbuse3 == "0" & Neglect1 == "0" & Neglect2 == "0" |
+MentalIllness == "1" & Alcoholic == "0" & SubstanceAddiction == "0" & Incarcerated == "0" & SeparationDivorce == "0" & DomesticViolence == "0" & PhysicalAbuse == "1" & EmotionalAbuse == "0" & SexualAbuse1 == "0" & SexualAbuse2 == "0" & SexualAbuse3 == "0" & Neglect1 == "0" & Neglect2 == "0" |
+MentalIllness == "1" & Alcoholic == "0" & SubstanceAddiction == "0" & Incarcerated == "0" & SeparationDivorce == "0" & DomesticViolence == "0" & PhysicalAbuse == "0" & EmotionalAbuse == "1" & SexualAbuse1 == "0" & SexualAbuse2 == "0" & SexualAbuse3 == "0" & Neglect1 == "0" & Neglect2 == "0" |
+MentalIllness == "1" & Alcoholic == "0" & SubstanceAddiction == "0" & Incarcerated == "0" & SeparationDivorce == "0" & DomesticViolence == "0" & PhysicalAbuse == "0" & EmotionalAbuse == "0" & SexualAbuse1 == "1" & SexualAbuse2 == "0" & SexualAbuse3 == "0" & Neglect1 == "0" & Neglect2 == "0" |
+MentalIllness == "1" & Alcoholic == "0" & SubstanceAddiction == "0" & Incarcerated == "0" & SeparationDivorce == "0" & DomesticViolence == "0" & PhysicalAbuse == "0" & EmotionalAbuse == "0" & SexualAbuse1 == "0" & SexualAbuse2 == "1" & SexualAbuse3 == "0" & Neglect1 == "0" & Neglect2 == "0" |
+MentalIllness == "1" & Alcoholic == "0" & SubstanceAddiction == "0" & Incarcerated == "0" & SeparationDivorce == "0" & DomesticViolence == "0" & PhysicalAbuse == "0" & EmotionalAbuse == "0" & SexualAbuse1 == "0" & SexualAbuse2 == "0" & SexualAbuse3 == "1" & Neglect1 == "0" & Neglect2 == "0" |
+MentalIllness == "1" & Alcoholic == "0" & SubstanceAddiction == "0" & Incarcerated == "0" & SeparationDivorce == "0" & DomesticViolence == "0" & PhysicalAbuse == "0" & EmotionalAbuse == "0" & SexualAbuse1 == "0" & SexualAbuse2 == "0" & SexualAbuse3 == "0" & Neglect1 == "1" & Neglect2 == "0" |
+MentalIllness == "1" & Alcoholic == "0" & SubstanceAddiction == "0" & Incarcerated == "0" & SeparationDivorce == "0" & DomesticViolence == "0" & PhysicalAbuse == "0" & EmotionalAbuse == "0" & SexualAbuse1 == "0" & SexualAbuse2 == "0" & SexualAbuse3 == "0" & Neglect1 == "0" & Neglect2 == "1" )
+
+aug_perweek |>
+  mutate(MentalIllness = as.numeric(MentalIllness),
+         Alcoholic = as.numeric(Alcoholic),
+         SubstanceAddiction = as.numeric(SubstanceAddiction),
+         Incarcerated = as.numeric(Incarcerated),
+         SeparationDivorce = as.numeric(SeparationDivorce),
+         DomesticViolence = as.numeric(DomesticViolence),
+         PhysicalAbuse = as.numeric(PhysicalAbuse),
+         EmotionalAbuse = as.numeric(EmotionalAbuse),
+         SexualAbuse1 = as.numeric(SexualAbuse1),
+         SexualAbuse2 = as.numeric(SexualAbuse2),
+         SexualAbuse3 = as.numeric(SexualAbuse3),
+         Neglect1 = as.numeric(Neglect1),
+         Neglect2 = as.numeric(Neglect2)) |>
+  mutate(sum = (MentalIllness+Alcoholic+Incarcerated+SeparationDivorce+DomesticViolence+PhysicalAbuse+EmotionalAbuse+SexualAbuse1+SexualAbuse2+SexualAbuse3+Neglect1+Neglect2)) |>
+  mutate()
+  filter(MentalIllness == 1 & sum == 2)
+  
+
+filter(MentalIllness == "1" & Alcoholic == "1")
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+```{r}
+full_join(one, two) |>
+  filter(sex == "Female") |>
+  mutate(age = case_when(
+    age == 1 ~ "18 to 24",
+    age == 2 ~ "25 to 34",
+    age == 3 ~ "35 to 44",
+    age == 4 ~ "45 to 54",
+    age == 5 ~ "55 to 64",
+    age == 6 ~ "65 or > 65")) |>
+  ggplot(aes(x = perweek, y = .fittedprob, col = Category, alpha = yesno)) +
+  geom_point() +
+  facet_wrap(~age)
+
+  
+
+
+
+
+  group_by(perweek, MentalIllness, Alcoholic, SubstanceAddiction, Incarcerated, SeparationDivorce, DomesticViolence, PhysicalAbuse, EmotionalAbuse, SexualAbuse1, SexualAbuse2, SexualAbuse3, Neglect1, Neglect2) |>
+  summarise(mean = mean(.fittedprob))
+
+```
+
+
+
+
+
+
+```{r}
+
+grid <- perweek |>
+  data_grid(
+    perweek = seq_range(perweek, n = 10),
+    sex = c("Female", "Male"),
+    age = c("1", "2", "3", "4", "5", "6"),
+    MentalIllness = c("0", "1"),
+    Alcoholic = c("0", "1"),
+    SubstanceAddiction = c("0", "1"),
+    Incarcerated = c("0", "1"),
+    SeparationDivorce = c("0", "1"),
+    DomesticViolence = c("0", "1"),
+    PhysicalAbuse = c("0", "1"),
+    EmotionalAbuse = c("0", "1"),
+    SexualAbuse1 = c("0", "1"),
+    SexualAbuse2 = c("0", "1"),
+    SexualAbuse3 = c("0", "1"),
+    Neglect1 = c("0", "1"),
+    Neglect2 = c("0", "1"),
+  ) 
+grid
+
+aug_perweek <- augment(perweekall4, newdata = grid, se_fit = TRUE) |>
+  mutate(.fittedprob = exp(.fitted) / (1 + exp(.fitted)))
+aug_perweek
+
+
+aug_perweek |> 
+  mutate(age = case_when(
+    age == 1 ~ "18 to 24",
+    age == 2 ~ "25 to 34",
+    age == 3 ~ "35 to 44",
+    age == 4 ~ "45 to 54",
+    age == 5 ~ "55 to 64",
+    age == 6 ~ "65 or > 65"
+  )) |>
+  filter(
+    sex == "Female" & 
+      MentalIllness == "1" &
+      Alcoholic == "0" & 
+      SubstanceAddiction == "0" & 
+      Incarcerated == "0" & 
+      SeparationDivorce == "0" &
+      DomesticViolence == "0" & 
+      PhysicalAbuse == "0" & 
+      EmotionalAbuse == "0" & 
+      SexualAbuse1 == "0" &
+      SexualAbuse2 == "0" & 
+      SexualAbuse3 == "0" &
+      Neglect1 == "0" &
+      Neglect2 == "0" |
+      sex == "Male" & 
+      MentalIllness == "1" &
+      Alcoholic == "0" & 
+      SubstanceAddiction == "0" & 
+      Incarcerated == "0" & 
+      SeparationDivorce == "0" &
+      DomesticViolence == "0" & 
+      PhysicalAbuse == "0" & 
+      EmotionalAbuse == "0" & 
+      SexualAbuse1 == "0" &
+      SexualAbuse2 == "0" & 
+      SexualAbuse3 == "0" &
+      Neglect1 == "0" &
+      Neglect2 == "0" |
+      sex == "Female" & 
+      MentalIllness == "0" &
+      Alcoholic == "0" & 
+      SubstanceAddiction == "0" & 
+      Incarcerated == "0" & 
+      SeparationDivorce == "0" &
+      DomesticViolence == "0" & 
+      PhysicalAbuse == "0" & 
+      EmotionalAbuse == "0" & 
+      SexualAbuse1 == "0" &
+      SexualAbuse2 == "0" & 
+      SexualAbuse3 == "0" &
+      Neglect1 == "0" &
+      Neglect2 == "0" |
+      sex == "Male" & 
+      MentalIllness == "0" &
+      Alcoholic == "0" & 
+      SubstanceAddiction == "0" & 
+      Incarcerated == "0" & 
+      SeparationDivorce == "0" &
+      DomesticViolence == "0" & 
+      PhysicalAbuse == "0" & 
+      EmotionalAbuse == "0" & 
+      SexualAbuse1 == "0" &
+      SexualAbuse2 == "0" & 
+      SexualAbuse3 == "0" &
+      Neglect1 == "0" &
+      Neglect2 == "0"
+  ) |>
+  mutate(MentalIllness = if_else(MentalIllness == "1", "Yes", "No")) |>
+  select(perweek, sex, age, MentalIllness, .fitted, .se.fit, .fittedprob) |>
+  ggplot(aes(x = perweek, y = .fittedprob)) +
+  geom_ribbon(aes(ymin = .fittedprob-.se.fit, ymax = .fittedprob+.se.fit, col = age), linetype = "dashed", alpha = 0, linewidth = 0.8) +
+  #geom_errorbar(aes(ymin = .fittedprob-.se.fit, ymax = .fittedprob+.se.fit, col = age), position = position_dodge(0.9)) +
+  geom_line(aes(x = perweek, y = .fittedprob, col = age)) +
+  geom_point(shape = 21, stroke = 1, size = 2, aes(x = perweek, y = .fittedprob, col = age)) +
+  facet_wrap(vars(sex, MentalIllness)) +
+  labs(title = "Mental Illness in the household", x = "Days Per Week", y = "Fitted Probability to Consume Alcohol") +
+  theme_minimal() +
+  scale_fill_viridis_d(option = "plasma", direction = 1, begin = 0.85, end = 0.35) +
+  scale_color_viridis_d(option = "plasma", direction = 1, begin = 0.85, end = 0.35) +
+  scale_alpha_manual(values = c(0.35, 1)) +
+  theme(
+    strip.text = element_text(color = "black", size = 16, family = "Avenir"),
+    plot.title = element_text(color = "black", size = 18, family = "Avenir"),
+    legend.title = element_blank(),
+    legend.text = element_text(color = "black", size = 12, family = "Avenir"),
+    axis.text = element_text(color = "black", size = 16, family = "Avenir"),
+    axis.title = element_text(color = "black", size = 20, family = "Avenir")
+  )
+
+
+aug_perweek |> 
+  mutate(age = case_when(
+    age == 1 ~ "18 to 24",
+    age == 2 ~ "25 to 34",
+    age == 3 ~ "35 to 44",
+    age == 4 ~ "45 to 54",
+    age == 5 ~ "55 to 64",
+    age == 6 ~ "65 or > 65"
+  )) |>
+  filter(
+    sex == "Female" & 
+      MentalIllness == "0" &
+      Alcoholic == "1" & 
+      SubstanceAddiction == "0" & 
+      Incarcerated == "0" & 
+      SeparationDivorce == "0" &
+      DomesticViolence == "0" & 
+      PhysicalAbuse == "0" & 
+      EmotionalAbuse == "0" & 
+      SexualAbuse1 == "0" &
+      SexualAbuse2 == "0" & 
+      SexualAbuse3 == "0" &
+      Neglect1 == "0" &
+      Neglect2 == "0" |
+      sex == "Male" & 
+      MentalIllness == "0" &
+      Alcoholic == "1" & 
+      SubstanceAddiction == "0" & 
+      Incarcerated == "0" & 
+      SeparationDivorce == "0" &
+      DomesticViolence == "0" & 
+      PhysicalAbuse == "0" & 
+      EmotionalAbuse == "0" & 
+      SexualAbuse1 == "0" &
+      SexualAbuse2 == "0" & 
+      SexualAbuse3 == "0" &
+      Neglect1 == "0" &
+      Neglect2 == "0" |
+      sex == "Female" & 
+      MentalIllness == "0" &
+      Alcoholic == "0" & 
+      SubstanceAddiction == "0" & 
+      Incarcerated == "0" & 
+      SeparationDivorce == "0" &
+      DomesticViolence == "0" & 
+      PhysicalAbuse == "0" & 
+      EmotionalAbuse == "0" & 
+      SexualAbuse1 == "0" &
+      SexualAbuse2 == "0" & 
+      SexualAbuse3 == "0" &
+      Neglect1 == "0" &
+      Neglect2 == "0" |
+      sex == "Male" & 
+      MentalIllness == "0" &
+      Alcoholic == "0" & 
+      SubstanceAddiction == "0" & 
+      Incarcerated == "0" & 
+      SeparationDivorce == "0" &
+      DomesticViolence == "0" & 
+      PhysicalAbuse == "0" & 
+      EmotionalAbuse == "0" & 
+      SexualAbuse1 == "0" &
+      SexualAbuse2 == "0" & 
+      SexualAbuse3 == "0" &
+      Neglect1 == "0" &
+      Neglect2 == "0"
+  ) |>
+  mutate(Alcoholic = if_else(Alcoholic == "1", "Yes", "No")) |>
+  select(perweek, sex, age, Alcoholic, .fitted, .se.fit, .fittedprob) |>
+  ggplot(aes(x = perweek, y = .fittedprob)) +
+  geom_ribbon(aes(ymin = .fittedprob-.se.fit, ymax = .fittedprob+.se.fit, col = age), linetype = "dashed", alpha = 0, linewidth = 0.8) +
+  #geom_errorbar(aes(ymin = .fittedprob-.se.fit, ymax = .fittedprob+.se.fit, col = age), position = position_dodge(0.9)) +
+  geom_line(aes(x = perweek, y = .fittedprob, col = age)) +
+  geom_point(shape = 21, stroke = 1, size = 2, aes(x = perweek, y = .fittedprob, col = age)) +
+  facet_wrap(vars(sex, Alcoholic)) +
+  labs(title = "Mental Illness in the household", x = "Days Per Week", y = "Fitted Probability to Consume Alcohol") +
+  theme_minimal() +
+  scale_fill_viridis_d(option = "plasma", direction = 1, begin = 0.85, end = 0.35) +
+  scale_color_viridis_d(option = "plasma", direction = 1, begin = 0.85, end = 0.35) +
+  scale_alpha_manual(values = c(0.35, 1)) +
+  theme(
+    strip.text = element_text(color = "black", size = 16, family = "Avenir"),
+    plot.title = element_text(color = "black", size = 18, family = "Avenir"),
+    legend.title = element_blank(),
+    legend.text = element_text(color = "black", size = 12, family = "Avenir"),
+    axis.text = element_text(color = "black", size = 16, family = "Avenir"),
+    axis.title = element_text(color = "black", size = 20, family = "Avenir")
+  )
+  
+```
+
+
+
+```{r}
+one = perweekplot |>
+  filter(race == "White") |>
+  mutate(sex = if_else(sex == 1, "Male", "Female")) |>
+  mutate(MentalIllness = if_else(MentalIllness == 1, "Yes", "No")) |>
+  filter(!is.na(perweek)) |>
+  filter(!is.na(MentalIllness)) |>
+  group_by(perweek, MentalIllness, sex, age, race) |>
+  summarise(n = n()) |>
+  ggplot(aes(x = perweek, y = n, col = age, alpha = MentalIllness)) + 
+  geom_line(linewidth = 1) +
+  theme_minimal() +
+  scale_color_viridis_d(option = "plasma", direction = 1, begin = 0.85, end = 0.35) +
+  scale_alpha_manual(values = c(0.35, 1)) +
+  facet_wrap(vars(race, sex)) + 
+  labs(x = "Days Per Week (Alcohol Consumption)", y = "People") +
+  theme(
+    strip.text = element_text(color = "black", size = 16, family = "Avenir"),
+    plot.title = element_text(color = "black", size = 18, family = "Avenir"),
+    legend.title = element_blank(),
+    legend.text = element_text(color = "black", size = 12, family = "Avenir"),
+    axis.text = element_text(color = "black", size = 16, family = "Avenir"),
+    axis.title = element_text(color = "black", size = 20, family = "Avenir")
+  )
+
+
+
+two = perweekplot |>
+  filter(race == "Black") |>
+  mutate(sex = if_else(sex == 1, "Male", "Female")) |>
+  mutate(MentalIllness = if_else(MentalIllness == 1, "Yes", "No")) |>
+  filter(!is.na(perweek)) |>
+  filter(!is.na(MentalIllness)) |>
+  group_by(perweek, MentalIllness, sex, age, race) |>
+  summarise(n = n()) |>
+  ggplot(aes(x = perweek, y = n, col = age, alpha = MentalIllness)) + 
+  geom_line(linewidth = 1) +
+  theme_minimal() +
+  scale_color_viridis_d(option = "plasma", direction = 1, begin = 0.85, end = 0.35) +
+  scale_alpha_manual(values = c(0.35, 1)) +
+  facet_wrap(vars(race, sex)) + 
+  labs(x = "Days Per Week (Alcohol Consumption)", y = "People") +
+  theme(
+    strip.text = element_text(color = "black", size = 16, family = "Avenir"),
+    plot.title = element_text(color = "black", size = 18, family = "Avenir"),
+    legend.title = element_blank(),
+    legend.text = element_text(color = "black", size = 12, family = "Avenir"),
+    axis.text = element_text(color = "black", size = 16, family = "Avenir"),
+    axis.title = element_text(color = "black", size = 20, family = "Avenir")
+  )
+
+three = perweekplot |>
+  filter(race == "Asian") |>
+  mutate(sex = if_else(sex == 1, "Male", "Female")) |>
+  mutate(MentalIllness = if_else(MentalIllness == 1, "Yes", "No")) |>
+  filter(!is.na(perweek)) |>
+  filter(!is.na(MentalIllness)) |>
+  group_by(perweek, MentalIllness, sex, age, race) |>
+  summarise(n = n()) |>
+  ggplot(aes(x = perweek, y = n, col = age, alpha = MentalIllness)) + 
+  geom_line(linewidth = 1) +
+  theme_minimal() +
+  scale_color_viridis_d(option = "plasma", direction = 1, begin = 0.85, end = 0.35) +
+  scale_alpha_manual(values = c(0.35, 1)) +
+  facet_wrap(vars(race, sex)) + 
+  labs(x = "Days Per Week (Alcohol Consumption)", y = "People") +
+  theme(
+    strip.text = element_text(color = "black", size = 16, family = "Avenir"),
+    plot.title = element_text(color = "black", size = 18, family = "Avenir"),
+    legend.title = element_blank(),
+    legend.text = element_text(color = "black", size = 12, family = "Avenir"),
+    axis.text = element_text(color = "black", size = 16, family = "Avenir"),
+    axis.title = element_text(color = "black", size = 20, family = "Avenir")
+  )
+
+five = perweekplot |>
+  filter(race == "AI/AN") |>
+  mutate(sex = if_else(sex == 1, "Male", "Female")) |>
+  mutate(MentalIllness = if_else(MentalIllness == 1, "Yes", "No")) |>
+  filter(!is.na(perweek)) |>
+  filter(!is.na(MentalIllness)) |>
+  group_by(perweek, MentalIllness, sex, age, race) |>
+  summarise(n = n()) |>
+  ggplot(aes(x = perweek, y = n, col = age, alpha = MentalIllness)) + 
+  geom_line(linewidth = 1) +
+  theme_minimal() +
+  scale_color_viridis_d(option = "plasma", direction = 1, begin = 0.85, end = 0.35) +
+  scale_alpha_manual(values = c(0.35, 1)) +
+  facet_wrap(vars(race, sex)) + 
+  labs(x = "Days Per Week (Alcohol Consumption)", y = "People") +
+  theme(
+    strip.text = element_text(color = "black", size = 16, family = "Avenir"),
+    plot.title = element_text(color = "black", size = 18, family = "Avenir"),
+    legend.title = element_blank(),
+    legend.text = element_text(color = "black", size = 12, family = "Avenir"),
+    axis.text = element_text(color = "black", size = 16, family = "Avenir"),
+    axis.title = element_text(color = "black", size = 20, family = "Avenir")
+  )
+
+
+four = perweekplot |>
+  filter(race == "Hispanic") |>
+  mutate(sex = if_else(sex == 1, "Male", "Female")) |>
+  mutate(MentalIllness = if_else(MentalIllness == 1, "Yes", "No")) |>
+  filter(!is.na(perweek)) |>
+  filter(!is.na(MentalIllness)) |>
+  group_by(perweek, MentalIllness, sex, age, race) |>
+  summarise(n = n()) |>
+  ggplot(aes(x = perweek, y = n, col = age, alpha = MentalIllness)) + 
+  geom_line(linewidth = 1) +
+  theme_minimal() +
+  scale_color_viridis_d(option = "plasma", direction = 1, begin = 0.85, end = 0.35) +
+  scale_alpha_manual(values = c(0.35, 1)) +
+  facet_wrap(vars(race, sex)) + 
+  labs(x = "Days Per Week (Alcohol Consumption)", y = "People") +
+  theme(
+    strip.text = element_text(color = "black", size = 16, family = "Avenir"),
+    plot.title = element_text(color = "black", size = 18, family = "Avenir"),
+    legend.title = element_blank(),
+    legend.text = element_text(color = "black", size = 12, family = "Avenir"),
+    axis.text = element_text(color = "black", size = 16, family = "Avenir"),
+    axis.title = element_text(color = "black", size = 20, family = "Avenir")
+  )
+
+
+six = perweekplot |>
+  filter(race == "Other") |>
+  mutate(sex = if_else(sex == 1, "Male", "Female")) |>
+  mutate(MentalIllness = if_else(MentalIllness == 1, "Yes", "No")) |>
+  filter(!is.na(perweek)) |>
+  filter(!is.na(MentalIllness)) |>
+  group_by(perweek, MentalIllness, sex, age, race) |>
+  summarise(n = n()) |>
+  ggplot(aes(x = perweek, y = n, col = age, alpha = MentalIllness)) + 
+  geom_line(linewidth = 1) +
+  theme_minimal() +
+  scale_color_viridis_d(option = "plasma", direction = 1, begin = 0.85, end = 0.35) +
+  scale_alpha_manual(values = c(0.35, 1)) +
+  facet_wrap(vars(race, sex)) + 
+  labs(x = "Days Per Week (Alcohol Consumption)", y = "People") +
+  theme(
+    strip.text = element_text(color = "black", size = 16, family = "Avenir"),
+    plot.title = element_text(color = "black", size = 18, family = "Avenir"),
+    legend.title = element_blank(),
+    legend.text = element_text(color = "black", size = 12, family = "Avenir"),
+    axis.text = element_text(color = "black", size = 16, family = "Avenir"),
+    axis.title = element_text(color = "black", size = 20, family = "Avenir")
+  )
+```
+
+
+
+
+

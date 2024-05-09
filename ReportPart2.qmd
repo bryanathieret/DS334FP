@@ -927,6 +927,31 @@ log(\frac{1-p}{p}) = &\beta_1 (\text{sex}) + \\
 
 
 
+```{=tex}
+\begin{align*}
+log(\frac{1-p}{p}) =& \\
+&\beta_0 + \\
+                     &\beta_1 (\text{sex}) + \\
+                     &\beta_2 (\text{age}) + \\
+                     &\beta_3 (\text{MentalIllness}) + \beta_4 (\text{MentalIllness} \cdot \text{age}) + \beta_5 (\text{MentalIllness} \cdot \text{sex}) + \\
+                     &\beta_6 (\text{Alcohol}) + \beta_7 (\text{Alcohol} \cdot \text{age}) + \beta_8 (\text{Alcohol} \cdot \text{sex}) + \\
+                     &\beta_9 (\text{SubstanceAddiction}) + \beta_{10} (\text{SubstanceAddiction} \cdot \text{age}) + \beta_{11} (\text{SubstanceAddiction} \cdot \text{sex}) + \\
+                     &\beta_{12} (\text{Incarcerated}) + \beta_{13} (\text{Incarcerated} \cdot \text{age}) + \beta_{14} (\text{Incarcerated} \cdot \text{sex}) + \\
+                     &\beta_{15} (\text{SeparationDivorce}) + \beta_{16} (\text{SeparationDivorce} \cdot \text{age}) + \beta_{17} (\text{SeparationDivorce} \cdot \text{sex}) + \\
+                     &\beta_{18} (\text{DomesticViolence}) + \beta_{19} (\text{DomesticViolence} \cdot \text{age}) + \beta_{20} (\text{DomesticViolence} \cdot \text{sex}) + \\
+                     &\beta_{21} (\text{PhysicalAbuse}) + \beta_{22} (\text{PhysicalAbuse} \cdot \text{age}) + \beta_{23} (\text{PhysicalAbuse} \cdot \text{sex}) + \\
+                     &\beta_{24} (\text{EmotionalAbuse}) + \beta_{25} (\text{EmotionalAbuse} \cdot \text{age}) + \beta_{26} (\text{EmotionalAbuse} \cdot \text{sex}) + \\
+                     &\beta_{27} (\text{SexualAbuse1}) + \beta_{28} (\text{SexualAbuse1} \cdot \text{age}) + \beta_{29} (text{SexualAbuse1} \cdot \text{sex}) + \\
+                     &\beta_{30} (\text{SexualAbuse2}) + \beta_{31} (\text{SexualAbuse2} \cdot \text{age}) + \beta_{32} (\text{SexualAbuse2} \cdot \text{sex}) + \\
+                     &\beta_{33} (\text{SexualAbuse3}) + \beta_{34} (\text{SexualAbuse3} \cdot \text{age}) + \beta_{35} (\text{SexualAbuse3} \cdot \text{sex}) + \\
+                     &\beta_{36} (\text{Neglect1}) + \beta_{37} (\text{Neglect1} \cdot \text{age}) + \beta_{38} (\text{Neglect1} \cdot \text{sex}) + \\ 
+                     &\beta_{39} (\text{Neglect2}) + \beta_{40} (\text{Neglect2} \cdot \text{age}) + \beta_{41} (\text{Neglect2} \cdot \text{sex}) \\
+\end{align*}
+```
+
+
+
+
 
 
 
