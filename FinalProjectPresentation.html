@@ -10,7 +10,7 @@
 <link href="FinalProjectPresentation_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.4.549">
 
-  <title>Adverse Childhood Events and Impulsive-Like Behavior</title>
+  <title>Adverse Childhood Events and Alcohol Consumption</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
@@ -325,7 +325,7 @@
     <div class="slides">
 
 <section id="title-slide" class="quarto-title-block center">
-  <h1 class="title">Adverse Childhood Events and Impulsive-Like Behavior</h1>
+  <h1 class="title">Adverse Childhood Events and Alcohol Consumption</h1>
 
 <div class="quarto-title-authors">
 </div>
@@ -333,229 +333,23 @@
 </section>
 <section id="data" class="slide level2">
 <h2>Data</h2>
+<ul>
+<li>CDC BRFFS survey</li>
+<li>“How many days per week do you consume at least one alcoholic beverage?”<br>
+</li>
+<li>13 different adverse childhood events categorized</li>
+</ul>
 </section>
 <section id="during-the-past-30-days-how-many-days-per-week-did-you-have-at-least-one-drink-of-any-alcoholic-beverage-such-as-beer-wine-a-malt-beverage-or-liquor" class="slide level2">
 <h2>During the past 30 days, how many days per week did you have at least one drink of any alcoholic beverage such as beer, wine, a malt beverage or liquor?</h2>
 <ul>
-<li>Quasipoisson regression (overdispersion = 1.234539)</li>
+<li>Those that report a history of mental illness in the household that are also between the ages of 25 to 34 show on average a 1.27 times greater number of days per week compared to females between the ages of 18-24 that report no history of an ACE (<span class="math inline">\(\beta_8 = 1.27\)</span>, <span class="math inline">\(SE = 0.09\)</span>, <span class="math inline">\(t = 2.63\)</span>, <span class="math inline">\(p = .0084\)</span>).</li>
 </ul>
-<div class="cell">
-<div class="cell-output-display">
-<table>
-<thead>
-<tr class="header">
-<th style="text-align: left;">term</th>
-<th style="text-align: right;">estimate</th>
-<th style="text-align: right;">std.error</th>
-<th style="text-align: right;">statistic</th>
-<th style="text-align: right;">p.value</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;">(Intercept)</td>
-<td style="text-align: right;">0.7518880</td>
-<td style="text-align: right;">0.0664486</td>
-<td style="text-align: right;">11.3153296</td>
-<td style="text-align: right;">0.0000000</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">age2</td>
-<td style="text-align: right;">0.1347022</td>
-<td style="text-align: right;">0.0351804</td>
-<td style="text-align: right;">3.8289007</td>
-<td style="text-align: right;">0.0001293</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">age3</td>
-<td style="text-align: right;">0.2119193</td>
-<td style="text-align: right;">0.0338327</td>
-<td style="text-align: right;">6.2637347</td>
-<td style="text-align: right;">0.0000000</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">age4</td>
-<td style="text-align: right;">0.2362130</td>
-<td style="text-align: right;">0.0333747</td>
-<td style="text-align: right;">7.0776083</td>
-<td style="text-align: right;">0.0000000</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">age5</td>
-<td style="text-align: right;">0.2870019</td>
-<td style="text-align: right;">0.0327550</td>
-<td style="text-align: right;">8.7620907</td>
-<td style="text-align: right;">0.0000000</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">age6</td>
-<td style="text-align: right;">0.3974536</td>
-<td style="text-align: right;">0.0318308</td>
-<td style="text-align: right;">12.4864475</td>
-<td style="text-align: right;">0.0000000</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">sexMale</td>
-<td style="text-align: right;">0.1380118</td>
-<td style="text-align: right;">0.0115504</td>
-<td style="text-align: right;">11.9486408</td>
-<td style="text-align: right;">0.0000000</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">race2</td>
-<td style="text-align: right;">-0.0961963</td>
-<td style="text-align: right;">0.0259806</td>
-<td style="text-align: right;">-3.7026275</td>
-<td style="text-align: right;">0.0002142</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">race3</td>
-<td style="text-align: right;">-0.2057606</td>
-<td style="text-align: right;">0.0639780</td>
-<td style="text-align: right;">-3.2161167</td>
-<td style="text-align: right;">0.0013025</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">race4</td>
-<td style="text-align: right;">-0.1233667</td>
-<td style="text-align: right;">0.0530021</td>
-<td style="text-align: right;">-2.3275820</td>
-<td style="text-align: right;">0.0199491</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">race5</td>
-<td style="text-align: right;">-0.2823326</td>
-<td style="text-align: right;">0.0332553</td>
-<td style="text-align: right;">-8.4898550</td>
-<td style="text-align: right;">0.0000000</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">race6</td>
-<td style="text-align: right;">-0.0185048</td>
-<td style="text-align: right;">0.0402463</td>
-<td style="text-align: right;">-0.4597894</td>
-<td style="text-align: right;">0.6456748</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">MentalIllness1</td>
-<td style="text-align: right;">0.0327499</td>
-<td style="text-align: right;">0.0170787</td>
-<td style="text-align: right;">1.9175861</td>
-<td style="text-align: right;">0.0551847</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Alcoholic1</td>
-<td style="text-align: right;">0.0488602</td>
-<td style="text-align: right;">0.0152422</td>
-<td style="text-align: right;">3.2055868</td>
-<td style="text-align: right;">0.0013510</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">SubstanceAddiction1</td>
-<td style="text-align: right;">0.0269375</td>
-<td style="text-align: right;">0.0229588</td>
-<td style="text-align: right;">1.1732988</td>
-<td style="text-align: right;">0.2406969</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Incarcerated1</td>
-<td style="text-align: right;">0.0174147</td>
-<td style="text-align: right;">0.0271147</td>
-<td style="text-align: right;">0.6422611</td>
-<td style="text-align: right;">0.5207147</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">SeparationDivorce1</td>
-<td style="text-align: right;">0.0163623</td>
-<td style="text-align: right;">0.0148682</td>
-<td style="text-align: right;">1.1004936</td>
-<td style="text-align: right;">0.2711369</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">DomesticViolence1</td>
-<td style="text-align: right;">-0.0233854</td>
-<td style="text-align: right;">0.0193130</td>
-<td style="text-align: right;">-1.2108640</td>
-<td style="text-align: right;">0.2259689</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">PhysicalAbuse1</td>
-<td style="text-align: right;">0.0241580</td>
-<td style="text-align: right;">0.0155287</td>
-<td style="text-align: right;">1.5557060</td>
-<td style="text-align: right;">0.1198016</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">EmotionalAbuse1</td>
-<td style="text-align: right;">-0.0112839</td>
-<td style="text-align: right;">0.0138374</td>
-<td style="text-align: right;">-0.8154661</td>
-<td style="text-align: right;">0.4148200</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">SexualAbuse11</td>
-<td style="text-align: right;">0.0564581</td>
-<td style="text-align: right;">0.0270671</td>
-<td style="text-align: right;">2.0858541</td>
-<td style="text-align: right;">0.0370107</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">SexualAbuse21</td>
-<td style="text-align: right;">0.0176296</td>
-<td style="text-align: right;">0.0315212</td>
-<td style="text-align: right;">0.5592931</td>
-<td style="text-align: right;">0.5759711</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">SexualAbuse31</td>
-<td style="text-align: right;">-0.0018520</td>
-<td style="text-align: right;">0.0373000</td>
-<td style="text-align: right;">-0.0496528</td>
-<td style="text-align: right;">0.9603998</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Neglect11</td>
-<td style="text-align: right;">-0.0476430</td>
-<td style="text-align: right;">0.0403482</td>
-<td style="text-align: right;">-1.1807957</td>
-<td style="text-align: right;">0.2377048</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">Neglect21</td>
-<td style="text-align: right;">-0.0051711</td>
-<td style="text-align: right;">0.0633987</td>
-<td style="text-align: right;">-0.0815646</td>
-<td style="text-align: right;">0.9349941</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
 </section>
-<section id="figures" class="slide level2">
-<h2>Figures</h2>
+<section id="mental-illness" class="slide level2">
+<h2>Mental Illness</h2>
 
-<img data-src="FinalProjectPresentation_files/figure-revealjs/unnamed-chunk-4-1.png" width="960" class="r-stretch"></section>
-<section id="figures-2" class="slide level2">
-<h2>Figures 2</h2>
-
-<img data-src="FinalProjectPresentation_files/figure-revealjs/unnamed-chunk-5-1.png" width="960" class="r-stretch"></section>
-<section id="figure-3" class="slide level2">
-<h2>Figure 3</h2>
-
-<img data-src="FinalProjectPresentation_files/figure-revealjs/unnamed-chunk-6-1.png" width="960" class="r-stretch"></section>
-<section id="figure-4" class="slide level2">
-<h2>Figure 4</h2>
-
-<img data-src="FinalProjectPresentation_files/figure-revealjs/unnamed-chunk-7-1.png" width="960" class="r-stretch"></section>
-<section id="figure-5" class="slide level2">
-<h2>Figure 5</h2>
-
-<img data-src="FinalProjectPresentation_files/figure-revealjs/unnamed-chunk-8-1.png" width="960" class="r-stretch"></section>
-<section id="figure-6" class="slide level2">
-<h2>Figure 6</h2>
-
-<img data-src="FinalProjectPresentation_files/figure-revealjs/unnamed-chunk-9-1.png" width="960" class="r-stretch"><div class="quarto-auto-generated-content">
+<img data-src="FinalProjectPresentation_files/figure-revealjs/unnamed-chunk-3-1.png" width="960" class="r-stretch"><div class="quarto-auto-generated-content">
 <div class="footer footer-default">
 
 </div>
